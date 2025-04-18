@@ -59,7 +59,8 @@ class CScoreboard : public CComponent
 		void reset()
 		{
 			m_Unlocked = false;
-			m_Clicked = false;;
+			m_Clicked = false;
+			;
 			m_LastMouseInput = false;
 			m_MouseInput = false;
 			m_IsDragging = false;

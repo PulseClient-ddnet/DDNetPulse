@@ -472,7 +472,7 @@ bool CControls::CheckNewInput()
 		TestInput.m_TargetY *= m_pClient->m_Camera.m_Zoom;
 	}
 
-	if (NewInput)
+	if(NewInput)
 	{
 		m_FastInput = TestInput;
 		return true;

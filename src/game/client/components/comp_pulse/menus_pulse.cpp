@@ -23,11 +23,11 @@
 #include <game/client/ui_scrollregion.h>
 #include <game/localization.h>
 
-#include "skinprofiles.h"
 #include "../binds.h"
 #include "../countryflags.h"
 #include "../menus.h"
 #include "../skins.h"
+#include "skinprofiles.h"
 
 #include <array>
 #include <chrono>
@@ -86,19 +86,18 @@ void CMenus::RenderConsoleImages(CUIRect MainView)
 	{
 		const char *apPaths[] = {
 			"pulse/assets/console",
-			"ddnet/pulse/assets/console"
-		};
+			"ddnet/pulse/assets/console"};
 
 		for(const char *pBasePath : apPaths)
 		{
 			char aPath[IO_MAX_PATH_LENGTH];
 			str_format(aPath, sizeof(aPath), "%s", pBasePath);
 			dbg_msg("console_images", "Checking path: %s", aPath);
-			
+
 			std::vector<CConsoleImage> vFiles;
 			Storage()->ListDirectory(IStorage::TYPE_ALL, aPath, ListConsoleImagesCallback, &vFiles);
 			dbg_msg("console_images", "Found %d PNG files in %s", vFiles.size(), aPath);
-			
+
 			for(CConsoleImage &Image : vFiles)
 			{
 				bool bExists = false;
@@ -117,7 +116,7 @@ void CMenus::RenderConsoleImages(CUIRect MainView)
 					char aFullPath[IO_MAX_PATH_LENGTH];
 					str_format(aFullPath, sizeof(aFullPath), "%s/%s", aPath, Image.m_aName);
 					dbg_msg("console_images", "Loading image: %s", aFullPath);
-					
+
 					if(Graphics()->LoadPng(ImgInfo, aFullPath, IStorage::TYPE_ALL))
 					{
 						Image.m_Texture = Graphics()->LoadTextureRaw(ImgInfo, 0);
@@ -240,7 +239,6 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 		CUIRect Left, Right;
 		MainView.VSplitMid(&Left, &Right);
 		Left.HSplitTop(20.0f, &Button, &Left);
-
 
 		if(DoButton_CheckBox(&g_Config.m_ClCustomConsole, Localize("Toggle Custom Console"), g_Config.m_ClCustomConsole, &Button))
 			g_Config.m_ClCustomConsole ^= 1;
@@ -670,6 +668,5 @@ void CMenus::RenderSettingsProfs(CUIRect MainView)
 		Client()->ViewFile(aTempBuf);
 	}
 }
-
 
 //TODO: Add everything to here
