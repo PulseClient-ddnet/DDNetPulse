@@ -37,7 +37,7 @@ ContinuationIndentWidth: 8
 IncludeCategories:
   - Regex:           '^"'
     Priority:        1
-  - Regex:           '^<(engine|game|mastersrv|versionsrv>'
+  - Regex:           '^<(engine|game|versionsrv>'
     Priority:        2
   - Regex:           '.*'
     Priority:        3

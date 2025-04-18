@@ -3820,7 +3820,7 @@ void CClient::LoadCustomConsole(const char *pPath)
 	CImageInfo ImgInfo;
 	bool PngLoaded = Graphics()->LoadPng(ImgInfo, aPath, IStorage::TYPE_ALL);
 
-	if (!PngLoaded || ImgInfo.m_Width == 0 || ImgInfo.m_Height == 0)
+	if(!PngLoaded || ImgInfo.m_Width == 0 || ImgInfo.m_Height == 0)
 	{
 		dbg_msg("CustomConsole", "Failed to load image info for: %s", aPath);
 		return;

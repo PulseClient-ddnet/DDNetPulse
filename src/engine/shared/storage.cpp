@@ -105,7 +105,6 @@ public:
 		Success &= CreateFolder("ghosts", TYPE_SAVE);
 		Success &= CreateFolder("teehistorian", TYPE_SAVE);
 
-
 		if(!Success)
 		{
 			log_error("storage", "failed to create default folders in the user directory");

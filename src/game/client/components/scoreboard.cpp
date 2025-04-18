@@ -48,7 +48,6 @@ struct SPopupProperties
 	static ColorRGBA TeamsActiveButtonColor() { return ColorRGBA(0.31f, 0.52f, 0.78f, 0.8f); };
 
 	static ColorRGBA ActionSpecButtonColor() { return ColorRGBA(0.2f, 1.0f, 0.2f, 0.8f); }; // Bright green color for spec
-
 };
 
 void CScoreboard::DoIconLabeledButton(CUIRect *pRect, const char *pTitle, const char *pIcon, float TextSize, float Height, ColorRGBA IconColor) const
@@ -167,7 +166,7 @@ bool CScoreboard::OnInput(const IInput::CEvent &Event)
 
 	m_Mouse.m_LastMouseInput = m_Mouse.m_MouseInput;
 	m_Mouse.m_MouseInput = m_Mouse.m_Unlocked && (Event.m_Flags & IInput::FLAG_PRESS && (Event.m_Key == KEY_MOUSE_1 || Event.m_Key == KEY_MOUSE_2));
-	
+
 	// Reset dragging state when mouse button is released
 	if(!m_Mouse.m_MouseInput && m_Mouse.m_LastMouseInput)
 	{

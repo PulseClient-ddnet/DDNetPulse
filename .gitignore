@@ -70,7 +70,6 @@ map_replace_area
 map_replace_image
 map_resave
 map_version
-mastersrv
 packetgen
 stun
 testrunner

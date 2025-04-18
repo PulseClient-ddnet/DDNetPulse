@@ -1865,8 +1865,7 @@ void CMenus::RenderSettings(CUIRect MainView)
 		Localize("DDNet"),
 		Localize("Assets"),
 		Localize("Pulse"),
-		Localize("SkinProfs.")
-	};
+		Localize("SkinProfs.")};
 	static CButtonContainer s_aTabButtons[SETTINGS_LENGTH];
 
 	for(int i = 0; i < SETTINGS_LENGTH; i++)

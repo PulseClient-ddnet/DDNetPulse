@@ -337,7 +337,6 @@ void CConsole::Print(int Level, const char *pFrom, const char *pStr, ColorRGBA P
 	{
 		log_log(LogLevel, pFrom, "%s", pStr);
 	}
-
 }
 
 void CConsole::SetTeeHistorianCommandCallback(FTeeHistorianCommandCallback pfnCallback, void *pUser)
