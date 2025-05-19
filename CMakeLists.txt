@@ -372,10 +372,8 @@ function(set_glob VAR GLOBBING EXTS DIRECTORY)
   foreach(ext ${EXTS})
     list(APPEND GLOBS "${DIRECTORY}/*.${ext}")
   endforeach()
-  file(${GLOBBING} GLOB_RESULT ${GLOBS})
+  file(${GLOBBING} GLOB_RESULT CONFIGURE_DEPENDS ${GLOBS})
   list(SORT GLOB_RESULT)
-  set(FILES)
-
   set(${VAR} ${GLOB_RESULT} PARENT_SCOPE)
 endfunction()
 
@@ -808,7 +806,7 @@ if(NOT CRYPTO_FOUND)
 endif()
 
 ########################################################################
-# DATA
+# DATAs
 ########################################################################
 
 set_glob(DATA GLOB_RECURSE "cfg;frag;json;map;otf;png;rules;ttc;ttf;txt;vert;wv" data)
