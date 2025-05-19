@@ -21,8 +21,6 @@ void CPlayerExtended::OnRender()
 	if(Client()->State() != IClient::STATE_ONLINE && Client()->State() != IClient::STATE_DEMOPLAYBACK)
 		return;
 
-	const CNetObj_Character *pPrevChar = nullptr;
-	const CNetObj_Character *pPlayerChar = nullptr;
 	int ClientId = GameClient()->m_Snap.m_LocalClientId;
 
 	if(ClientId >= 0)
@@ -31,8 +29,6 @@ void CPlayerExtended::OnRender()
 		if(CharacterInfo.m_Active)
 		{
 			const CGameClient::CClientData &ClientData = GameClient()->m_aClients[ClientId];
-			pPrevChar = &ClientData.m_RenderPrev;
-			pPlayerChar = &ClientData.m_RenderCur;
 
 			vec2 Position = ClientData.m_RenderPos;
 
