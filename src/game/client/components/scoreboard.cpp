@@ -919,23 +919,21 @@ void CScoreboard::RenderQuickActions(CUIRect *pBase)
 	Container.VSplitRight(SPopupProperties::ms_QuickActionsHeight, &Container, &Action);
 
 	// spec
-	bool IsSpec = false;
 	if(Hovered(&Action))
 	{
-		Action.Draw(IsSpec ? SPopupProperties::ActionGeneralButtonColor() : SPopupProperties::ActionSpecButtonColor(), IGraphics::CORNER_ALL, SPopupProperties::ms_Rounding);
-		DoIconButton(&Action, IsSpec ? FontIcons::FONT_ICON_EYE : FontIcons::FONT_ICON_EYE, SPopupProperties::ms_IconFontSize, TextRender()->DefaultTextColor());
+		Action.Draw(SPopupProperties::ActionSpecButtonColor(), IGraphics::CORNER_ALL, SPopupProperties::ms_Rounding);
+		DoIconButton(&Action, FontIcons::FONT_ICON_EYE, SPopupProperties::ms_IconFontSize, TextRender()->DefaultTextColor());
 	}
 	else
 	{
-		Action.Draw(IsSpec ? SPopupProperties::ActionSpecButtonColor() : SPopupProperties::ActionGeneralButtonColor(), IGraphics::CORNER_ALL, SPopupProperties::ms_Rounding);
-		DoIconButton(&Action, IsSpec ? FontIcons::FONT_ICON_EYE : FontIcons::FONT_ICON_EYE, SPopupProperties::ms_IconFontSize, TextRender()->DefaultTextColor());
+		Action.Draw(SPopupProperties::ActionGeneralButtonColor(), IGraphics::CORNER_ALL, SPopupProperties::ms_Rounding);
+		DoIconButton(&Action, FontIcons::FONT_ICON_EYE, SPopupProperties::ms_IconFontSize, TextRender()->DefaultTextColor());
 	}
 	if(DoButtonLogic(&Action))
 	{
 		if(!GameClient()->m_Snap.m_SpecInfo.m_Active)
 			Console()->ExecuteLine("say /pause");
 		GameClient()->m_Spectator.Spectate(m_Popup.m_PlayerId);
-		IsSpec = true;
 	}
 }
 
