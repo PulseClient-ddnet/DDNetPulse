@@ -8,18 +8,18 @@
 class CPlayerExtended : public CPlayers
 {
 public:
-    CPlayerExtended();
-    virtual ~CPlayerExtended() {}
+	CPlayerExtended();
+	virtual ~CPlayerExtended() {}
 
-    virtual void OnInit() override;
-    virtual void OnRender() override;
+	virtual void OnInit() override;
+	virtual void OnRender() override;
 
 private:
-    void RenderPlayerAura(vec2 Position, float Alpha, vec4 BodyColor);
-    
-    float m_LastMovementTime;
-    vec2 m_LastPosition;
-    float m_LastAlpha;
+	void RenderPlayerAura(vec2 Position, float Alpha, vec4 BodyColor);
+
+	float m_LastMovementTime;
+	vec2 m_LastPosition;
+	float m_LastAlpha;
 };
 
 #endif

@@ -27,7 +27,7 @@ void CHoverNotification::ResizeArrays()
 	{
 		SNotification *pNewNotifications = new SNotification[NewMaxNotifications];
 		int NewNumActive = 0;
-		
+
 		for(int i = 0; i < m_MaxNotifications && NewNumActive < NewMaxNotifications; i++)
 		{
 			if(m_aNotifications[i].m_Active)
@@ -36,7 +36,7 @@ void CHoverNotification::ResizeArrays()
 				NewNumActive++;
 			}
 		}
-		
+
 		for(int i = NewNumActive; i < NewMaxNotifications; i++)
 		{
 			pNewNotifications[i].m_Active = false;
@@ -45,7 +45,7 @@ void CHoverNotification::ResizeArrays()
 			pNewNotifications[i].m_aText[0] = '\0';
 			pNewNotifications[i].m_Position = vec2(0, 0);
 		}
-		
+
 		delete[] m_aNotifications;
 		m_aNotifications = pNewNotifications;
 		m_MaxNotifications = NewMaxNotifications;
@@ -56,20 +56,20 @@ void CHoverNotification::ResizeArrays()
 	{
 		SNotification *pNewHistory = new SNotification[NewMaxHistory];
 		int NewHistoryCount = 0;
-		
+
 		for(int i = 0; i < m_HistoryCount && NewHistoryCount < NewMaxHistory; i++)
 		{
 			int OldIndex = (m_HistoryIndex - 1 - i + m_MaxHistory) % m_MaxHistory;
 			pNewHistory[NewHistoryCount] = m_aHistory[OldIndex];
 			NewHistoryCount++;
 		}
-		
+
 		for(int i = NewHistoryCount; i < NewMaxHistory; i++)
 		{
 			pNewHistory[i].m_aText[0] = '\0';
 			pNewHistory[i].m_StartTime = 0;
 		}
-		
+
 		delete[] m_aHistory;
 		m_aHistory = pNewHistory;
 		m_MaxHistory = NewMaxHistory;
@@ -120,7 +120,7 @@ void CHoverNotification::AddToHistory(const char *pText)
 
 	str_copy(m_aHistory[m_HistoryIndex].m_aText, pText, sizeof(m_aHistory[m_HistoryIndex].m_aText));
 	m_aHistory[m_HistoryIndex].m_StartTime = time_get();
-	
+
 	m_HistoryIndex = (m_HistoryIndex + 1) % m_MaxHistory;
 	if(m_HistoryCount < m_MaxHistory)
 		m_HistoryCount++;

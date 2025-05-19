@@ -1093,7 +1093,7 @@ void CGameConsole::OnRender()
 		Graphics()->QuadsSetSubset(0, 0, Screen.w / 80.0f, ConsoleHeight / 80.0f);
 
 		IGraphics::CQuadItem QuadItemBackground(0.0f, 0.0f, Screen.w, ConsoleHeight);
-			Graphics()->QuadsDrawTL(&QuadItemBackground, 1);
+		Graphics()->QuadsDrawTL(&QuadItemBackground, 1);
 		Graphics()->QuadsEnd();
 	}
 	else

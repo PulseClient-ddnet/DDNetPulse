@@ -1,8 +1,8 @@
 #ifndef GAME_CLIENT_COMPONENTS_HOVER_NOTIFICATION_H
 #define GAME_CLIENT_COMPONENTS_HOVER_NOTIFICATION_H
 
-#include <game/client/component.h>
 #include <engine/shared/config.h>
+#include <game/client/component.h>
 
 struct SNotification
 {
