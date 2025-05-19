@@ -398,9 +398,6 @@ void CItems::RenderLaser(vec2 From, vec2 Pos, ColorRGBA OuterColor, ColorRGBA In
 				a = clamp(a, 0.0f, 1.0f);
 				float Ia = 1 - a;
 
-				Graphics()->TextureClear();
-				Graphics()->QuadsBegin();
-
 				// do outline
 				Graphics()->SetColor(OuterColor);
 				vec2 Out = vec2(Dir.y, -Dir.x) * (7.0f * Ia);

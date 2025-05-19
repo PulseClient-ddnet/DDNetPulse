@@ -28,20 +28,13 @@ else()
   project(DDNet VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
 endif()
 
-# Find and configure ASIO
-find_path(ASIO_INCLUDE_DIR asio.hpp
-    PATHS
-    /usr/include
-    /usr/local/include
-    /opt/local/include
-)
-
-if(NOT ASIO_INCLUDE_DIR)
-    message(FATAL_ERROR "ASIO not found. Please install ASIO development package.")
-endif()
-
 # Add socket.io-client-cpp
+set(USE_SUBMODULES ON)
+
+set(_old_compile_options "${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w -include algorithm")
 add_subdirectory(src/engine/external/socket.io-client-cpp)
+set(CMAKE_CXX_FLAGS "${_old_compile_options}")
 
 set(ORIGINAL_CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH})
 set(ORIGINAL_CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES})

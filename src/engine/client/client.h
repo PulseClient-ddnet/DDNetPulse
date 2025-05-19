@@ -417,7 +417,7 @@ public:
 	void Run();
 
 	void LoadCustomConsole(const char *pPath);
-	void LoadConsoleBackground(int ConsoleType);
+	void LoadConsoleBackground(int ConsoleType) override;
 
 	bool InitNetworkClient(char *pError, size_t ErrorSize);
 	bool CtrlShiftKey(int Key, bool &Last);
