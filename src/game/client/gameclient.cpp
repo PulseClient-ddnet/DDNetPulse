@@ -2374,7 +2374,7 @@ void CGameClient::OnPredict()
 	if(PredictDummy())
 		pDummyChar = m_PredictedWorld.GetCharacterById(m_PredictedDummyId);
 
-	int PredictionTick = Client()->GetPredictionTick();
+	// int PredictionTick = Client()->GetPredictionTick();
 	// predict
 	int FinalTick = Client()->PredGameTick(g_Config.m_ClDummy) + g_Config.m_ClFastInp;
 	for(int Tick = Client()->GameTick(g_Config.m_ClDummy) + 1; Tick <= FinalTick; Tick++)

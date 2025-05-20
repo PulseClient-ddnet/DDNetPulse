@@ -40,8 +40,6 @@
 using namespace FontIcons;
 using namespace std::chrono_literals;
 
-static bool s_IsConnected = false;
-
 const float FontSize = 14.0f;
 const float Margin = 10.0f;
 const float HeaderHeight = FontSize + 5.0f + Margin;
@@ -303,7 +301,7 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 
 		// Right Column - Visual Effects
 		{
-			CUIRect Section, Label;
+			CUIRect Section;
 			Right.HSplitTop(40.0f, &Section, &Right);
 			Ui()->DoLabel(&Section, Localize("Visual Effects"), 20.0f, TEXTALIGN_MC);
 			Right.HSplitTop(10.0f, nullptr, &Right);

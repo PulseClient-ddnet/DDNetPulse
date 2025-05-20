@@ -303,7 +303,19 @@ void CLayerTele::FillSelection(bool Empty, std::shared_ptr<CLayer> pBrush, CUIRe
 	FlagModified(sx, sy, w, h);
 }
 
-bool CLayerTele::ContainsElementWithId(int Id, bool Checkpoint)
+int CLayerTele::FindNextFreeNumber(bool Checkpoint) const
+{
+	for(int i = 1; i <= 255; i++)
+	{
+		if(!ContainsElementWithId(i, Checkpoint))
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
+bool CLayerTele::ContainsElementWithId(int Id, bool Checkpoint) const
 {
 	for(int y = 0; y < m_Height; ++y)
 	{
@@ -332,6 +344,8 @@ void CLayerTele::GetPos(int Number, int Offset, int &TeleX, int &TeleY)
 			for(int y = 0; y < m_Height; y++)
 			{
 				int i = y * m_Width + x;
+				if(!IsTeleTileNumberUsedAny(m_pTeleTile[i].m_Type))
+					continue;
 				int Tele = m_pTeleTile[i].m_Number;
 				if(Number == Tele)
 				{

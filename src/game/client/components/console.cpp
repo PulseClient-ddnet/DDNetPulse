@@ -1093,7 +1093,7 @@ void CGameConsole::OnRender()
 		Graphics()->QuadsSetSubset(0, 0, Screen.w / 80.0f, ConsoleHeight / 80.0f);
 
 		IGraphics::CQuadItem QuadItemBackground(0.0f, 0.0f, Screen.w, ConsoleHeight);
-			Graphics()->QuadsDrawTL(&QuadItemBackground, 1);
+		Graphics()->QuadsDrawTL(&QuadItemBackground, 1);
 		Graphics()->QuadsEnd();
 	}
 	else
@@ -1216,6 +1216,10 @@ void CGameConsole::OnRender()
 			if(pConsole->m_MousePress.y >= pConsole->m_BoundingBox.m_Y && pConsole->m_MousePress.y < pConsole->m_BoundingBox.m_Y + pConsole->m_BoundingBox.m_H)
 			{
 				CLineInput::SMouseSelection *pMouseSelection = pConsole->m_Input.GetMouseSelection();
+				if(pMouseSelection->m_Selecting && !pConsole->m_MouseIsPress && pConsole->m_Input.IsActive())
+				{
+					Input()->EnsureScreenKeyboardShown();
+				}
 				pMouseSelection->m_Selecting = pConsole->m_MouseIsPress;
 				pMouseSelection->m_PressMouse = pConsole->m_MousePress;
 				pMouseSelection->m_ReleaseMouse = pConsole->m_MouseRelease;
