@@ -332,136 +332,37 @@ void CItems::RenderLaser(vec2 From, vec2 Pos, ColorRGBA OuterColor, ColorRGBA In
 			Graphics()->TextureClear();
 			Graphics()->QuadsBegin();
 
-			// Outer glow layers
-			// Layer 12 (outermost, very faint)
-			Graphics()->SetColor(OuterColor.WithMultipliedAlpha(0.02f * (GlowIntensity / 100)));
-			vec2 Out = vec2(Dir.y, -Dir.x) * (24.0f * Ia * (GlowIntensity / 100));
-			IGraphics::CFreeformItem Freeform(
-				From.x - Out.x, From.y - Out.y,
-				From.x + Out.x, From.y + Out.y,
-				Pos.x - Out.x, Pos.y - Out.y,
-				Pos.x + Out.x, Pos.y + Out.y);
-			Graphics()->QuadsDrawFreeform(&Freeform, 1);
+			constexpr int NumLayers = 13;
 
-			// Layer 11
-			Graphics()->SetColor(OuterColor.WithMultipliedAlpha(0.03f * (GlowIntensity / 100)));
-			Out = vec2(Dir.y, -Dir.x) * (22.0f * Ia * (GlowIntensity / 100));
-			Freeform = IGraphics::CFreeformItem(
-				From.x - Out.x, From.y - Out.y,
-				From.x + Out.x, From.y + Out.y,
-				Pos.x - Out.x, Pos.y - Out.y,
-				Pos.x + Out.x, Pos.y + Out.y);
-			Graphics()->QuadsDrawFreeform(&Freeform, 1);
+			const float Alphas[NumLayers] = {
+				0.02f, 0.03f, 0.04f, 0.05f, 0.06f, 0.08f, 0.10f,
+				0.15f, 0.25f, 0.45f, 0.65f, 0.85f, 1.0f
+			    };
+			const float Widths[NumLayers] = {
+				24.0f, 22.0f, 20.0f, 18.0f, 16.0f, 14.0f, 12.0f,
+				10.0f, 8.0f, 6.0f, 4.0f, 3.0f, 2.0f
+			    };
 
-			// Layer 10
-			Graphics()->SetColor(OuterColor.WithMultipliedAlpha(0.04f * (GlowIntensity / 100)));
-			Out = vec2(Dir.y, -Dir.x) * (20.0f * Ia * (GlowIntensity / 100));
-			Freeform = IGraphics::CFreeformItem(
-				From.x - Out.x, From.y - Out.y,
-				From.x + Out.x, From.y + Out.y,
-				Pos.x - Out.x, Pos.y - Out.y,
-				Pos.x + Out.x, Pos.y + Out.y);
-			Graphics()->QuadsDrawFreeform(&Freeform, 1);
+			for(int i = 0; i < NumLayers; ++i)
+			{
+				float Alpha = Alphas[i] * (GlowIntensity / 100.0f);
+				float Offset = Widths[i] * Ia * (GlowIntensity / 100.0f);
+				vec2 Out = vec2(Dir.y, -Dir.x) * Offset;
 
-			// Layer 9
-			Graphics()->SetColor(OuterColor.WithMultipliedAlpha(0.05f * (GlowIntensity / 100)));
-			Out = vec2(Dir.y, -Dir.x) * (18.0f * Ia * (GlowIntensity / 100));
-			Freeform = IGraphics::CFreeformItem(
-				From.x - Out.x, From.y - Out.y,
-				From.x + Out.x, From.y + Out.y,
-				Pos.x - Out.x, Pos.y - Out.y,
-				Pos.x + Out.x, Pos.y + Out.y);
-			Graphics()->QuadsDrawFreeform(&Freeform, 1);
+				ColorRGBA Color = (i == NumLayers - 1)
+				    ? ColorRGBA(1.0f, 1.0f, 1.0f, Alpha)
+				    : (i >= NumLayers - 2
+					? InnerColor.WithMultipliedAlpha(Alpha)
+					: OuterColor.WithMultipliedAlpha(Alpha));
 
-			// Layer 8
-			Graphics()->SetColor(OuterColor.WithMultipliedAlpha(0.06f * (GlowIntensity / 100)));
-			Out = vec2(Dir.y, -Dir.x) * (16.0f * Ia * (GlowIntensity / 100));
-			Freeform = IGraphics::CFreeformItem(
-				From.x - Out.x, From.y - Out.y,
-				From.x + Out.x, From.y + Out.y,
-				Pos.x - Out.x, Pos.y - Out.y,
-				Pos.x + Out.x, Pos.y + Out.y);
-			Graphics()->QuadsDrawFreeform(&Freeform, 1);
-
-			// Layer 7
-			Graphics()->SetColor(OuterColor.WithMultipliedAlpha(0.08f * (GlowIntensity / 100)));
-			Out = vec2(Dir.y, -Dir.x) * (14.0f * Ia * (GlowIntensity / 100));
-			Freeform = IGraphics::CFreeformItem(
-				From.x - Out.x, From.y - Out.y,
-				From.x + Out.x, From.y + Out.y,
-				Pos.x - Out.x, Pos.y - Out.y,
-				Pos.x + Out.x, Pos.y + Out.y);
-			Graphics()->QuadsDrawFreeform(&Freeform, 1);
-
-			// Layer 6
-			Graphics()->SetColor(OuterColor.WithMultipliedAlpha(0.10f * (GlowIntensity / 100)));
-			Out = vec2(Dir.y, -Dir.x) * (12.0f * Ia * (GlowIntensity / 100));
-			Freeform = IGraphics::CFreeformItem(
-				From.x - Out.x, From.y - Out.y,
-				From.x + Out.x, From.y + Out.y,
-				Pos.x - Out.x, Pos.y - Out.y,
-				Pos.x + Out.x, Pos.y + Out.y);
-			Graphics()->QuadsDrawFreeform(&Freeform, 1);
-
-			// Layer 5
-			Graphics()->SetColor(OuterColor.WithMultipliedAlpha(0.15f * (GlowIntensity / 100)));
-			Out = vec2(Dir.y, -Dir.x) * (10.0f * Ia * (GlowIntensity / 100));
-			Freeform = IGraphics::CFreeformItem(
-				From.x - Out.x, From.y - Out.y,
-				From.x + Out.x, From.y + Out.y,
-				Pos.x - Out.x, Pos.y - Out.y,
-				Pos.x + Out.x, Pos.y + Out.y);
-			Graphics()->QuadsDrawFreeform(&Freeform, 1);
-
-			// Layer 4
-			Graphics()->SetColor(OuterColor.WithMultipliedAlpha(0.25f * (GlowIntensity / 100)));
-			Out = vec2(Dir.y, -Dir.x) * (8.0f * Ia * (GlowIntensity / 100));
-			Freeform = IGraphics::CFreeformItem(
-				From.x - Out.x, From.y - Out.y,
-				From.x + Out.x, From.y + Out.y,
-				Pos.x - Out.x, Pos.y - Out.y,
-				Pos.x + Out.x, Pos.y + Out.y);
-			Graphics()->QuadsDrawFreeform(&Freeform, 1);
-
-			// Layer 3
-			Graphics()->SetColor(OuterColor.WithMultipliedAlpha(0.45f * (GlowIntensity / 100)));
-			Out = vec2(Dir.y, -Dir.x) * (6.0f * Ia * (GlowIntensity / 100));
-			Freeform = IGraphics::CFreeformItem(
-				From.x - Out.x, From.y - Out.y,
-				From.x + Out.x, From.y + Out.y,
-				Pos.x - Out.x, Pos.y - Out.y,
-				Pos.x + Out.x, Pos.y + Out.y);
-			Graphics()->QuadsDrawFreeform(&Freeform, 1);
-
-			// Layer 2
-			Graphics()->SetColor(OuterColor.WithMultipliedAlpha(0.65f * (GlowIntensity / 100)));
-			Out = vec2(Dir.y, -Dir.x) * (4.0f * Ia * (GlowIntensity / 100));
-			Freeform = IGraphics::CFreeformItem(
-				From.x - Out.x, From.y - Out.y,
-				From.x + Out.x, From.y + Out.y,
-				Pos.x - Out.x, Pos.y - Out.y,
-				Pos.x + Out.x, Pos.y + Out.y);
-			Graphics()->QuadsDrawFreeform(&Freeform, 1);
-
-			// Layer 1 (inner glow)
-			Graphics()->SetColor(InnerColor.WithMultipliedAlpha(0.85f * (GlowIntensity / 100)));
-			Out = vec2(Dir.y, -Dir.x) * (3.0f * Ia * (GlowIntensity / 100));
-			Freeform = IGraphics::CFreeformItem(
-				From.x - Out.x, From.y - Out.y,
-				From.x + Out.x, From.y + Out.y,
-				Pos.x - Out.x, Pos.y - Out.y,
-				Pos.x + Out.x, Pos.y + Out.y);
-			Graphics()->QuadsDrawFreeform(&Freeform, 1);
-
-			// Core (bright white)
-			Graphics()->SetColor(ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f * (GlowIntensity / 100)));
-			Out = vec2(Dir.y, -Dir.x) * (2.0f * Ia * (GlowIntensity / 100));
-			Freeform = IGraphics::CFreeformItem(
-				From.x - Out.x, From.y - Out.y,
-				From.x + Out.x, From.y + Out.y,
-				Pos.x - Out.x, Pos.y - Out.y,
-				Pos.x + Out.x, Pos.y + Out.y);
-			Graphics()->QuadsDrawFreeform(&Freeform, 1);
+				Graphics()->SetColor(Color);
+				IGraphics::CFreeformItem Freeform(
+				    From.x - Out.x, From.y - Out.y,
+				    From.x + Out.x, From.y + Out.y,
+				    Pos.x - Out.x, Pos.y - Out.y,
+				    Pos.x + Out.x, Pos.y + Out.y);
+				Graphics()->QuadsDrawFreeform(&Freeform, 1);
+			}
 
 			Graphics()->QuadsEnd();
 		}
