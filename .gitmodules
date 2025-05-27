@@ -4,5 +4,5 @@
 	shallow = true
 [submodule "ddnet-libs"]
 	path = ddnet-libs
-	url = https://github.com/ddnet/ddnet-libs
+	url = https://github.com/PulseClient-ddnet/pulse-libs
 	shallow = true

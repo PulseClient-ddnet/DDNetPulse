@@ -318,103 +318,144 @@ void CItems::RenderLaser(vec2 From, vec2 Pos, ColorRGBA OuterColor, ColorRGBA In
 {
 	int TuneZone = (Client()->State() == IClient::STATE_ONLINE && GameClient()->m_GameWorld.m_WorldConfig.m_UseTuneZones) ? Collision()->IsTune(Collision()->GetMapIndex(From)) : 0;
 	float Len = distance(Pos, From);
-	if(g_Config.m_ClBetterLasers && Len > 0)
+	if(g_Config.m_ClBetterLasers)
 	{
-		vec2 Dir, Out;
-		float Ms, a, Ia;
-		IGraphics::CFreeformItem Freeform;
-
-		Dir = normalize_pre_length(Pos - From, Len);
-
-		Ms = TicksBody * 1000.0f / Client()->GameTickSpeed();
-		a = Ms / m_pClient->GetTuning(TuneZone)->m_LaserBounceDelay;
-		a = clamp(a, 0.0f, 1.0f);
-		Ia = 1 - a;
-
-		Graphics()->TextureClear();
-		Graphics()->QuadsBegin();
-
-		// Outer glow layers
-		// Layer 12 (outermost, very faint)
-		Graphics()->SetColor(OuterColor.WithMultipliedAlpha(0.02f * (GlowIntensity / 100)));
-		Out = vec2(Dir.y, -Dir.x) * (24.0f * Ia * (GlowIntensity / 100));
-		Freeform = {
-			From.x - Out.x, From.y - Out.y,
-			From.x + Out.x, From.y + Out.y,
-			Pos.x - Out.x, Pos.y - Out.y,
-			Pos.x + Out.x, Pos.y + Out.y};
-		Graphics()->QuadsDrawFreeform(&Freeform, 1);
-
-		// Layer 11
-		Graphics()->SetColor(OuterColor.WithMultipliedAlpha(0.03f * (GlowIntensity / 100)));
-		Out = vec2(Dir.y, -Dir.x) * (22.0f * Ia * (GlowIntensity / 100));
-		Freeform = IGraphics::CFreeformItem(
-			From.x - Out.x, From.y - Out.y,
-			From.x + Out.x, From.y + Out.y,
-			Pos.x - Out.x, Pos.y - Out.y,
-			Pos.x + Out.x, Pos.y + Out.y);
-		Graphics()->QuadsDrawFreeform(&Freeform, 1);
-
-		// Layer 10
-		Graphics()->SetColor(OuterColor.WithMultipliedAlpha(0.04f * (GlowIntensity / 100)));
-		Out = vec2(Dir.y, -Dir.x) * (20.0f * Ia * (GlowIntensity / 100));
-		Freeform = IGraphics::CFreeformItem(
-			From.x - Out.x, From.y - Out.y,
-			From.x + Out.x, From.y + Out.y,
-			Pos.x - Out.x, Pos.y - Out.y,
-			Pos.x + Out.x, Pos.y + Out.y);
-		Graphics()->QuadsDrawFreeform(&Freeform, 1);
-
-		// Layer 9
-		Graphics()->SetColor(OuterColor.WithMultipliedAlpha(0.05f * (GlowIntensity / 100)));
-		Out = vec2(Dir.y, -Dir.x) * (18.0f * Ia * (GlowIntensity / 100));
-		Freeform = IGraphics::CFreeformItem(
-			From.x - Out.x, From.y - Out.y,
-			From.x + Out.x, From.y + Out.y,
-			Pos.x - Out.x, Pos.y - Out.y,
-			Pos.x + Out.x, Pos.y + Out.y);
-		Graphics()->QuadsDrawFreeform(&Freeform, 1);
-
-		// Layer 8
-		Graphics()->SetColor(OuterColor.WithMultipliedAlpha(0.06f * (GlowIntensity / 100)));
-		Out = vec2(Dir.y, -Dir.x) * (16.0f * Ia * (GlowIntensity / 100));
-		Freeform = IGraphics::CFreeformItem(
-			From.x - Out.x, From.y - Out.y,
-			From.x + Out.x, From.y + Out.y,
-			Pos.x - Out.x, Pos.y - Out.y,
-			Pos.x + Out.x, Pos.y + Out.y);
-		Graphics()->QuadsDrawFreeform(&Freeform, 1);
-
 		if(Len > 0)
 		{
-			if(Type == LASERTYPE_DRAGGER)
-			{
-				// rubber band effect
-				float Thickness = std::sqrt(Len) / 5.f;
-				TicksBody = clamp(Thickness, 1.0f, 5.0f);
-			}
-			Dir = normalize_pre_length(Pos - From, Len);
+			vec2 Dir = normalize_pre_length(Pos - From, Len);
 
-			Ms = TicksBody * 1000.0f / Client()->GameTickSpeed();
-			a = Ms / m_pClient->GetTuning(TuneZone)->m_LaserBounceDelay;
+			float Ms = TicksBody * 1000.0f / Client()->GameTickSpeed();
+			float a = Ms / m_pClient->GetTuning(TuneZone)->m_LaserBounceDelay;
 			a = clamp(a, 0.0f, 1.0f);
-			Ia = 1 - a;
+			float Ia = 1 - a;
 
-			// do outline
-			Graphics()->SetColor(OuterColor);
-			Out = vec2(Dir.y, -Dir.x) * (7.0f * Ia);
+			Graphics()->TextureClear();
+			Graphics()->QuadsBegin();
 
-			Freeform = {
+			// Outer glow layers
+			// Layer 12 (outermost, very faint)
+			Graphics()->SetColor(OuterColor.WithMultipliedAlpha(0.02f * (GlowIntensity / 100)));
+			vec2 Out = vec2(Dir.y, -Dir.x) * (24.0f * Ia * (GlowIntensity / 100));
+			IGraphics::CFreeformItem Freeform(
 				From.x - Out.x, From.y - Out.y,
 				From.x + Out.x, From.y + Out.y,
 				Pos.x - Out.x, Pos.y - Out.y,
-				Pos.x + Out.x, Pos.y + Out.y};
+				Pos.x + Out.x, Pos.y + Out.y);
 			Graphics()->QuadsDrawFreeform(&Freeform, 1);
 
-			// do inner
-			Out = vec2(Dir.y, -Dir.x) * (5.0f * Ia);
-			Graphics()->SetColor(InnerColor); // center
+			// Layer 11
+			Graphics()->SetColor(OuterColor.WithMultipliedAlpha(0.03f * (GlowIntensity / 100)));
+			Out = vec2(Dir.y, -Dir.x) * (22.0f * Ia * (GlowIntensity / 100));
+			Freeform = IGraphics::CFreeformItem(
+				From.x - Out.x, From.y - Out.y,
+				From.x + Out.x, From.y + Out.y,
+				Pos.x - Out.x, Pos.y - Out.y,
+				Pos.x + Out.x, Pos.y + Out.y);
+			Graphics()->QuadsDrawFreeform(&Freeform, 1);
 
+			// Layer 10
+			Graphics()->SetColor(OuterColor.WithMultipliedAlpha(0.04f * (GlowIntensity / 100)));
+			Out = vec2(Dir.y, -Dir.x) * (20.0f * Ia * (GlowIntensity / 100));
+			Freeform = IGraphics::CFreeformItem(
+				From.x - Out.x, From.y - Out.y,
+				From.x + Out.x, From.y + Out.y,
+				Pos.x - Out.x, Pos.y - Out.y,
+				Pos.x + Out.x, Pos.y + Out.y);
+			Graphics()->QuadsDrawFreeform(&Freeform, 1);
+
+			// Layer 9
+			Graphics()->SetColor(OuterColor.WithMultipliedAlpha(0.05f * (GlowIntensity / 100)));
+			Out = vec2(Dir.y, -Dir.x) * (18.0f * Ia * (GlowIntensity / 100));
+			Freeform = IGraphics::CFreeformItem(
+				From.x - Out.x, From.y - Out.y,
+				From.x + Out.x, From.y + Out.y,
+				Pos.x - Out.x, Pos.y - Out.y,
+				Pos.x + Out.x, Pos.y + Out.y);
+			Graphics()->QuadsDrawFreeform(&Freeform, 1);
+
+			// Layer 8
+			Graphics()->SetColor(OuterColor.WithMultipliedAlpha(0.06f * (GlowIntensity / 100)));
+			Out = vec2(Dir.y, -Dir.x) * (16.0f * Ia * (GlowIntensity / 100));
+			Freeform = IGraphics::CFreeformItem(
+				From.x - Out.x, From.y - Out.y,
+				From.x + Out.x, From.y + Out.y,
+				Pos.x - Out.x, Pos.y - Out.y,
+				Pos.x + Out.x, Pos.y + Out.y);
+			Graphics()->QuadsDrawFreeform(&Freeform, 1);
+
+			// Layer 7
+			Graphics()->SetColor(OuterColor.WithMultipliedAlpha(0.08f * (GlowIntensity / 100)));
+			Out = vec2(Dir.y, -Dir.x) * (14.0f * Ia * (GlowIntensity / 100));
+			Freeform = IGraphics::CFreeformItem(
+				From.x - Out.x, From.y - Out.y,
+				From.x + Out.x, From.y + Out.y,
+				Pos.x - Out.x, Pos.y - Out.y,
+				Pos.x + Out.x, Pos.y + Out.y);
+			Graphics()->QuadsDrawFreeform(&Freeform, 1);
+
+			// Layer 6
+			Graphics()->SetColor(OuterColor.WithMultipliedAlpha(0.10f * (GlowIntensity / 100)));
+			Out = vec2(Dir.y, -Dir.x) * (12.0f * Ia * (GlowIntensity / 100));
+			Freeform = IGraphics::CFreeformItem(
+				From.x - Out.x, From.y - Out.y,
+				From.x + Out.x, From.y + Out.y,
+				Pos.x - Out.x, Pos.y - Out.y,
+				Pos.x + Out.x, Pos.y + Out.y);
+			Graphics()->QuadsDrawFreeform(&Freeform, 1);
+
+			// Layer 5
+			Graphics()->SetColor(OuterColor.WithMultipliedAlpha(0.15f * (GlowIntensity / 100)));
+			Out = vec2(Dir.y, -Dir.x) * (10.0f * Ia * (GlowIntensity / 100));
+			Freeform = IGraphics::CFreeformItem(
+				From.x - Out.x, From.y - Out.y,
+				From.x + Out.x, From.y + Out.y,
+				Pos.x - Out.x, Pos.y - Out.y,
+				Pos.x + Out.x, Pos.y + Out.y);
+			Graphics()->QuadsDrawFreeform(&Freeform, 1);
+
+			// Layer 4
+			Graphics()->SetColor(OuterColor.WithMultipliedAlpha(0.25f * (GlowIntensity / 100)));
+			Out = vec2(Dir.y, -Dir.x) * (8.0f * Ia * (GlowIntensity / 100));
+			Freeform = IGraphics::CFreeformItem(
+				From.x - Out.x, From.y - Out.y,
+				From.x + Out.x, From.y + Out.y,
+				Pos.x - Out.x, Pos.y - Out.y,
+				Pos.x + Out.x, Pos.y + Out.y);
+			Graphics()->QuadsDrawFreeform(&Freeform, 1);
+
+			// Layer 3
+			Graphics()->SetColor(OuterColor.WithMultipliedAlpha(0.45f * (GlowIntensity / 100)));
+			Out = vec2(Dir.y, -Dir.x) * (6.0f * Ia * (GlowIntensity / 100));
+			Freeform = IGraphics::CFreeformItem(
+				From.x - Out.x, From.y - Out.y,
+				From.x + Out.x, From.y + Out.y,
+				Pos.x - Out.x, Pos.y - Out.y,
+				Pos.x + Out.x, Pos.y + Out.y);
+			Graphics()->QuadsDrawFreeform(&Freeform, 1);
+
+			// Layer 2
+			Graphics()->SetColor(OuterColor.WithMultipliedAlpha(0.65f * (GlowIntensity / 100)));
+			Out = vec2(Dir.y, -Dir.x) * (4.0f * Ia * (GlowIntensity / 100));
+			Freeform = IGraphics::CFreeformItem(
+				From.x - Out.x, From.y - Out.y,
+				From.x + Out.x, From.y + Out.y,
+				Pos.x - Out.x, Pos.y - Out.y,
+				Pos.x + Out.x, Pos.y + Out.y);
+			Graphics()->QuadsDrawFreeform(&Freeform, 1);
+
+			// Layer 1 (inner glow)
+			Graphics()->SetColor(InnerColor.WithMultipliedAlpha(0.85f * (GlowIntensity / 100)));
+			Out = vec2(Dir.y, -Dir.x) * (3.0f * Ia * (GlowIntensity / 100));
+			Freeform = IGraphics::CFreeformItem(
+				From.x - Out.x, From.y - Out.y,
+				From.x + Out.x, From.y + Out.y,
+				Pos.x - Out.x, Pos.y - Out.y,
+				Pos.x + Out.x, Pos.y + Out.y);
+			Graphics()->QuadsDrawFreeform(&Freeform, 1);
+
+			// Core (bright white)
+			Graphics()->SetColor(ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f * (GlowIntensity / 100)));
+			Out = vec2(Dir.y, -Dir.x) * (2.0f * Ia * (GlowIntensity / 100));
 			Freeform = IGraphics::CFreeformItem(
 				From.x - Out.x, From.y - Out.y,
 				From.x + Out.x, From.y + Out.y,
@@ -425,45 +466,40 @@ void CItems::RenderLaser(vec2 From, vec2 Pos, ColorRGBA OuterColor, ColorRGBA In
 			Graphics()->QuadsEnd();
 		}
 	}
-
-	// render head
-	if(Type == LASERTYPE_DOOR)
+	else
 	{
-		Graphics()->TextureClear();
-		Graphics()->QuadsSetRotation(0);
-		Graphics()->SetColor(OuterColor);
-		Graphics()->RenderQuadContainerEx(m_ItemsQuadContainerIndex, m_DoorHeadOffset, 1, Pos.x - 8.0f, Pos.y - 8.0f);
-		Graphics()->SetColor(InnerColor);
-		Graphics()->RenderQuadContainerEx(m_ItemsQuadContainerIndex, m_DoorHeadOffset, 1, Pos.x - 6.0f, Pos.y - 6.0f, 6.f / 8.f, 6.f / 8.f);
-	}
-	else if(Type == LASERTYPE_DRAGGER)
-	{
-		Graphics()->TextureSet(GameClient()->m_ExtrasSkin.m_SpritePulley);
-		for(int Inner = 0; Inner < 2; ++Inner)
+		if(Len > 0)
 		{
-			Graphics()->SetColor(Inner ? InnerColor : OuterColor);
-
-			float Size = Inner ? 4.f / 5.f : 1.f;
-
-			// circle at laser end
-			if(Len > 0)
-			{
-				Graphics()->QuadsSetRotation(0);
-				Graphics()->RenderQuadContainerAsSprite(m_ItemsQuadContainerIndex, m_PulleyHeadOffset, From.x, From.y, Size, Size);
-			}
-
-			//rotating orbs
-			Size = Inner ? 0.75f - 1.f / 5.f : 0.75f;
-			for(int Orb = 0; Orb < 3; ++Orb)
-			{
-				vec2 Offset(10.f, 0);
-				Offset = rotate(Offset, Orb * 120 + TicksHead);
-				Graphics()->QuadsSetRotation(TicksHead + Orb * pi * 2.f / 3.f); // rotate the sprite as well, as it might be customized
-				Graphics()->RenderQuadContainerAsSprite(m_ItemsQuadContainerIndex, m_PulleyHeadOffset, From.x + Offset.x, From.y + Offset.y, Size, Size);
-			}
+			vec2 Dir = normalize_pre_length(Pos - From, Len);
+			float Ms = TicksBody * 1000.0f / Client()->GameTickSpeed();
+			float a = Ms / m_pClient->GetTuning(TuneZone)->m_LaserBounceDelay;
+			a = clamp(a, 0.0f, 1.0f);
+			float Ia = 1 - a;
+			Graphics()->TextureClear();
+			Graphics()->QuadsBegin();
+			// do outline
+			Graphics()->SetColor(OuterColor);
+			vec2 Out = vec2(Dir.y, -Dir.x) * (7.0f * Ia);
+			IGraphics::CFreeformItem Freeform(
+				From.x - Out.x, From.y - Out.y,
+				From.x + Out.x, From.y + Out.y,
+				Pos.x - Out.x, Pos.y - Out.y,
+				Pos.x + Out.x, Pos.y + Out.y);
+			Graphics()->QuadsDrawFreeform(&Freeform, 1);
+			// do inner
+			Out = vec2(Dir.y, -Dir.x) * (5.0f * Ia);
+			Graphics()->SetColor(InnerColor); // center
+			Freeform = IGraphics::CFreeformItem(
+				From.x - Out.x, From.y - Out.y,
+				From.x + Out.x, From.y + Out.y,
+				Pos.x - Out.x, Pos.y - Out.y,
+				Pos.x + Out.x, Pos.y + Out.y);
+			Graphics()->QuadsDrawFreeform(&Freeform, 1);
+			Graphics()->QuadsEnd();
 		}
 	}
-	else
+
+	// render head
 	{
 		int CurParticle = (int)TicksHead % 3;
 		Graphics()->TextureSet(GameClient()->m_ParticlesSkin.m_aSpriteParticleSplat[CurParticle]);
