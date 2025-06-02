@@ -404,28 +404,33 @@ void CItems::RenderLaser(vec2 From, vec2 Pos, ColorRGBA OuterColor, ColorRGBA In
 	{
 		int CurParticle = (int)TicksHead % 3;
 		Graphics()->TextureSet(GameClient()->m_ParticlesSkin.m_aSpriteParticleSplat[CurParticle]);
-		Graphics()->QuadsSetRotation((int)TicksHead);
 
-		// Enhanced head glow with more layers
-		float Scale = 1.8f;
+		vec2 Dir = normalize(Pos - From);
+		float ImpactAngle = angle(Dir);
+		Graphics()->QuadsSetRotation(ImpactAngle);
+
+		float ImpactDot = absolute(dot(Dir, vec2(1, 0)));
+		float AngleFactor = 1.0f - (ImpactDot * 0.3f);
+		
+		float BaseScale = 1.8f * AngleFactor;
 		Graphics()->SetColor(OuterColor.WithMultipliedAlpha(0.15f * (GlowIntensity / 100)));
-		Graphics()->RenderQuadContainerAsSprite(m_ItemsQuadContainerIndex, m_aParticleSplatOffset[CurParticle], Pos.x, Pos.y, Scale, Scale);
+		Graphics()->RenderQuadContainerAsSprite(m_ItemsQuadContainerIndex, m_aParticleSplatOffset[CurParticle], Pos.x, Pos.y, BaseScale, BaseScale);
 
-		Scale = 1.5f;
+		BaseScale = 1.5f * AngleFactor;
 		Graphics()->SetColor(OuterColor.WithMultipliedAlpha(0.25f * (GlowIntensity / 100)));
-		Graphics()->RenderQuadContainerAsSprite(m_ItemsQuadContainerIndex, m_aParticleSplatOffset[CurParticle], Pos.x, Pos.y, Scale, Scale);
+		Graphics()->RenderQuadContainerAsSprite(m_ItemsQuadContainerIndex, m_aParticleSplatOffset[CurParticle], Pos.x, Pos.y, BaseScale, BaseScale);
 
-		Scale = 1.2f;
+		BaseScale = 1.2f * AngleFactor;
 		Graphics()->SetColor(OuterColor.WithMultipliedAlpha(0.45f * (GlowIntensity / 100)));
-		Graphics()->RenderQuadContainerAsSprite(m_ItemsQuadContainerIndex, m_aParticleSplatOffset[CurParticle], Pos.x, Pos.y, Scale, Scale);
+		Graphics()->RenderQuadContainerAsSprite(m_ItemsQuadContainerIndex, m_aParticleSplatOffset[CurParticle], Pos.x, Pos.y, BaseScale, BaseScale);
 
-		Scale = 0.9f;
+		BaseScale = 0.9f * AngleFactor;
 		Graphics()->SetColor(InnerColor.WithMultipliedAlpha(0.65f * (GlowIntensity / 100)));
-		Graphics()->RenderQuadContainerAsSprite(m_ItemsQuadContainerIndex, m_aParticleSplatOffset[CurParticle], Pos.x, Pos.y, Scale, Scale);
+		Graphics()->RenderQuadContainerAsSprite(m_ItemsQuadContainerIndex, m_aParticleSplatOffset[CurParticle], Pos.x, Pos.y, BaseScale, BaseScale);
 
-		Scale = 0.6f;
+		BaseScale = 0.6f * AngleFactor;
 		Graphics()->SetColor(ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f * (GlowIntensity / 100)));
-		Graphics()->RenderQuadContainerAsSprite(m_ItemsQuadContainerIndex, m_aParticleSplatOffset[CurParticle], Pos.x, Pos.y, Scale, Scale);
+		Graphics()->RenderQuadContainerAsSprite(m_ItemsQuadContainerIndex, m_aParticleSplatOffset[CurParticle], Pos.x, Pos.y, BaseScale, BaseScale);
 	}
 }
 
