@@ -30,6 +30,7 @@ MACRO_CONFIG_INT(ClCustomConsoleRconAlpha, p_custom_console_rcon_alpha, 100, 0, 
 MACRO_CONFIG_INT(ClCustomConsoleRconFading, p_custom_console_rcon_fading, 0, 0, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "RCON console background fading")
 
 MACRO_CONFIG_INT(ClFastInp, p_fast_input, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "")
+MACRO_CONFIG_INT(ClFastInpOthers, p_fast_input_others, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "")
 
 MACRO_CONFIG_INT(ClHoverMessages, p_hover_message, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "")
 MACRO_CONFIG_INT(ClHoverMessagesHistory, p_hover_messages_history, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "")
