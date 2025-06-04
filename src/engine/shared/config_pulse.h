@@ -39,6 +39,8 @@ MACRO_CONFIG_INT(ClHoverMessagesMaxNotifications, p_hover_message_max_notificati
 
 MACRO_CONFIG_INT(ClTrailStyle, p_toggle_trails, 0, 0, 2, CFGFLAG_CLIENT | CFGFLAG_SAVE, "")
 MACRO_CONFIG_INT(ClPlayerIdleAura, p_idle_aura, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "")
+
+
 MACRO_CONFIG_INT(ClPlayerIdleAuraTimer, p_idle_aura_timer, 2, 2, 30, CFGFLAG_CLIENT | CFGFLAG_SAVE, "")
 MACRO_CONFIG_INT(ClToggleAura, p_toggle_aura, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "")
 
@@ -55,3 +57,12 @@ MACRO_CONFIG_INT(ClShowDJ, dc_show_jumps, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE
 MACRO_CONFIG_INT(ClShowJumpsSize, dc_show_jumps_size, 30, -50, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Size of double jump indicators")
 MACRO_CONFIG_INT(ClFreeMouse, dc_free_mouse, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Free mouse mode (WIP)")
 MACRO_CONFIG_INT(ClUnlockZoom, dc_unlock_zoom, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Disable camera zoom lock")
+
+
+//Effects controls
+MACRO_CONFIG_INT(ClFreezeSnowFlakes, p_effect_freeze_snowflakes, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "toggles snowflakes effect")
+MACRO_CONFIG_INT(ClHammerHitEffect, p_effect_hammerhit, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "toggles hammer hit effect")
+MACRO_CONFIG_INT(ClHammerHitEffectSound, p_effect_sound_hammerhit, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "toggles hammer hit effect")
+MACRO_CONFIG_INT(ClJumpEffect, p_effect_jump, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "toggles hammer hit effect")
+MACRO_CONFIG_INT(ClJumpEffectSound, p_effect_sound_jump, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "toggles jump effect sound")
+

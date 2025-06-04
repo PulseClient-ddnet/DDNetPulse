@@ -24,6 +24,13 @@ CEffects::CEffects()
 
 void CEffects::AirJump(vec2 Pos, float Alpha)
 {
+	if (!g_Config.m_ClJumpEffect)
+	{
+		if(g_Config.m_SndGame)
+			m_pClient->m_Sounds.PlayAt(CSounds::CHN_WORLD, SOUND_PLAYER_AIRJUMP, 1.0f, Pos);
+		return;
+	}
+
 	CParticle p;
 	p.SetDefault();
 	p.m_Spr = SPRITE_PART_AIRJUMP;
@@ -78,6 +85,9 @@ void CEffects::PowerupShine(vec2 Pos, vec2 Size, float Alpha)
 
 void CEffects::FreezingFlakes(vec2 Pos, vec2 Size, float Alpha)
 {
+if(g_Config.m_ClFreezeSnowFlakes == 0)
+		return;
+
 	if(!m_Add5hz)
 		return;
 
@@ -105,6 +115,7 @@ void CEffects::FreezingFlakes(vec2 Pos, vec2 Size, float Alpha)
 
 void CEffects::SparkleTrail(vec2 Pos, float Alpha)
 {
+	// Add sparkle trail
 	if(!m_Add50hz)
 		return;
 
@@ -430,6 +441,14 @@ void CEffects::Explosion(vec2 Pos, float Alpha)
 
 void CEffects::HammerHit(vec2 Pos, float Alpha)
 {
+	if(g_Config.m_ClHammerHitEffect == 0)
+	{
+		if(g_Config.m_SndGame && g_Config.m_ClHammerHitEffectSound)
+			m_pClient->m_Sounds.PlayAt(CSounds::CHN_WORLD, SOUND_HAMMER_HIT, 1.0f, Pos);
+		return;
+	}
+
+
 	// add the explosion
 	CParticle p;
 	p.SetDefault();
