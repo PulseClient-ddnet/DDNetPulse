@@ -3,7 +3,7 @@
     if(DoButton_CheckBox(id, text, value, &button)) \
         value ^= 1
 
-#define MENU_LABEL(section, title_section, title, title_height, spacing_height) \
+#define BOX_LABEL(section, title_section, title, title_height, spacing_height) \
     section.HSplitTop(title_height, &title_section, &section); \
     Ui()->DoLabel(&title_section, Localize(title), 20.0f, TEXTALIGN_MC); \
     section.HSplitTop(spacing_height, nullptr, &section)

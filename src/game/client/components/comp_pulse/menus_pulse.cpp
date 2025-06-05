@@ -245,13 +245,13 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 
 	if(s_CurTab == PULSE_TAB_GLOBAL)
 	{
-
 		// scrollable controls
 		static CScrollRegion s_ScrollRegion;
 		vec2 ScrollOffset(0.0f, 0.0f);
 		CScrollRegionParams ScrollParams;
 		ScrollParams.m_ScrollUnit = 120.0f;
 		s_ScrollRegion.Begin(&MainView, &ScrollOffset, &ScrollParams);
+		//s_ScrollRegion.AddRect(MainView);
 		MainView.y += ScrollOffset.y;
 
 		// Add some spacing at the top
@@ -269,7 +269,8 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 
 			CUIRect GameplayRect;
 			DRAW_BOX(LeftSection, GameplayRect, 100.0f, defaultCol, 10.0f);
-			MENU_LABEL(GameplayRect, Section, "Input & Predict", 40.0f, 10.0f);
+			s_ScrollRegion.AddRect(GameplayRect);
+			BOX_LABEL(GameplayRect, Section, "Input & Predict", 40.0f, 10.0f);
 			BUTTON(GameplayRect, Button, 20.0f, &g_Config.m_ClFastInp, "Fast Input", g_Config.m_ClFastInp);
 			BUTTON(GameplayRect, Button, 20.0f, &g_Config.m_ClFastInpOthers, "Fast Input Others", g_Config.m_ClFastInpOthers);
 			END_LABEL(LeftSection);
@@ -277,7 +278,8 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 			// Laser Settings
 			CUIRect LaserRect;
 			DRAW_BOX(LeftSection, LaserRect, 260.0f, defaultCol, 10.0f);
-			MENU_LABEL(LaserRect, Section, "Laser Settings", 40.0f, 10.0f);
+			s_ScrollRegion.AddRect(LaserRect);
+			BOX_LABEL(LaserRect, Section, "Laser Settings", 40.0f, 10.0f);
 
 			// RTX Laser
 			BUTTON(LaserRect, Button, 20.0f, &g_Config.m_ClBetterLasers, "Enhanced Laser Effects", g_Config.m_ClBetterLasers);
@@ -286,22 +288,38 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 			{
 				// Laser Glow Intensity
 				LaserRect.HSplitTop(20.0f, &Button, &LaserRect);
+				s_ScrollRegion.AddRect(Button);
 				Ui()->DoScrollbarOption(&g_Config.m_ClLaserGlowIntensity, &g_Config.m_ClLaserGlowIntensity, &Button, Localize("Laser Glow Intensity"), 30, 100);
 
 				LaserRect.HSplitTop(20.0f, &Button, &LaserRect);
 				// Laser Preview
-				MENU_LABEL(LaserRect, Label, "Laser Preview", 20.0f, 10.0f);
+				BOX_LABEL(LaserRect, Label, "Laser Preview", 20.0f, 10.0f);
+				s_ScrollRegion.AddRect(LaserRect);
 
 				const float LaserPreviewHeight = 50.0f;
 				CUIRect LaserPreview;
 				LaserRect.HSplitTop(LaserPreviewHeight, &LaserPreview, &LaserRect);
+				s_ScrollRegion.AddRect(LaserPreview);
 				LaserRect.HSplitTop(2 * MarginSmall, nullptr, &LaserRect);
 				DoLaserPreview(&LaserPreview, g_Config.m_ClLaserRifleInnerColor, g_Config.m_ClLaserRifleOutlineColor, LASERTYPE_RIFLE);
 
 				LaserRect.HSplitTop(LaserPreviewHeight, &LaserPreview, &LaserRect);
+				s_ScrollRegion.AddRect(LaserPreview);
 				LaserRect.HSplitTop(2 * MarginSmall, nullptr, &LaserRect);
 				DoLaserPreview(&LaserPreview, g_Config.m_ClLaserShotgunInnerColor, g_Config.m_ClLaserShotgunOutlineColor, LASERTYPE_SHOTGUN);
 			}
+			END_LABEL(LeftSection);
+
+			CUIRect EffectsRect;
+			// Effects Settings Box
+			DRAW_BOX(LeftSection, EffectsRect, 160.0f, defaultCol, 10.0f);
+			s_ScrollRegion.AddRect(EffectsRect);
+			BOX_LABEL(EffectsRect, Section, "Effects Settings", 40.0f, 10.0f);
+			BUTTON(EffectsRect, Button, 20.0f, &g_Config.m_ClFreezeSnowFlakes, "Show Freeze Snowflakes", g_Config.m_ClFreezeSnowFlakes);
+			BUTTON(EffectsRect, Button, 20.0f, &g_Config.m_ClHammerHitEffect, "Hammer Hit Effects", g_Config.m_ClHammerHitEffect);
+			BUTTON(EffectsRect, Button, 20.0f, &g_Config.m_ClHammerHitEffectSound, "Hammer Hit Sound Effects", g_Config.m_ClHammerHitEffectSound);
+			BUTTON(EffectsRect, Button, 20.0f, &g_Config.m_ClJumpEffect, "Jump Effects", g_Config.m_ClJumpEffect);
+			BUTTON(EffectsRect, Button, 20.0f, &g_Config.m_ClJumpEffectSound, "Jump Sound Effects", g_Config.m_ClJumpEffectSound);
 		}
 
 		// Right Section - Visual Effects
@@ -311,26 +329,50 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 
 			// Player Effects Box
 			DRAW_BOX(RightSection, VisualRect, 100.0f, defaultCol, 10.0f);
-			MENU_LABEL(VisualRect, Section, "Player Effects", 40.0f, 10.0f);
+			s_ScrollRegion.AddRect(VisualRect);
+			BOX_LABEL(VisualRect, Section, "Player Effects", 40.0f, 10.0f);
 			BUTTON(VisualRect, Button, 20.0f, &g_Config.m_ClPlayerIdleAura, "Idle Player Aura", g_Config.m_ClPlayerIdleAura);
 
 			if(g_Config.m_ClPlayerIdleAura)
 			{
 				SCROLLBAR(VisualRect, Button, 20.0f, &g_Config.m_ClPlayerIdleAuraTimer, 2, 30, "Aura Timer");
+				s_ScrollRegion.AddRect(Button);
 			}
 			END_LABEL(RightSection);
 
 			// Hover Messages Box
 			CUIRect HoverRect;
 			DRAW_BOX(RightSection, HoverRect, 140.0f, defaultCol, 10.0f);
-			MENU_LABEL(HoverRect, Section, "Hover Messages", 40.0f, 10.0f);
+			s_ScrollRegion.AddRect(HoverRect);
+			BOX_LABEL(HoverRect, Section, "Hover Messages", 40.0f, 10.0f);
 			BUTTON(HoverRect, Button, 20.0f, &g_Config.m_ClHoverMessages, "Hover Messages", g_Config.m_ClHoverMessages);
 
 			if(g_Config.m_ClHoverMessages)
 			{
 				BUTTON(HoverRect, Button, 20.0f, &g_Config.m_ClHoverMessagesHistory, "Message History", g_Config.m_ClHoverMessagesHistory);
 				SCROLLBAR(HoverRect, Button, 20.0f, &g_Config.m_ClHoverMessagesMaxHistory, 1, 40, "Max History");
+				s_ScrollRegion.AddRect(Button);
 				SCROLLBAR(HoverRect, Button, 20.0f, &g_Config.m_ClHoverMessagesMaxNotifications, 1, 40, "Max Notifications");
+				s_ScrollRegion.AddRect(Button);
+			}
+			END_LABEL(RightSection);
+
+			CUIRect DuckRect;
+			// Duck Settings Box
+			DRAW_BOX(RightSection, DuckRect, 140.0f, defaultCol, 10.0f);
+			s_ScrollRegion.AddRect(DuckRect);
+			BOX_LABEL(DuckRect, Section, "Duck Settings", 40.0f, 10.0f);
+			BUTTON(DuckRect, Button, 20.0f, &g_Config.m_ClShowFlags, "Show Nameplates Flags (Deep/Jetpack/etc)", g_Config.m_ClShowFlags);
+			if(g_Config.m_ClShowFlags)
+			{
+				SCROLLBAR(DuckRect, Button, 20.0f, &g_Config.m_ClShowFlagsSize, -50, 100, "Nameplates Flags Size");
+				s_ScrollRegion.AddRect(Button);
+			}
+			BUTTON(DuckRect, Button, 20.0f, &g_Config.m_ClShowDJ, "Show Double Jumps", g_Config.m_ClShowDJ);
+			if(g_Config.m_ClShowDJ)
+			{
+				SCROLLBAR(DuckRect, Button, 20.0f, &g_Config.m_ClShowJumpsSize, -50, 100, "Double Jumps Size");
+				s_ScrollRegion.AddRect(Button);
 			}
 			END_LABEL(RightSection);
 		}
