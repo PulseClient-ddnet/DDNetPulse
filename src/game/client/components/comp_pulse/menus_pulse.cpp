@@ -62,6 +62,15 @@ struct CConsoleImage
 	bool m_IsLoaded;
 };
 
+typedef struct
+{
+	const char *m_pName;
+	const char *m_pCommand;
+	int m_KeyId;
+	int m_ModifierCombination;
+} CKeyInfo;
+
+
 static int ListConsoleImagesCallback(const char *pName, int IsDir, int StorageType, void *pUser)
 {
 	std::vector<CConsoleImage> *pFiles = static_cast<std::vector<CConsoleImage> *>(pUser);
@@ -363,6 +372,34 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 				SCROLLBAR(DuckRect, Button, 20.0f, &g_Config.m_ClShowJumpsSize, -50, 100, "Double Jumps Size");
 			}
 			END_LABEL(RightSection);
+
+			CUIRect ScoreboardRect;
+			// Scoreboard Settings Box
+			DRAW_BOX(RightSection, ScoreboardRect, 140.0f, defaultCol, 10.0f);
+			s_ScrollRegion.AddRect(ScoreboardRect);
+			BOX_LABEL(ScoreboardRect, Section, "Scoreboard Settings", 40.0f, 10.0f);
+
+			CKeyInfo Key;
+			FIND_KEY_BINDING(Key, "toggle_scoreboard_menu");
+
+			CUIRect KeyLabel;
+			ScoreboardRect.HSplitTop(20.0f, &Button, &ScoreboardRect);
+			Button.VSplitLeft(120.0f, &KeyLabel, &Button);
+			Button.VSplitLeft(100.0f, &Button, nullptr);
+			char aBuf[64];
+			str_format(aBuf, sizeof(aBuf), "%s:", Localize((const char *)Key.m_pName));
+
+			Ui()->DoLabel(&KeyLabel, aBuf, FontSize, TEXTALIGN_ML);
+			int OldId = Key.m_KeyId, OldModifierCombination = Key.m_ModifierCombination, NewModifierCombination;
+			int NewId = DoKeyReader((void *)&Key.m_pName, &Button, OldId, OldModifierCombination, &NewModifierCombination);
+			if(NewId != OldId || NewModifierCombination != OldModifierCombination)
+			{
+				if(OldId != 0 || NewId == 0)
+					m_pClient->m_Binds.Bind(OldId, "", false, OldModifierCombination);
+				if(NewId != 0)
+					m_pClient->m_Binds.Bind(NewId, Key.m_pCommand, false, NewModifierCombination);
+			}
+			ScoreboardRect.HSplitTop(5.0f, nullptr, &ScoreboardRect);
 		}
 		s_ScrollRegion.End();
 	}

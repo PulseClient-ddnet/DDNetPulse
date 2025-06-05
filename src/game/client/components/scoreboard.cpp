@@ -76,13 +76,30 @@ CScoreboard::CScoreboard()
 
 void CScoreboard::ConKeyScoreboard(IConsole::IResult *pResult, void *pUserData)
 {
-	CScoreboard *pSelf = static_cast<CScoreboard *>(pUserData);
+	CScoreboard *pSelf = (CScoreboard *)pUserData;
 	pSelf->m_Active = pResult->GetInteger(0) != 0;
+	if(!pSelf->m_Active)
+	{
+		pSelf->m_Mouse.reset();
+		pSelf->m_Popup.reset();
+	}
+}
+
+void CScoreboard::ConToggleScoreboardMenu(IConsole::IResult *pResult, void *pUserData)
+{
+	CScoreboard *pSelf = (CScoreboard *)pUserData;
+	pSelf->m_MenuActive = !pSelf->m_MenuActive;
+	if(!pSelf->m_MenuActive)
+	{
+		pSelf->m_Mouse.reset();
+		pSelf->m_Popup.reset();
+	}
 }
 
 void CScoreboard::OnConsoleInit()
 {
 	Console()->Register("+scoreboard", "", CFGFLAG_CLIENT, ConKeyScoreboard, this, "Show scoreboard");
+	Console()->Register("toggle_scoreboard_menu", "", CFGFLAG_CLIENT, ConToggleScoreboardMenu, this, "Toggle scoreboard menu");
 }
 
 void CScoreboard::OnInit()
@@ -93,6 +110,7 @@ void CScoreboard::OnInit()
 void CScoreboard::OnReset()
 {
 	m_Active = false;
+	m_MenuActive = false;
 	m_Mouse.reset();
 	m_Popup.reset();
 	m_ServerRecord = -1.0f;
@@ -101,6 +119,7 @@ void CScoreboard::OnReset()
 void CScoreboard::OnRelease()
 {
 	m_Active = false;
+	m_MenuActive = false;
 	m_Mouse.reset();
 	m_Popup.reset();
 }
@@ -770,7 +789,7 @@ void CScoreboard::RenderRecordingNotification(float x)
 }
 float CScoreboard::CalculatePopupHeight()
 {
-	int GeneralButtons = 4;
+	int GeneralButtons = 5;
 	int TeamButtons = 0;
 	{
 		bool LocalIsTarget = GameClient()->m_aLocalIds[g_Config.m_ClDummy] == m_Popup.m_PlayerId;
@@ -990,6 +1009,18 @@ void CScoreboard::RenderGeneralActions(CUIRect *pBase)
 	if(DoButtonLogic(&Button))
 	{
 		GameClient()->m_Voting.CallvoteKick(m_Popup.m_PlayerId, "");
+	}
+
+	pBase->HSplitTop(SPopupProperties::ms_ItemSpacing, nullptr, pBase);
+	pBase->HSplitTop(SPopupProperties::ms_ButtonHeight, &Button, pBase);
+	Button.Draw(Hovered(&Button) ? SPopupProperties::GeneralActiveButtonColor() : SPopupProperties::GeneralButtonColor(), IGraphics::CORNER_ALL, SPopupProperties::ms_Rounding);
+	Ui()->DoLabel(&Button, Localize("Copy to Profiles"), SPopupProperties::ms_FontSize, TEXTALIGN_MC);
+	if(DoButtonLogic(&Button))
+	{
+		char aBuf[64];
+		str_format(aBuf, sizeof(aBuf), "p_copy %d", m_Popup.m_PlayerId);
+		Console()->ExecuteLine(aBuf);
+		//dbg_msg("DASDSDSA" "%s", aBuf);
 	}
 }
 
@@ -1249,7 +1280,7 @@ bool CScoreboard::IsActive() const
 	if(GameClient()->m_Statboard.IsActive())
 		return false;
 
-	if(m_Active)
+	if(m_Active || m_MenuActive)
 		return true;
 
 	const CNetObj_GameInfo *pGameInfoObj = GameClient()->m_Snap.m_pGameInfoObj;

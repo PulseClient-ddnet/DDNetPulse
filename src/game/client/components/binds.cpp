@@ -265,6 +265,7 @@ void CBinds::SetDefaults()
 	Bind(KEY_F2, "toggle_remote_console");
 	Bind(KEY_TAB, "+scoreboard");
 	Bind(KEY_EQUALS, "+statboard");
+	Bind(KEY_MOUSE_3, "toggle_scoreboard_menu");
 	Bind(KEY_F10, "screenshot");
 
 	Bind(KEY_A, "+left");

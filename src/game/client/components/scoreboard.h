@@ -39,9 +39,11 @@ class CScoreboard : public CComponent
 	void RenderTeamActions(CUIRect *pBase);
 
 	static void ConKeyScoreboard(IConsole::IResult *pResult, void *pUserData);
+	static void ConToggleScoreboardMenu(IConsole::IResult *pResult, void *pUserData);
 	const char *GetTeamName(int Team) const;
 
 	bool m_Active;
+	bool m_MenuActive;
 	float m_ServerRecord;
 
 	struct SMouseState

@@ -24,3 +24,22 @@
     section.HSplitTop(height, &preview_rect, &section); \
     section.HSplitTop(2 * MarginSmall, nullptr, &section); \
     DoLaserPreview(&preview_rect, inner_color, outline_color, laser_type)
+
+#define FIND_KEY_BINDING(key_info, command_name) \
+    key_info = CKeyInfo{command_name, command_name, 0, 0}; \
+    for(int Mod = 0; Mod < CBinds::MODIFIER_COMBINATION_COUNT; Mod++) \
+    { \
+        for(int KeyId = 0; KeyId < KEY_LAST; KeyId++) \
+        { \
+            const char *pBind = m_pClient->m_Binds.Get(KeyId, Mod); \
+            if(!pBind[0]) \
+                continue; \
+            if(str_comp(pBind, key_info.m_pCommand) == 0) \
+            { \
+                key_info.m_KeyId = KeyId; \
+                key_info.m_ModifierCombination = Mod; \
+                break; \
+            } \
+        } \
+    }
+

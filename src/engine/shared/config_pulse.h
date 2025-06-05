@@ -64,3 +64,4 @@ MACRO_CONFIG_INT(ClHammerHitEffectSound, p_effect_sound_hammerhit, 1, 0, 1, CFGF
 MACRO_CONFIG_INT(ClJumpEffect, p_effect_jump, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "toggles hammer hit effect")
 MACRO_CONFIG_INT(ClJumpEffectSound, p_effect_sound_jump, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "toggles jump effect sound")
 
+
