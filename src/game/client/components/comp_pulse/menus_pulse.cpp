@@ -297,15 +297,9 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 
 				const float LaserPreviewHeight = 50.0f;
 				CUIRect LaserPreview;
-				LaserRect.HSplitTop(LaserPreviewHeight, &LaserPreview, &LaserRect);
-				s_ScrollRegion.AddRect(LaserPreview);
-				LaserRect.HSplitTop(2 * MarginSmall, nullptr, &LaserRect);
-				DoLaserPreview(&LaserPreview, g_Config.m_ClLaserRifleInnerColor, g_Config.m_ClLaserRifleOutlineColor, LASERTYPE_RIFLE);
+				LASER_PREVIEW(LaserRect, LaserPreview, LaserPreviewHeight, g_Config.m_ClLaserRifleInnerColor, g_Config.m_ClLaserRifleOutlineColor, LASERTYPE_RIFLE);
+				LASER_PREVIEW(LaserRect, LaserPreview, LaserPreviewHeight, g_Config.m_ClLaserShotgunInnerColor, g_Config.m_ClLaserShotgunOutlineColor, LASERTYPE_SHOTGUN);
 
-				LaserRect.HSplitTop(LaserPreviewHeight, &LaserPreview, &LaserRect);
-				s_ScrollRegion.AddRect(LaserPreview);
-				LaserRect.HSplitTop(2 * MarginSmall, nullptr, &LaserRect);
-				DoLaserPreview(&LaserPreview, g_Config.m_ClLaserShotgunInnerColor, g_Config.m_ClLaserShotgunOutlineColor, LASERTYPE_SHOTGUN);
 			}
 			END_LABEL(LeftSection);
 

@@ -19,3 +19,8 @@
 #define SCROLLBAR(section, button, height, value, min, max, text) \
     section.HSplitTop(height, &button, &section); \
     Ui()->DoScrollbarOption(value, value, &button, Localize(text), min, max)
+
+#define LASER_PREVIEW(section, preview_rect, height, inner_color, outline_color, laser_type) \
+    section.HSplitTop(height, &preview_rect, &section); \
+    section.HSplitTop(2 * MarginSmall, nullptr, &section); \
+    DoLaserPreview(&preview_rect, inner_color, outline_color, laser_type)
