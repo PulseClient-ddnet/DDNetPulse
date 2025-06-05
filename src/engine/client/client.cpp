@@ -52,6 +52,8 @@
 #include <game/localization.h>
 #include <game/version.h>
 
+#include <game/client/components/comp_pulse/version.h>
+
 #include "client.h"
 #include "demoedit.h"
 #include "friends.h"
@@ -212,8 +214,28 @@ int CClient::SendMsgActive(CMsgPacker *pMsg, int Flags)
 	return SendMsg(g_Config.m_ClDummy, pMsg, Flags);
 }
 
+
+void CClient::SendPulse(bool Dummy)
+{
+	CMsgPacker Msg(NETMSG_IAMPULSE, true);
+	Msg.AddInt(PULSE_VERSIONNR);
+	Msg.AddString("ux", 0);
+	char aBuf[2048];
+	str_format(aBuf, sizeof(aBuf),
+		"Pulse - %s (DDNet %s, built on %s, git rev %s)",
+		PULSE_VERSION,
+		GAME_VERSION,
+		PULSE_BUILD_DATE,
+		GIT_SHORTREV_HASH);
+	Msg.AddString(aBuf, 0);
+	SendMsg(Dummy, &Msg, MSGFLAG_VITAL);
+}
+
+
 void CClient::SendInfo(int Conn)
 {
+	SendPulse(Conn == 1);
+
 	CMsgPacker MsgVer(NETMSG_CLIENTVER, true);
 	MsgVer.AddRaw(&m_ConnectionId, sizeof(m_ConnectionId));
 	MsgVer.AddInt(GameClient()->DDNetVersion());
