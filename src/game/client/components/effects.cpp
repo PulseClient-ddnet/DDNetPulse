@@ -370,6 +370,40 @@ void CEffects::PlayerTrail(vec2 Pos, float Alpha)
 			m_pClient->m_Particles.Add(CParticles::GROUP_TRAIL_EXTRA, &p);
 		}
 	}
+	else if(Style == 3)
+	{
+		// Rainbow pulsing trail
+		static float s_Time = 0.0f;
+		s_Time += 0.01f; // Adjust speed of color change
+		
+		// Create a ring of particles
+		for(int i = 0; i < 16; i++)
+		{
+			CParticle p;
+			p.SetDefault();
+			p.m_Spr = SPRITE_PART_SPARKLE;
+			
+			// Calculate position in a circle
+			float Angle = (i / 16.0f) * 2 * pi;
+			vec2 Offset = vec2(std::cos(Angle), std::sin(Angle)) * 24.0f;
+			p.m_Pos = Pos + Offset;
+			p.m_Vel = vec2(0, 0);
+			
+			// Calculate rainbow color using HSVA
+			float Hue = (s_Time + i / 16.0f) - floor(s_Time + i / 16.0f); // Keep hue in [0,1]
+			float Pulse = (std::sin(s_Time * 2.0f) + 1.0f) * 0.5f; // Pulse between 0 and 1
+			ColorHSVA HSVA(Hue, 1.0f, 1.0f, Alpha * (0.5f + Pulse * 0.5f));
+			p.m_Color = color_cast<ColorRGBA>(HSVA);
+			
+			p.m_LifeSpan = 0.2f;
+			p.m_StartSize = random_float(12.0f, 16.0f);
+			p.m_EndSize = p.m_StartSize * 0.5f;
+			p.m_UseAlphaFading = true;
+			p.m_StartAlpha = Alpha;
+			p.m_EndAlpha = 0.0f;
+			m_pClient->m_Particles.Add(CParticles::GROUP_TRAIL_EXTRA, &p);
+		}
+	}
 }
 
 void CEffects::Explosion(vec2 Pos, float Alpha)
