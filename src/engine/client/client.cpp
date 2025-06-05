@@ -234,7 +234,7 @@ void CClient::SendPulse(int Conn)
 
 void CClient::SendInfo(int Conn)
 {
-	SendPulse(CONN_MAIN);
+	SendPulse(Conn);
 
 	CMsgPacker MsgVer(NETMSG_CLIENTVER, true);
 	MsgVer.AddRaw(&m_ConnectionId, sizeof(m_ConnectionId));
@@ -3214,7 +3214,7 @@ void CClient::Run()
 		{
 			m_DummySendConnInfo = false;
 
-			SendPulse(CONN_DUMMY);
+			//SendPulse(CONN_DUMMY);
 
 			SendInfo(CONN_DUMMY);
 			m_aNetClient[CONN_DUMMY].Update();
