@@ -370,36 +370,26 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 	{
 		CUIRect Left, Right;
 		MainView.VSplitMid(&Left, &Right);
-		Left.HSplitTop(20.0f, &Button, &Left);
+		CUIRect ConsoleRect;
+		DRAW_BOX(Left, ConsoleRect, 200.0f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.3f), 10.0f);
 
-		if(DoButton_CheckBox(&g_Config.m_ClCustomConsole, Localize("Toggle Custom Console"), g_Config.m_ClCustomConsole, &Button))
-			g_Config.m_ClCustomConsole ^= 1;
-
+		CUIRect Section;
+		BOX_LABEL(ConsoleRect, Section, "Console Settings", 40.0f, 10.0f);
+		BUTTON(ConsoleRect, Button, 20.0f, &g_Config.m_ClCustomConsole, "Toggle Custom Console", g_Config.m_ClCustomConsole);
 		if(g_Config.m_ClCustomConsole)
 		{
 			Right.Draw(ColorRGBA(0.0f, 0.0f, 0.0f, 0.3f), IGraphics::CORNER_ALL, 5.0f);
 			RenderConsoleImages(Right);
-			CUIRect Title, OpenFolderButton;
-			Left.HSplitTop(40.0f, &Title, &Left);
-			Ui()->DoLabel(&Title, Localize("Console Settings"), 20.0f, TEXTALIGN_BC);
-
-			Left.HSplitTop(20.0f, &Button, &Left);
-			Ui()->DoScrollbarOption(&g_Config.m_ClCustomConsoleAlpha, &g_Config.m_ClCustomConsoleAlpha, &Button, Localize("Console Alpha"), 0, 100);
-
-			Left.HSplitTop(20.0f, &Button, &Left);
-			Ui()->DoScrollbarOption(&g_Config.m_ClCustomConsoleFading, &g_Config.m_ClCustomConsoleFading, &Button, Localize("Console Brightness"), 100, 0);
-
-			Left.HSplitTop(20.0f, &Button, &Left);
-			Ui()->DoLabel(&Button, Localize("RCON Console"), 14.0f, TEXTALIGN_ML);
-
-			Left.HSplitTop(20.0f, &Button, &Left);
-			Ui()->DoScrollbarOption(&g_Config.m_ClCustomConsoleRconAlpha, &g_Config.m_ClCustomConsoleRconAlpha, &Button, Localize("RCON Console Alpha"), 0, 100);
-
-			Left.HSplitTop(20.0f, &Button, &Left);
-			Ui()->DoScrollbarOption(&g_Config.m_ClCustomConsoleRconFading, &g_Config.m_ClCustomConsoleRconFading, &Button, Localize("RCON Console Brightness"), 100, 0);
-
-			//** Open Console Assets Folder **//
-			Left.HSplitTop(20.0f, &OpenFolderButton, &Left);
+			
+			SCROLLBAR(ConsoleRect, Button, 20.0f, &g_Config.m_ClCustomConsoleAlpha, 0, 100, "Console Alpha");
+			SCROLLBAR(ConsoleRect, Button, 20.0f, &g_Config.m_ClCustomConsoleFading, 100, 0, "Console Brightness");
+			
+			BOX_LABEL(ConsoleRect, Section, "RCON Console", 20.0f, 10.0f);
+			SCROLLBAR(ConsoleRect, Button, 20.0f, &g_Config.m_ClCustomConsoleRconAlpha, 0, 100, "RCON Console Alpha");
+			SCROLLBAR(ConsoleRect, Button, 20.0f, &g_Config.m_ClCustomConsoleRconFading, 100, 0, "RCON Console Brightness");
+			
+			CUIRect OpenFolderButton;
+			ConsoleRect.HSplitTop(20.0f, &OpenFolderButton, &ConsoleRect);
 			static CButtonContainer s_OpenFolderButton;
 			if(DoButton_Menu(&s_OpenFolderButton, Localize("Open Console Assets Folder"), 0, &OpenFolderButton))
 			{
@@ -408,6 +398,7 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 				Client()->ViewFile(aPath);
 			}
 		}
+		END_LABEL(Left);
 	}
 }
 
