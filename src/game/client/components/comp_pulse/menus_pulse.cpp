@@ -288,7 +288,6 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 			{
 				// Laser Glow Intensity
 				LaserRect.HSplitTop(20.0f, &Button, &LaserRect);
-				s_ScrollRegion.AddRect(Button);
 				Ui()->DoScrollbarOption(&g_Config.m_ClLaserGlowIntensity, &g_Config.m_ClLaserGlowIntensity, &Button, Localize("Laser Glow Intensity"), 30, 100);
 
 				LaserRect.HSplitTop(20.0f, &Button, &LaserRect);
@@ -336,7 +335,6 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 			if(g_Config.m_ClPlayerIdleAura)
 			{
 				SCROLLBAR(VisualRect, Button, 20.0f, &g_Config.m_ClPlayerIdleAuraTimer, 2, 30, "Aura Timer");
-				s_ScrollRegion.AddRect(Button);
 			}
 			END_LABEL(RightSection);
 
@@ -351,9 +349,7 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 			{
 				BUTTON(HoverRect, Button, 20.0f, &g_Config.m_ClHoverMessagesHistory, "Message History", g_Config.m_ClHoverMessagesHistory);
 				SCROLLBAR(HoverRect, Button, 20.0f, &g_Config.m_ClHoverMessagesMaxHistory, 1, 40, "Max History");
-				s_ScrollRegion.AddRect(Button);
 				SCROLLBAR(HoverRect, Button, 20.0f, &g_Config.m_ClHoverMessagesMaxNotifications, 1, 40, "Max Notifications");
-				s_ScrollRegion.AddRect(Button);
 			}
 			END_LABEL(RightSection);
 
@@ -366,13 +362,11 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 			if(g_Config.m_ClShowFlags)
 			{
 				SCROLLBAR(DuckRect, Button, 20.0f, &g_Config.m_ClShowFlagsSize, -50, 100, "Nameplates Flags Size");
-				s_ScrollRegion.AddRect(Button);
 			}
 			BUTTON(DuckRect, Button, 20.0f, &g_Config.m_ClShowDJ, "Show Double Jumps", g_Config.m_ClShowDJ);
 			if(g_Config.m_ClShowDJ)
 			{
 				SCROLLBAR(DuckRect, Button, 20.0f, &g_Config.m_ClShowJumpsSize, -50, 100, "Double Jumps Size");
-				s_ScrollRegion.AddRect(Button);
 			}
 			END_LABEL(RightSection);
 		}
