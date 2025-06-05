@@ -15,6 +15,7 @@
 #include <game/client/components/chat.h>
 #include <game/client/components/menu_background.h>
 #include <game/client/components/sounds.h>
+#include <game/client/components/comp_pulse/menus_macro.h>
 #include <game/client/gameclient.h>
 #include <game/client/render.h>
 #include <game/client/skin.h>
@@ -244,101 +245,96 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 
 	if(s_CurTab == PULSE_TAB_GLOBAL)
 	{
+
+		// scrollable controls
+		static CScrollRegion s_ScrollRegion;
+		vec2 ScrollOffset(0.0f, 0.0f);
+		CScrollRegionParams ScrollParams;
+		ScrollParams.m_ScrollUnit = 120.0f;
+		s_ScrollRegion.Begin(&MainView, &ScrollOffset, &ScrollParams);
+		MainView.y += ScrollOffset.y;
+
 		// Add some spacing at the top
 		MainView.HSplitTop(10.0f, nullptr, &MainView);
 
-		// Split into two columns
-		CUIRect Left, Right;
-		MainView.VSplitMid(&Left, &Right, 10.0f);
+		// Create two sections side by side
+		CUIRect LeftSection, RightSection;
+		MainView.VSplitMid(&LeftSection, &RightSection, 10.0f);
 
-		// Left Column - Gameplay Settings
+		ColorRGBA defaultCol = ColorRGBA(0, 0, 0, 0.45f);
+
+		// Left Section - Gameplay Settings
 		{
 			CUIRect Section, Label;
-			Left.HSplitTop(40.0f, &Section, &Left);
-			Ui()->DoLabel(&Section, Localize("Gameplay Settings"), 20.0f, TEXTALIGN_MC);
-			Left.HSplitTop(10.0f, nullptr, &Left);
 
-			// Fast Input
-			Left.HSplitTop(20.0f, &Button, &Left);
-			if(DoButton_CheckBox(&g_Config.m_ClFastInp, Localize("Fast Input"), g_Config.m_ClFastInp, &Button))
-				g_Config.m_ClFastInp ^= 1;
-
-			// Add spacing
-			Left.HSplitTop(20.0f, nullptr, &Left);
+			CUIRect GameplayRect;
+			DRAW_BOX(LeftSection, GameplayRect, 100.0f, defaultCol, 10.0f);
+			MENU_LABEL(GameplayRect, Section, "Input & Predict", 40.0f, 10.0f);
+			BUTTON(GameplayRect, Button, 20.0f, &g_Config.m_ClFastInp, "Fast Input", g_Config.m_ClFastInp);
+			BUTTON(GameplayRect, Button, 20.0f, &g_Config.m_ClFastInpOthers, "Fast Input Others", g_Config.m_ClFastInpOthers);
+			END_LABEL(LeftSection);
 
 			// Laser Settings
-			Left.HSplitTop(40.0f, &Section, &Left);
-			Ui()->DoLabel(&Section, Localize("Laser Settings"), 20.0f, TEXTALIGN_MC);
-			Left.HSplitTop(10.0f, nullptr, &Left);
+			CUIRect LaserRect;
+			DRAW_BOX(LeftSection, LaserRect, 260.0f, defaultCol, 10.0f);
+			MENU_LABEL(LaserRect, Section, "Laser Settings", 40.0f, 10.0f);
 
 			// RTX Laser
-			Left.HSplitTop(20.0f, &Button, &Left);
-			if(DoButton_CheckBox(&g_Config.m_ClBetterLasers, Localize("Enhanced Laser Effects"), g_Config.m_ClBetterLasers, &Button))
-				g_Config.m_ClBetterLasers ^= 1;
+			BUTTON(LaserRect, Button, 20.0f, &g_Config.m_ClBetterLasers, "Enhanced Laser Effects", g_Config.m_ClBetterLasers);
 
 			if(g_Config.m_ClBetterLasers)
 			{
 				// Laser Glow Intensity
-				Left.HSplitTop(20.0f, &Button, &Left);
+				LaserRect.HSplitTop(20.0f, &Button, &LaserRect);
 				Ui()->DoScrollbarOption(&g_Config.m_ClLaserGlowIntensity, &g_Config.m_ClLaserGlowIntensity, &Button, Localize("Laser Glow Intensity"), 30, 100);
 
+				LaserRect.HSplitTop(20.0f, &Button, &LaserRect);
 				// Laser Preview
-				Left.HSplitTop(20.0f, &Label, &Left);
-				Ui()->DoLabel(&Label, Localize("Laser Preview"), 16.0f, TEXTALIGN_ML);
-				Left.HSplitTop(10.0f, nullptr, &Left);
+				MENU_LABEL(LaserRect, Label, "Laser Preview", 20.0f, 10.0f);
 
 				const float LaserPreviewHeight = 50.0f;
 				CUIRect LaserPreview;
-				Left.HSplitTop(LaserPreviewHeight, &LaserPreview, &Left);
-				Left.HSplitTop(2 * MarginSmall, nullptr, &Left);
+				LaserRect.HSplitTop(LaserPreviewHeight, &LaserPreview, &LaserRect);
+				LaserRect.HSplitTop(2 * MarginSmall, nullptr, &LaserRect);
 				DoLaserPreview(&LaserPreview, g_Config.m_ClLaserRifleInnerColor, g_Config.m_ClLaserRifleOutlineColor, LASERTYPE_RIFLE);
 
-				Left.HSplitTop(LaserPreviewHeight, &LaserPreview, &Left);
-				Left.HSplitTop(2 * MarginSmall, nullptr, &Left);
+				LaserRect.HSplitTop(LaserPreviewHeight, &LaserPreview, &LaserRect);
+				LaserRect.HSplitTop(2 * MarginSmall, nullptr, &LaserRect);
 				DoLaserPreview(&LaserPreview, g_Config.m_ClLaserShotgunInnerColor, g_Config.m_ClLaserShotgunOutlineColor, LASERTYPE_SHOTGUN);
 			}
 		}
 
-		// Right Column - Visual Effects
+		// Right Section - Visual Effects
 		{
-			CUIRect Section;
-			Right.HSplitTop(40.0f, &Section, &Right);
-			Ui()->DoLabel(&Section, Localize("Visual Effects"), 20.0f, TEXTALIGN_MC);
-			Right.HSplitTop(10.0f, nullptr, &Right);
+			CUIRect Section, Label;
+			CUIRect VisualRect;
 
-			// Player Effects
-			Right.HSplitTop(20.0f, &Button, &Right);
-			if(DoButton_CheckBox(&g_Config.m_ClPlayerIdleAura, Localize("Idle Player Aura"), g_Config.m_ClPlayerIdleAura, &Button))
-				g_Config.m_ClPlayerIdleAura ^= 1;
+			// Player Effects Box
+			DRAW_BOX(RightSection, VisualRect, 100.0f, defaultCol, 10.0f);
+			MENU_LABEL(VisualRect, Section, "Player Effects", 40.0f, 10.0f);
+			BUTTON(VisualRect, Button, 20.0f, &g_Config.m_ClPlayerIdleAura, "Idle Player Aura", g_Config.m_ClPlayerIdleAura);
 
 			if(g_Config.m_ClPlayerIdleAura)
 			{
-				Right.HSplitTop(20.0f, &Button, &Right);
-				Ui()->DoScrollbarOption(&g_Config.m_ClPlayerIdleAuraTimer, &g_Config.m_ClPlayerIdleAuraTimer, &Button, Localize("Aura Timer"), 2, 30);
+				SCROLLBAR(VisualRect, Button, 20.0f, &g_Config.m_ClPlayerIdleAuraTimer, 2, 30, "Aura Timer");
 			}
+			END_LABEL(RightSection);
 
-			/* Trail Style
-			Right.HSplitTop(20.0f, &Button, &Right);
-			Ui()->DoScrollbarOption(&g_Config.m_ClTrailStyle, &g_Config.m_ClTrailStyle, &Button, Localize("Trail Style"), 0, 2);
-			*/
-			// Hover Messages
-			Right.HSplitTop(20.0f, &Button, &Right);
-			if(DoButton_CheckBox(&g_Config.m_ClHoverMessages, Localize("Hover Messages"), g_Config.m_ClHoverMessages, &Button))
-				g_Config.m_ClHoverMessages ^= 1;
+			// Hover Messages Box
+			CUIRect HoverRect;
+			DRAW_BOX(RightSection, HoverRect, 140.0f, defaultCol, 10.0f);
+			MENU_LABEL(HoverRect, Section, "Hover Messages", 40.0f, 10.0f);
+			BUTTON(HoverRect, Button, 20.0f, &g_Config.m_ClHoverMessages, "Hover Messages", g_Config.m_ClHoverMessages);
 
 			if(g_Config.m_ClHoverMessages)
 			{
-				Right.HSplitTop(20.0f, &Button, &Right);
-				if(DoButton_CheckBox(&g_Config.m_ClHoverMessagesHistory, Localize("Message History"), g_Config.m_ClHoverMessagesHistory, &Button))
-					g_Config.m_ClHoverMessagesHistory ^= 1;
-
-				Right.HSplitTop(20.0f, &Button, &Right);
-				Ui()->DoScrollbarOption(&g_Config.m_ClHoverMessagesMaxHistory, &g_Config.m_ClHoverMessagesMaxHistory, &Button, Localize("Max History"), 1, 40);
-
-				Right.HSplitTop(20.0f, &Button, &Right);
-				Ui()->DoScrollbarOption(&g_Config.m_ClHoverMessagesMaxNotifications, &g_Config.m_ClHoverMessagesMaxNotifications, &Button, Localize("Max Notifications"), 1, 40);
+				BUTTON(HoverRect, Button, 20.0f, &g_Config.m_ClHoverMessagesHistory, "Message History", g_Config.m_ClHoverMessagesHistory);
+				SCROLLBAR(HoverRect, Button, 20.0f, &g_Config.m_ClHoverMessagesMaxHistory, 1, 40, "Max History");
+				SCROLLBAR(HoverRect, Button, 20.0f, &g_Config.m_ClHoverMessagesMaxNotifications, 1, 40, "Max Notifications");
 			}
+			END_LABEL(RightSection);
 		}
+		s_ScrollRegion.End();
 	}
 	else if(s_CurTab == PULSE_TAB_CONSOLE)
 	{
