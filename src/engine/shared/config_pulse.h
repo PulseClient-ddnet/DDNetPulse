@@ -37,7 +37,7 @@ MACRO_CONFIG_INT(ClHoverMessagesHistory, p_hover_messages_history, 0, 0, 1, CFGF
 MACRO_CONFIG_INT(ClHoverMessagesMaxHistory, p_hover_message_max_history, 15, 1, 40, CFGFLAG_CLIENT | CFGFLAG_SAVE, "")
 MACRO_CONFIG_INT(ClHoverMessagesMaxNotifications, p_hover_message_max_notifications, 10, 1, 40, CFGFLAG_CLIENT | CFGFLAG_SAVE, "")
 
-MACRO_CONFIG_INT(ClTrailStyle, p_toggle_trails, 0, 0, 2, CFGFLAG_CLIENT | CFGFLAG_SAVE, "")
+MACRO_CONFIG_INT(ClTrailStyle, p_toggle_trails, 0, 0, 3, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Player trail style (0 = off, 1 = sparkle, 2 = ring, 3 = rainbow)")
 MACRO_CONFIG_INT(ClPlayerIdleAura, p_idle_aura, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "")
 
 
@@ -64,4 +64,6 @@ MACRO_CONFIG_INT(ClHammerHitEffectSound, p_effect_sound_hammerhit, 1, 0, 1, CFGF
 MACRO_CONFIG_INT(ClJumpEffect, p_effect_jump, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "toggles hammer hit effect")
 MACRO_CONFIG_INT(ClJumpEffectSound, p_effect_sound_jump, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "toggles jump effect sound")
 
-
+//Scoreboard
+MACRO_CONFIG_COL(ClFoeColor, p_blacklist_p_color, 65457, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Blacklist players color")
+MACRO_CONFIG_COL(ClFriendColor, p_friend_color, 7995321, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Friends color")

@@ -43,3 +43,7 @@
         } \
     }
 
+#define COLORPICKER(rect, section, title, config_var, default_color) \
+    DoLine_ColorPicker(&rect, ColorPickerLineSize, ColorPickerLabelSize, ColorPickerLineSpacing, &section, Localize(title), config_var, default_color, false)
+
+

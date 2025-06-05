@@ -691,6 +691,26 @@ bool CScoreboard::RenderScoreboard(CUIRect Scoreboard, int Team, int CountStart,
 				{
 					TextRender()->TextColor(color_cast<ColorRGBA>(ColorHSLA(g_Config.m_ClAuthedPlayerColor)));
 				}
+				//PulseStuff===========
+				if(ClientData.m_AuthLevel)
+				{
+					ColorRGBA Color = color_cast<ColorRGBA>(ColorHSLA(g_Config.m_ClAuthedPlayerColor));
+					TextRender()->TextColor(Color);
+				}
+				else if(ClientData.m_Friend)
+				{
+					ColorRGBA Color = color_cast<ColorRGBA>(ColorHSLA(g_Config.m_ClFriendColor));
+					TextRender()->TextColor(Color);
+				}
+
+				TextRender()->SetCursor(&Cursor, NameOffset, Row.y + (Row.h - FontSize) / 2.f, FontSize, TEXTFLAG_RENDER | TEXTFLAG_ELLIPSIS_AT_END);
+				if(ClientData.m_Foe)
+				{
+					ColorRGBA Color = color_cast<ColorRGBA>(ColorHSLA(g_Config.m_ClFoeColor));
+					TextRender()->TextColor(Color);
+				}
+
+
 				if(g_Config.m_ClShowIds)
 				{
 					char aClientId[16];
@@ -709,14 +729,31 @@ bool CScoreboard::RenderScoreboard(CUIRect Scoreboard, int Team, int CountStart,
 
 			// clan
 			{
-				if(GameClient()->m_aLocalIds[g_Config.m_ClDummy] >= 0 && str_comp(ClientData.m_aClan, GameClient()->m_aClients[GameClient()->m_aLocalIds[g_Config.m_ClDummy]].m_aClan) == 0)
+				// clan
+
+				if(str_comp(ClientData.m_aClan, GameClient()->m_aClients[GameClient()->m_aLocalIds[g_Config.m_ClDummy]].m_aClan) == 0)
 				{
-					TextRender()->TextColor(color_cast<ColorRGBA>(ColorHSLA(g_Config.m_ClSameClanColor)));
+					ColorRGBA Color = color_cast<ColorRGBA>(ColorHSLA(g_Config.m_ClSameClanColor));
+					TextRender()->TextColor(Color);
+
+					std::string SpecialClan = "Inner peace";
+					if(ClientData.m_aClan == SpecialClan)
+					{
+						float Time = LocalTime();
+						float PulseSpeed = 0.2f;
+						float PulseIntensity = 0.5f;
+						
+						float Hue = fmod(Time * PulseSpeed, 1.0f);
+						float Saturation = 0.8f + 0.2f * sinf(Time * PulseSpeed * 2.0f);
+						float Value = 0.8f + 0.2f * sinf(Time * PulseSpeed * 1.5f);
+						
+						ColorRGBA Special = color_cast<ColorRGBA>(ColorHSVA(Hue, Saturation, Value));
+						TextRender()->TextColor(Special);
+					}
 				}
 				else
-				{
-					TextRender()->TextColor(TextColor);
-				}
+					TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
+
 				CTextCursor Cursor;
 				TextRender()->SetCursor(&Cursor, ClanOffset + (ClanLength - minimum(TextRender()->TextWidth(FontSize, ClientData.m_aClan), ClanLength)) / 2.0f, Row.y + (Row.h - FontSize) / 2.0f, FontSize, TEXTFLAG_RENDER | TEXTFLAG_ELLIPSIS_AT_END);
 				Cursor.m_LineWidth = ClanLength;

@@ -378,6 +378,10 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 			DRAW_BOX(RightSection, ScoreboardRect, 140.0f, defaultCol, 10.0f);
 			s_ScrollRegion.AddRect(ScoreboardRect);
 			BOX_LABEL(ScoreboardRect, Section, "Scoreboard Settings", 40.0f, 10.0f);
+			static CButtonContainer s_FoeColor, s_FriendColor;
+			ColorRGBA DefaultCol = ColorRGBA(1.0f, 1.0f, 1.0f, 1.f);
+			COLORPICKER(s_FoeColor, ScoreboardRect, "Foe Color In Scoreboard", &g_Config.m_ClFoeColor, DefaultCol);
+			COLORPICKER(s_FriendColor, ScoreboardRect, "Friend Color In Scoreboard", &g_Config.m_ClFriendColor, DefaultCol);
 
 			CKeyInfo Key;
 			FIND_KEY_BINDING(Key, "toggle_scoreboard_menu");
