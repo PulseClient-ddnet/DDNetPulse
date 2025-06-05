@@ -215,7 +215,7 @@ int CClient::SendMsgActive(CMsgPacker *pMsg, int Flags)
 }
 
 
-void CClient::SendPulse(bool Dummy)
+void CClient::SendPulse(int Conn)
 {
 	CMsgPacker Msg(NETMSG_IAMPULSE, true);
 	Msg.AddInt(PULSE_VERSIONNR);
@@ -228,13 +228,13 @@ void CClient::SendPulse(bool Dummy)
 		PULSE_BUILD_DATE,
 		GIT_SHORTREV_HASH);
 	Msg.AddString(aBuf, 0);
-	SendMsg(Dummy, &Msg, MSGFLAG_VITAL);
+	SendMsg(Conn, &Msg, MSGFLAG_VITAL);
 }
 
 
 void CClient::SendInfo(int Conn)
 {
-	SendPulse(Conn == 1);
+	SendPulse(CONN_MAIN);
 
 	CMsgPacker MsgVer(NETMSG_CLIENTVER, true);
 	MsgVer.AddRaw(&m_ConnectionId, sizeof(m_ConnectionId));
@@ -3213,6 +3213,9 @@ void CClient::Run()
 		if(m_DummySendConnInfo && m_aNetClient[CONN_DUMMY].State() == NETSTATE_ONLINE)
 		{
 			m_DummySendConnInfo = false;
+
+			SendPulse(CONN_DUMMY);
+
 			SendInfo(CONN_DUMMY);
 			m_aNetClient[CONN_DUMMY].Update();
 			SendReady(CONN_DUMMY);
