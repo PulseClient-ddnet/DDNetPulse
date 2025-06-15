@@ -227,7 +227,7 @@ public:
 			}
 
 			// We don't iterate sections in the map with increasing width and height at the same time,
-			// because it's slower and doesn't noticeable increase the atlas utilization.
+			// because it's slower and doesn't noticeably increase the atlas utilization.
 		}
 
 		// Check vector for larger section
@@ -324,6 +324,7 @@ private:
 	// Font faces
 	FT_Face m_DefaultFace = nullptr;
 	FT_Face m_IconFace = nullptr;
+	FT_Face m_MinecraftFace = nullptr; //PULSE
 	FT_Face m_VariantFace = nullptr;
 	FT_Face m_SelectedFace = nullptr;
 	std::vector<FT_Face> m_vFallbackFaces;
@@ -678,15 +679,21 @@ public:
 		return true;
 	}
 
-	void SetFontPreset(EFontPreset FontPreset)
+	void SetFontPreset(EFontPreset Preset)
 	{
-		switch(FontPreset)
+		switch(Preset)
 		{
 		case EFontPreset::DEFAULT_FONT:
-			m_SelectedFace = nullptr;
+			m_SelectedFace = nullptr;  // nullptr means use default font
 			break;
 		case EFontPreset::ICON_FONT:
 			m_SelectedFace = m_IconFace;
+			break;
+		case EFontPreset::MINECRAFT_FONT:
+			m_SelectedFace = m_MinecraftFace;
+			break;
+		default:
+			m_SelectedFace = nullptr;
 			break;
 		}
 	}
@@ -829,6 +836,17 @@ public:
 	IGraphics::CTextureHandle Texture(size_t TextureIndex) const
 	{
 		return m_aTextures[TextureIndex];
+	}
+
+	bool SetMinecraftFaceByName(const char *pFamilyName)
+	{
+		m_MinecraftFace = GetFaceByName(pFamilyName);
+		if(!m_MinecraftFace)
+		{
+			log_error("textrender", "The Minecraft font face '%s' could not be found", pFamilyName);
+			return false;
+		}
+		return true;
 	}
 };
 
@@ -1306,14 +1324,19 @@ public:
 			Success = false;
 		}
 
+		// Load Minecraft font
+		const char *pMinecraftFontName = "Minecraft";
+		if(!m_pGlyphMap->SetMinecraftFaceByName(pMinecraftFontName))
+		{
+			log_error("textrender", "Failed to load Minecraft font '%s'", pMinecraftFontName);
+			Success = false;
+		}
+
 		json_value_free(pJsonData);
 		return Success;
 	}
 
-	void SetFontPreset(EFontPreset FontPreset) override
-	{
-		m_pGlyphMap->SetFontPreset(FontPreset);
-	}
+
 
 	void SetFontLanguageVariant(const char *pLanguageFile) override
 	{
@@ -1383,6 +1406,61 @@ public:
 		SetCursor(&Cursor, x, y, Size, TEXTFLAG_RENDER);
 		Cursor.m_LineWidth = LineWidth;
 		TextEx(&Cursor, pText, -1);
+	}
+
+	void TextRotated(float x, float y, float Size, float Rotation, const char *pText, float LineWidth = -1.0f) override
+	{
+		// Calculate text dimensions for centering
+		float TextWidthValue = TextWidth(Size, pText, -1, LineWidth);
+		float TextHeight = Size;
+		
+		// Center the text around rotation point
+		x -= TextWidthValue/2;
+		y -= TextHeight/2;
+		
+		// Create text container with rotation
+		CTextCursor Cursor;
+		SetCursor(&Cursor, x, y, Size, TEXTFLAG_RENDER);
+		Cursor.m_LineWidth = LineWidth;
+		
+		// Store rotation in render flags
+		unsigned OldRenderFlags = m_RenderFlags;
+		m_RenderFlags |= TEXT_RENDER_FLAG_NO_AUTOMATIC_QUAD_UPLOAD; // Prevent automatic quad upload
+		
+		STextContainerIndex TextCont;
+		if(CreateTextContainer(TextCont, &Cursor, pText, -1))
+		{
+			if((Cursor.m_Flags & TEXTFLAG_RENDER) != 0)
+			{
+				// Apply rotation to the text container
+				STextContainer &Container = GetTextContainer(TextCont);
+				for(auto &Quad : Container.m_StringInfo.m_vCharacterQuads)
+				{
+					// Rotate each vertex around the center point
+					float CenterX = x + TextWidthValue/2;
+					float CenterY = y + TextHeight/2;
+					
+					for(int i = 0; i < 4; i++)
+					{
+						float dx = Quad.m_aVertices[i].m_X - CenterX;
+						float dy = Quad.m_aVertices[i].m_Y - CenterY;
+						float cos_a = cosf(Rotation);
+						float sin_a = sinf(Rotation);
+						
+						Quad.m_aVertices[i].m_X = CenterX + dx * cos_a - dy * sin_a;
+						Quad.m_aVertices[i].m_Y = CenterY + dx * sin_a + dy * cos_a;
+					}
+				}
+				
+				// Upload and render the rotated text
+				UploadTextContainer(TextCont);
+				RenderTextContainer(TextCont, m_Color, m_OutlineColor);
+			}
+			DeleteTextContainer(TextCont);
+		}
+		
+		// Restore render flags
+		m_RenderFlags = OldRenderFlags;
 	}
 
 	float TextWidth(float Size, const char *pText, int StrLength = -1, float LineWidth = -1.0f, int Flags = 0, const STextSizeProperties &TextSizeProps = {}) override
@@ -2353,6 +2431,11 @@ public:
 		}
 
 		dbg_assert(!HasNonEmptyTextContainer, "text container was not empty");
+	}
+
+	void SetFontPreset(EFontPreset Preset) override
+	{
+		m_pGlyphMap->SetFontPreset(Preset);
 	}
 };
 

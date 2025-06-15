@@ -23,6 +23,118 @@
 
 using namespace FontIcons;
 
+static const char *s_apSplashTexts[] = {
+	"Hook. Fail. Repeat.",
+    	"Made with love and checkpoints!",
+    	"0.1 seconds from greatness.",
+    	"Inspired by Aoe, but way worse.",
+    	"Cendren was here.",
+    	"n9 did it first.",
+    	"Laser me up, bro!",
+    	"Now with 100% more ragequits.",
+    	"StormA approved.",
+    	"Jetpack? More like Regretpack.",
+    	"You are not stuck, you are learning.",
+    	"One shot, one deep.",
+    	"Teleport abuse not included.",
+    	"Welcome to the 900th try!",
+    	"Save your hammerhits, they matter.",
+    	"Unhook me, I'm famous.",
+    	"AFK at finish since 2015.",
+    	"Wallhammered into existence.",
+    	"KoG called, they want their edge back.",
+    	"Checkpoint 7 will haunt you.",
+    	"This map is easy... said no one ever.",
+    	"Rank 1? In your dreams.",
+    	"Who needs friends when you have dummy?",
+    	"FPS doesn’t help with edgehooks.",
+    	"Spamming /pause like a pro.",
+    	"Did you just skip 7 minutes?",
+    	"Map by Broken, skill by you.",
+    	"Sawblade lovers anonymous.",
+    	"Rated E for Everyone’s Screams.",
+    	"Your dummy is judging you.",
+    	"Map finish: 0.01%, rage: 99.9%.",
+    	"Made with more triggers than emotions.",
+    	"Even n9 failed this one. Probably.",
+    	"Edgehook? More like edge-nope.",
+    	"You can't out-wallhammer your problems.",
+    	"Speedrunners hate this one trick!",
+    	"Unfreeze me, I swear I won’t troll.",
+    	"KoG’s playground, DDNet’s battlefield.",
+    	"Lost in CP3 again, aren’t you?",
+    	"You thought that was the finish? Cute.",
+    	"Still loading… like your team skills.",
+    	"Your team just voted restart.",
+    	"Map rated 2★, ego rated 5★.",
+    	"Inspired by Aoe, failed like you.",
+    	"This phrase was placed here by Tee gods.",
+    	"Welcome to hook school – you’re late.",
+    	"Lag is just a feature.",
+    	"Reset timer. Reset hope.",
+    	"Designed to destroy friendships.",
+    	"Ghost of Cendren haunts this server.",
+    	"This map has no chill.",
+    	"DDRace is love. DDRace is pain.",
+    	"Hold F to pay respects to your dummy.",
+    	"You didn’t triple hook, you triple failed.",
+    	"n3xt plz!",
+    	"You can't hammer your way out of this one.",
+    	"That wasn’t lag, that was skill delay.",
+    	"Now featuring invisible fails!",
+    	"Climb like nobody's watching.",
+    	"Maps don’t break you, CP9 does.",
+    	"Your dummy abandoned you.",
+    	"Made by players. Cursed by players.",
+    	"Finish the map, they said.",
+    	"Where walljumps go to die.",
+    	"Hitting lasers like it’s a feature.",
+    	"Triggered? So is this map.",
+    	"Rank farming intensifies.",
+    	"100% skill, 0% sanity.",
+    	"Spectate the pros. Copy. Fail.",
+    	"Mapmaker’s revenge starts here.",
+    	"One more try. One more life.",
+    	"What’s a solo part between friends?",
+    	"Manual edgehook required. Good luck.",
+    	"In tees we trust.",
+    	"Tee lost. Please return to DDNet.",
+    	"Checkpoint roulette: Try again.",
+    	"Trust your dummy... or don’t.",
+    	"Legend says Aoe beat it blindfolded.",
+    	"Press F1 to uninstall.",
+    	"You vs. the dummy she told you not to worry about.",
+    	"This phrase is harder than the map.",
+	"Aoe finished before you even spawned.",
+    	"n9’s ghost approved this run.",
+    	"You're not Aoe. Accept it.",
+    	"Cendren would have edgehooked that...",
+    	"n9 did it backwards.",
+    	"StormA paused. You're safe.",
+    	"Even Brokecdx couldn't break this.",
+    	"n9 finished this map blindfolded.",
+    	"Cendren wrote a book on this part.",
+    	"Aoe says hi. Also, get good.",
+    	"StormA already reviewed your demo.",
+    	"n9 could finish this with a spoon.",
+    	"This map once feared Aoe.",
+    	"You just failed where Cendren flexed.",
+	"x lines of code",
+	"absolutely no bots",
+	"waiting for noob school 3",
+	"also try teeworlds",
+	"didirice notwork",
+	"soon will crash",
+	"♿",
+
+
+};
+
+static const char *GetRandomSplashText()
+{
+	return s_apSplashTexts[secure_rand() % (sizeof(s_apSplashTexts) / sizeof(s_apSplashTexts[0]))];
+}
+
 void CMenus::RenderStartMenu(CUIRect MainView)
 {
 	GameClient()->m_MenuBackground.ChangePosition(CMenuBackground::POS_START);
@@ -34,6 +146,50 @@ void CMenus::RenderStartMenu(CUIRect MainView)
 	IGraphics::CQuadItem QuadItem(MainView.w / 2 - 170, 60, 360, 103);
 	Graphics()->QuadsDrawTL(&QuadItem, 1);
 	Graphics()->QuadsEnd();
+
+	static const char *s_pCurrentSplashText = nullptr;
+	static float s_SplashTextTime = 0.0f;
+	
+	if(s_SplashTextTime == 0.0f || Client()->LocalTime() - s_SplashTextTime > 10.0f)
+	{
+		s_pCurrentSplashText = GetRandomSplashText();
+		s_SplashTextTime = Client()->LocalTime();
+	}
+
+	// Render splash text
+	if(s_pCurrentSplashText)
+	{
+		float x = MainView.w / 2 + 190.0f;
+		float y = 120.0f;
+		
+		float BaseSize = 18.0f;
+		float PulseSpeed = 0.000000003f; //eeeeh, vibecoded
+		float PulseAmount = 2.0f;
+		float CurrentTime = time_get_nanoseconds().count() * PulseSpeed;
+		float PulseSize = BaseSize + sinf(CurrentTime) * PulseAmount;
+		
+		CUIRect SplashButton;
+		SplashButton.x = MainView.w / 2 - 150;
+		SplashButton.y = 60.0f;
+		SplashButton.w = 350.0f;
+		SplashButton.h = 100.0f;
+		//SplashButton.Draw(ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f), IGraphics::CORNER_ALL, 10.0f);
+		static CButtonContainer s_SplashTextButton;
+
+		if(DoButton_Menu(&s_SplashTextButton, "", 0, &SplashButton, BUTTONFLAG_LEFT, nullptr, IGraphics::CORNER_NONE, 0.0f, 0.0f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.0f)))
+		{
+			s_pCurrentSplashText = GetRandomSplashText();
+			s_SplashTextTime = Client()->LocalTime();
+		}
+		
+		TextRender()->TextColor(1.0f, 0.8f, 0.0f, 1.0f);
+		TextRender()->SetFontPreset(EFontPreset::MINECRAFT_FONT);
+		
+		TextRender()->TextRotated(x, y - 30, PulseSize, pi/7.0f, s_pCurrentSplashText);
+
+		TextRender()->SetFontPreset(EFontPreset::DEFAULT_FONT);
+		TextRender()->TextColor(TextRender()->DefaultTextColor());
+	}
 
 	const float Rounding = 10.0f;
 	const float VMargin = MainView.w / 2 - 190.0f;
