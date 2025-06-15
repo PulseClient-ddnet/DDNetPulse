@@ -69,9 +69,9 @@ void CPlayerExtended::OnRender()
 
 void CPlayerExtended::RenderPlayerAura(vec2 Position, float Alpha, vec4 BodyColor)
 {
-	const int NUM_SPARKLES = 12;
+	const int NUM_SPARKLES = g_Config.m_ClToggleAuraParticlesNum;
 	const float SPARKLE_SIZE = 6.0f;
-	const float AURA_RADIUS = 30.9f;
+	const float AURA_RADIUS = g_Config.m_ClToggleAuraRadius;
 	const float VERTICAL_OFFSET = -17.0f;
 
 	Graphics()->TextureSet(GameClient()->m_ExtrasSkin.m_SpriteParticleSparkle);

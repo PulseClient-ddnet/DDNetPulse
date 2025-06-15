@@ -42,7 +42,8 @@ MACRO_CONFIG_INT(ClPlayerIdleAura, p_idle_aura, 1, 0, 1, CFGFLAG_CLIENT | CFGFLA
 
 
 MACRO_CONFIG_INT(ClPlayerIdleAuraTimer, p_idle_aura_timer, 2, 2, 30, CFGFLAG_CLIENT | CFGFLAG_SAVE, "")
-MACRO_CONFIG_INT(ClToggleAura, p_toggle_aura, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "")
+MACRO_CONFIG_INT(ClToggleAuraParticlesNum, p_toggle_aura_parsicle_num, 12, 0, 300, CFGFLAG_CLIENT | CFGFLAG_SAVE, "")
+MACRO_CONFIG_INT(ClToggleAuraRadius, p_toggle_aura_radius, 30, 0, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "")
 
 MACRO_CONFIG_INT(ClLaserGlowIntensity, p_laser_ench, 0, 0, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "")
 MACRO_CONFIG_INT(ClBetterLasers, p_better_laser, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "")

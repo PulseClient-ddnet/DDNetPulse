@@ -322,7 +322,24 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 			BUTTON(EffectsRect, Button, 20.0f, &g_Config.m_ClHammerHitEffectSound, "Hammer Hit Sound Effects", g_Config.m_ClHammerHitEffectSound);
 			BUTTON(EffectsRect, Button, 20.0f, &g_Config.m_ClJumpEffect, "Jump Effects", g_Config.m_ClJumpEffect);
 			BUTTON(EffectsRect, Button, 20.0f, &g_Config.m_ClJumpEffectSound, "Jump Sound Effects", g_Config.m_ClJumpEffectSound);
-		}
+			END_LABEL(LeftSection);
+
+			// Player Aura Settings
+			CUIRect PlayerAuraRect;
+			DRAW_BOX(LeftSection, PlayerAuraRect, 160.0f, defaultCol, 10.0f);
+			s_ScrollRegion.AddRect(PlayerAuraRect);
+			BOX_LABEL(PlayerAuraRect, Section, "Player Aura Settings", 40.0f, 10.0f);
+			BUTTON(PlayerAuraRect, Button, 20.0f, &g_Config.m_ClPlayerIdleAura, "Idle Player Aura", g_Config.m_ClPlayerIdleAura);
+			if(g_Config.m_ClPlayerIdleAura)
+			{
+				SCROLLBAR(PlayerAuraRect, Button, 20.0f, &g_Config.m_ClPlayerIdleAuraTimer, 2, 30, "Aura Timer (seconds)");
+				SCROLLBAR(PlayerAuraRect, Button, 20.0f, &g_Config.m_ClToggleAuraParticlesNum, 0, 300, "Particles Number");
+				SCROLLBAR(PlayerAuraRect, Button, 20.0f, &g_Config.m_ClToggleAuraRadius, 0, 600, "Aura Radius");
+			}
+			END_LABEL(LeftSection)
+			;
+
+	}
 
 		// Right Section - Visual Effects
 		{
