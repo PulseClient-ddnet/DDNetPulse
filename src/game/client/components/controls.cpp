@@ -463,6 +463,12 @@ bool CControls::CheckNewInput()
 		NewInput = true;
 	if(m_FastInput.m_Jump != TestInput.m_Jump)
 		NewInput = true;
+	if(m_FastInput.m_WantedWeapon != TestInput.m_WantedWeapon)
+		NewInput = true;
+	if(m_FastInput.m_NextWeapon != TestInput.m_NextWeapon)
+		NewInput = true;
+	if(m_FastInput.m_PrevWeapon != TestInput.m_PrevWeapon)
+		NewInput = true;
 
 	if(g_Config.m_ClSubTickAiming)
 	{
@@ -471,6 +477,11 @@ bool CControls::CheckNewInput()
 		TestInput.m_TargetX *= m_pClient->m_Camera.m_Zoom;
 		TestInput.m_TargetY *= m_pClient->m_Camera.m_Zoom;
 	}
+
+	if(m_FastInput.m_TargetX != TestInput.m_TargetX)
+		NewInput = true;
+	if(m_FastInput.m_TargetY != TestInput.m_TargetY)
+		NewInput = true;
 
 	if(NewInput)
 	{
