@@ -128,7 +128,7 @@ static const char *s_apSplashTexts[] = {
 
 static const char *GetRandomSplashText()
 {
-	return s_apSplashTexts[secure_rand() % (sizeof(s_apSplashTexts) / sizeof(s_apSplashTexts[0]))];
+	return s_apSplashTexts[secure_rand() % std::size(s_apSplashTexts)];
 }
 
 void CMenus::RenderStartMenu(CUIRect MainView)
