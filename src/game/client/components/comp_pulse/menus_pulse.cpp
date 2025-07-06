@@ -156,11 +156,6 @@ void CMenus::RenderConsoleImages(CUIRect MainView)
 	CUIRect DefaultBtn, RconBtn;
 	ConsoleTypeSelector.VSplitMid(&DefaultBtn, &RconBtn);
 
-	if(DoButton_CheckBox(&s_DefaultConsoleBtn, Localize("Default Console"), s_SelectedConsoleType == 0, &DefaultBtn))
-		s_SelectedConsoleType = 0;
-	if(DoButton_CheckBox(&s_RconConsoleBtn, Localize("RCON Console"), s_SelectedConsoleType == 1, &RconBtn))
-		s_SelectedConsoleType = 1;
-
 	// Display images in list
 	static CListBox s_ListBox;
 	s_ListBox.DoHeader(&MainView, Localize("Console Images"), 20.0f);
@@ -211,13 +206,10 @@ void CMenus::RenderConsoleImages(CUIRect MainView)
 			Console()->ExecuteLine(a_buf);
 			Console()->ExecuteLine("p_console_reload");
 
-			// Set the selected background for the appropriate console type
-			if(s_SelectedConsoleType == 0)
-				str_copy(g_Config.m_ClCustomConsoleDefault, a_cleanName, sizeof(g_Config.m_ClCustomConsoleDefault));
-			else
-				str_copy(g_Config.m_ClCustomConsoleRcon, a_cleanName, sizeof(g_Config.m_ClCustomConsoleRcon));
+			str_copy(g_Config.m_ClAssetConsole, a_cleanName, sizeof(g_Config.m_ClAssetConsole));
 
-			dbg_msg("console_images", "Selected image: %s for %s console", a_cleanName, s_SelectedConsoleType == 0 ? "default" : "RCON");
+
+			//dbg_msg("console_images", "Selected image: %s for %s console", a_cleanName, s_SelectedConsoleType == 0 ? "default" : "RCON");
 		}
 	}
 }
@@ -441,10 +433,7 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 			
 			SCROLLBAR(ConsoleRect, Button, 20.0f, &g_Config.m_ClCustomConsoleAlpha, 0, 100, "Console Alpha");
 			SCROLLBAR(ConsoleRect, Button, 20.0f, &g_Config.m_ClCustomConsoleFading, 100, 0, "Console Brightness");
-			
-			BOX_LABEL(ConsoleRect, Section, "RCON Console", 20.0f, 10.0f);
-			SCROLLBAR(ConsoleRect, Button, 20.0f, &g_Config.m_ClCustomConsoleRconAlpha, 0, 100, "RCON Console Alpha");
-			SCROLLBAR(ConsoleRect, Button, 20.0f, &g_Config.m_ClCustomConsoleRconFading, 100, 0, "RCON Console Brightness");
+
 			
 			CUIRect OpenFolderButton;
 			ConsoleRect.HSplitTop(20.0f, &OpenFolderButton, &ConsoleRect);

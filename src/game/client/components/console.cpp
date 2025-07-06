@@ -1079,8 +1079,8 @@ void CGameConsole::OnRender()
 	const ColorRGBA aBackgroundColors[NUM_CONSOLETYPES] = {ColorRGBA(0.2f, 0.2f, 0.2f, 0.9f), ColorRGBA(0.4f, 0.2f, 0.2f, 0.9f)};
 	const ColorRGBA aBorderColors[NUM_CONSOLETYPES] = {ColorRGBA(0.1f, 0.1f, 0.1f, 0.9f), ColorRGBA(0.2f, 0.1f, 0.1f, 0.9f)};
 
-	float FadingFactor = 1.0f - Client()->m_ConsoleSkin.m_Fading / 100.0f;
-	float AlphaFactor = Client()->m_ConsoleSkin.m_Alpha / 100.0f;
+	float FadingFactor = 1.0f - g_Config.m_ClCustomConsoleFading / 100.0f;
+	float AlphaFactor = g_Config.m_ClCustomConsoleAlpha / 100.0f;
 
 	ColorRGBA Fading = ColorRGBA(FadingFactor, FadingFactor, FadingFactor, AlphaFactor);
 
@@ -1540,28 +1540,39 @@ bool CGameConsole::OnInput(const IInput::CEvent &Event)
 
 void CGameConsole::Toggle(int Type)
 {
-	if(m_ConsoleState == CONSOLE_CLOSED)
+	if(m_ConsoleType != Type && (m_ConsoleState == CONSOLE_OPEN || m_ConsoleState == CONSOLE_OPENING))
 	{
-		m_ConsoleState = CONSOLE_OPENING;
-		m_StateChangeEnd = Client()->GlobalTime() + m_StateChangeDuration;
-		m_ConsoleType = Type;
-		Input()->MouseModeAbsolute();
-		Client()->LoadConsoleBackground(Type);
+		// don't toggle console, just switch what console to use
 	}
-	else if(m_ConsoleState == CONSOLE_OPEN)
+	else
 	{
-		if(m_ConsoleType == Type)
+		if(m_ConsoleState == CONSOLE_CLOSED || m_ConsoleState == CONSOLE_OPEN)
 		{
-			m_ConsoleState = CONSOLE_CLOSING;
 			m_StateChangeEnd = Client()->GlobalTime() + m_StateChangeDuration;
-			Input()->MouseModeRelative();
 		}
 		else
 		{
-			m_ConsoleType = Type;
-			Client()->LoadConsoleBackground(Type);
+			float Progress = m_StateChangeEnd - Client()->GlobalTime();
+			float ReversedProgress = m_StateChangeDuration - Progress;
+
+			m_StateChangeEnd = Client()->GlobalTime() + ReversedProgress;
+		}
+
+		if(m_ConsoleState == CONSOLE_CLOSED || m_ConsoleState == CONSOLE_CLOSING)
+		{
+			Ui()->SetEnabled(false);
+			m_ConsoleState = CONSOLE_OPENING;
+		}
+		else
+		{
+			ConsoleForType(Type)->m_Input.Deactivate();
+			Input()->MouseModeRelative();
+			Ui()->SetEnabled(true);
+			m_pClient->OnRelease();
+			m_ConsoleState = CONSOLE_CLOSING;
 		}
 	}
+	m_ConsoleType = Type;
 }
 
 void CGameConsole::ConToggleLocalConsole(IConsole::IResult *pResult, void *pUserData)
@@ -1683,6 +1694,8 @@ void CGameConsole::OnInit()
 		m_RemoteConsole.UpdateBacklogTextAttributes();
 		m_RemoteConsole.m_HasSelection = false;
 	});
+	Console()->ExecuteLine("p_console_reload");
+	//dbg_msg("BOOP!", "PINGED");
 }
 
 void CGameConsole::OnStateChange(int NewState, int OldState)
