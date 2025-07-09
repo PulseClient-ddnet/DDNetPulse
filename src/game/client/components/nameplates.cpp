@@ -2,6 +2,8 @@
 #include <engine/shared/config.h>
 #include <engine/textrender.h>
 
+#include <engine/shared/protocol7.h>
+
 #include <game/generated/client_data.h>
 
 #include <game/client/animstate.h>
@@ -305,7 +307,7 @@ public:
 class CNamePlatePartName : public CNamePlatePartText
 {
 private:
-	char m_aText[MAX_NAME_LENGTH] = "";
+	char m_aText[std::max<size_t>(MAX_NAME_LENGTH, protocol7::MAX_NAME_ARRAY_SIZE)] = "";
 	float m_FontSize = -INFINITY;
 
 protected:
@@ -334,7 +336,7 @@ public:
 class CNamePlatePartClan : public CNamePlatePartText
 {
 private:
-	char m_aText[MAX_CLAN_LENGTH] = "";
+	char m_aText[std::max<size_t>(MAX_CLAN_LENGTH, protocol7::MAX_CLAN_ARRAY_SIZE)] = "";
 	float m_FontSize = -INFINITY;
 
 protected:
@@ -755,7 +757,7 @@ void CNamePlates::RenderNamePlateGame(vec2 Position, const CNetObj_PlayerInfo *p
 	Data.m_FontSizeJumps = 18.0f + 20.0f * g_Config.m_ClShowJumpsSize / 100.0f;
 
 	if(g_Config.m_ClNamePlatesAlways == 0)
-		Alpha *= clamp(1.0f - std::pow(distance(GameClient()->m_Controls.m_aTargetPos[g_Config.m_ClDummy], Position) / 200.0f, 16.0f), 0.0f, 1.0f);
+		Alpha *= std::clamp(1.0f - std::pow(distance(GameClient()->m_Controls.m_aTargetPos[g_Config.m_ClDummy], Position) / 200.0f, 16.0f), 0.0f, 1.0f);
 	if(OtherTeam)
 		Alpha *= (float)g_Config.m_ClShowOthersAlpha / 100.0f;
 
@@ -868,8 +870,8 @@ void CNamePlates::RenderNamePlateGame(vec2 Position, const CNetObj_PlayerInfo *p
 		}
 		if(Data.m_ShowJumps && Other.m_HasExtendedData && (Other.m_ExtendedData.m_Flags & CHARACTERFLAG_ENDLESS_JUMP) == 0)
 		{
-			Data.m_JumpsUsed = minimum(clamp(Other.m_ExtendedData.m_JumpedTotal, 0, 5), Other.m_ExtendedData.m_Jumps - 1);
-			Data.m_JumpsLeft = clamp(Other.m_ExtendedData.m_Jumps - 1, 0, 5) - Data.m_JumpsUsed;
+			Data.m_JumpsUsed = minimum(std::clamp(Other.m_ExtendedData.m_JumpedTotal, 0, 5), Other.m_ExtendedData.m_Jumps - 1);
+			Data.m_JumpsLeft = std::clamp(Other.m_ExtendedData.m_Jumps - 1, 0, 5) - Data.m_JumpsUsed;
 		}
 		else
 		{
@@ -955,12 +957,12 @@ void CNamePlates::RenderNamePlatePreview(vec2 Position, int Dummy)
 	CTeeRenderInfo TeeRenderInfo;
 	if(Dummy == 0)
 	{
-		TeeRenderInfo.Apply(m_pClient->m_Skins.Find(g_Config.m_ClPlayerSkin));
+		TeeRenderInfo.Apply(GameClient()->m_Skins.Find(g_Config.m_ClPlayerSkin));
 		TeeRenderInfo.ApplyColors(g_Config.m_ClPlayerUseCustomColor, g_Config.m_ClPlayerColorBody, g_Config.m_ClPlayerColorFeet);
 	}
 	else
 	{
-		TeeRenderInfo.Apply(m_pClient->m_Skins.Find(g_Config.m_ClDummySkin));
+		TeeRenderInfo.Apply(GameClient()->m_Skins.Find(g_Config.m_ClDummySkin));
 		TeeRenderInfo.ApplyColors(g_Config.m_ClDummyUseCustomColor, g_Config.m_ClDummyColorBody, g_Config.m_ClDummyColorFeet);
 	}
 	TeeRenderInfo.m_Size = 64.0f;

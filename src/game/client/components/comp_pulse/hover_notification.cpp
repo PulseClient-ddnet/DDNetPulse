@@ -187,12 +187,12 @@ void CHoverNotification::OnRender()
 {
 	CheckConfigChanges();
 
-	if(m_NumActiveNotifications == 0 && !m_pClient->m_Chat.IsActive())
+	if(m_NumActiveNotifications == 0 && !GameClient()->m_Chat.IsActive())
 		return;
 
 	Graphics()->MapScreen(0, 0, Graphics()->ScreenWidth(), Graphics()->ScreenHeight());
 
-	if(m_pClient->m_Chat.IsActive() && g_Config.m_ClHoverMessagesHistory)
+	if(GameClient()->m_Chat.IsActive() && g_Config.m_ClHoverMessagesHistory)
 	{
 		float CurrentY = 100.0f;
 		float Spacing = 35.0f;

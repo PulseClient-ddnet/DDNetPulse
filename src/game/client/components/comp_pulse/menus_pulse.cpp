@@ -408,9 +408,9 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 			if(NewId != OldId || NewModifierCombination != OldModifierCombination)
 			{
 				if(OldId != 0 || NewId == 0)
-					m_pClient->m_Binds.Bind(OldId, "", false, OldModifierCombination);
+					GameClient()->m_Binds.Bind(OldId, "", false, OldModifierCombination);
 				if(NewId != 0)
-					m_pClient->m_Binds.Bind(NewId, Key.m_pCommand, false, NewModifierCombination);
+					GameClient()->m_Binds.Bind(NewId, Key.m_pCommand, false, NewModifierCombination);
 			}
 			ScoreboardRect.HSplitTop(5.0f, nullptr, &ScoreboardRect);
 		}
@@ -470,7 +470,7 @@ void CMenus::RenderSettingsProfs(CUIRect MainView)
 
 	// skin info
 	CTeeRenderInfo OwnSkinInfo;
-	const CSkin *pSkin = m_pClient->m_Skins.Find(pSkinName);
+	const CSkin *pSkin = GameClient()->m_Skins.Find(pSkinName);
 	OwnSkinInfo.m_OriginalRenderSkin = pSkin->m_OriginalSkin;
 	OwnSkinInfo.m_ColorableRenderSkin = pSkin->m_ColorableSkin;
 	OwnSkinInfo.m_SkinMetrics = pSkin->m_Metrics;
@@ -527,7 +527,7 @@ void CMenus::RenderSettingsProfs(CUIRect MainView)
 	FlagRect.HSplitBottom(25.0f, nullptr, &FlagRect);
 	FlagRect.y -= 10.0f;
 	ColorRGBA Color(1.0f, 1.0f, 1.0f, 1.0f);
-	m_pClient->m_CountryFlags.Render(m_Dummy ? g_Config.m_ClDummyCountry : g_Config.m_PlayerCountry, Color, FlagRect.x, FlagRect.y, FlagRect.w, FlagRect.h);
+	GameClient()->m_CountryFlags.Render(m_Dummy ? g_Config.m_ClDummyCountry : g_Config.m_PlayerCountry, Color, FlagRect.x, FlagRect.y, FlagRect.w, FlagRect.h);
 
 	bool DoSkin = g_Config.m_ClApplyProfileSkin;
 	bool DoColors = g_Config.m_ClApplyProfileColors;
@@ -550,7 +550,7 @@ void CMenus::RenderSettingsProfs(CUIRect MainView)
 
 		if(DoSkin && strlen(LoadProfile.SkinName) != 0)
 		{
-			const CSkin *pLoadSkin = m_pClient->m_Skins.Find(LoadProfile.SkinName);
+			const CSkin *pLoadSkin = GameClient()->m_Skins.Find(LoadProfile.SkinName);
 			OwnSkinInfo.m_OriginalRenderSkin = pLoadSkin->m_OriginalSkin;
 			OwnSkinInfo.m_ColorableRenderSkin = pLoadSkin->m_ColorableSkin;
 			OwnSkinInfo.m_SkinMetrics = pLoadSkin->m_Metrics;
@@ -593,7 +593,7 @@ void CMenus::RenderSettingsProfs(CUIRect MainView)
 		int RenderFlag = m_Dummy ? g_Config.m_ClDummyCountry : g_Config.m_PlayerCountry;
 		if(DoFlag && LoadProfile.CountryFlag != -2)
 			RenderFlag = LoadProfile.CountryFlag;
-		m_pClient->m_CountryFlags.Render(RenderFlag, Color, FlagRect.x, FlagRect.y, FlagRect.w, FlagRect.h);
+		GameClient()->m_CountryFlags.Render(RenderFlag, Color, FlagRect.x, FlagRect.y, FlagRect.w, FlagRect.h);
 
 		str_format(aName, sizeof(aName), "%s", m_Dummy ? g_Config.m_ClDummyName : g_Config.m_PlayerName);
 		str_format(aClan, sizeof(aClan), "%s", m_Dummy ? g_Config.m_ClDummyClan : g_Config.m_PlayerClan);
@@ -760,7 +760,7 @@ void CMenus::RenderSettingsProfs(CUIRect MainView)
 		else
 			str_copy(RenderSkin, CurrentProfile.SkinName, sizeof(RenderSkin));
 
-		const CSkin *pSkinToBeDraw = m_pClient->m_Skins.Find(RenderSkin);
+		const CSkin *pSkinToBeDraw = GameClient()->m_Skins.Find(RenderSkin);
 
 		CListboxItem Item = s_ListBox.DoNextItem(&s_Indexs[i], s_SelectedProfile >= 0 && (size_t)s_SelectedProfile == i);
 
@@ -808,7 +808,7 @@ void CMenus::RenderSettingsProfs(CUIRect MainView)
 			SLabelProperties Props;
 			Props.m_MaxWidth = Item.m_Rect.w;
 			if(CurrentProfile.CountryFlag != -2)
-				m_pClient->m_CountryFlags.Render(CurrentProfile.CountryFlag, Color, FlagRect.x, FlagRect.y, FlagRect.w, FlagRect.h);
+				GameClient()->m_CountryFlags.Render(CurrentProfile.CountryFlag, Color, FlagRect.x, FlagRect.y, FlagRect.w, FlagRect.h);
 
 			if(CurrentProfile.BodyColor != -1 && CurrentProfile.FeetColor != -1)
 			{

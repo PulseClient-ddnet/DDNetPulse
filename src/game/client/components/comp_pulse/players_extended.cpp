@@ -49,12 +49,12 @@ void CPlayerExtended::OnRender()
 			if(TimeSinceLastMovement >= 2.0f)
 			{
 				float FadeInProgress = (TimeSinceLastMovement - 2.0f) / FadeInTime;
-				BaseAlpha = clamp(FadeInProgress, 0.0f, 1.0f);
+				BaseAlpha = std::clamp(FadeInProgress, 0.0f, 1.0f);
 			}
 			else if(m_LastAlpha > 0.0f)
 			{
 				float FadeOutProgress = TimeSinceLastMovement / FadeOutTime;
-				BaseAlpha = m_LastAlpha * (1.0f - clamp(FadeOutProgress, 0.0f, 1.0f));
+				BaseAlpha = m_LastAlpha * (1.0f - std::clamp(FadeOutProgress, 0.0f, 1.0f));
 			}
 
 			m_LastAlpha = BaseAlpha;

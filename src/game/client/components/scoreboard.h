@@ -71,8 +71,8 @@ class CScoreboard : public CComponent
 
 		void clampPosition(float ScreenWidth, float ScreenHeight)
 		{
-			m_Position.x = clamp(m_Position.x, 0.0f, ScreenWidth - 1.0f);
-			m_Position.y = clamp(m_Position.y, 0.0f, ScreenHeight - 1.0f);
+			m_Position.x = std::clamp(m_Position.x, 0.0f, ScreenWidth - 1.0f);
+			m_Position.y = std::clamp(m_Position.y, 0.0f, ScreenHeight - 1.0f);
 		}
 
 		bool canClick(IClient *pClient) const
@@ -153,15 +153,15 @@ class CScoreboard : public CComponent
 
 public:
 	CScoreboard();
-	virtual int Sizeof() const override { return sizeof(*this); }
-	virtual void OnConsoleInit() override;
-	virtual void OnInit() override;
-	virtual void OnReset() override;
-	virtual void OnRender() override;
-	virtual void OnRelease() override;
-	virtual void OnMessage(int MsgType, void *pRawMsg) override;
-	virtual bool OnCursorMove(float x, float y, IInput::ECursorType CursorType) override;
-	virtual bool OnInput(const IInput::CEvent &Event) override;
+	int Sizeof() const override { return sizeof(*this); }
+	void OnConsoleInit() override;
+	void OnInit() override;
+	void OnReset() override;
+	void OnRender() override;
+	void OnRelease() override;
+	void OnMessage(int MsgType, void *pRawMsg) override;
+	bool OnCursorMove(float x, float y, IInput::ECursorType CursorType) override;
+	bool OnInput(const IInput::CEvent &Event) override;
 
 	bool IsActive() const;
 };

@@ -6,15 +6,15 @@ if(CMAKE_OSX_DEPLOYMENT_TARGET VERSION_LESS 10.15)
 endif()
 
 file(STRINGS src/game/version.h VERSION_LINE
-        LIMIT_COUNT 1
-        REGEX "^#define GAME_RELEASE_VERSION "
+  LIMIT_COUNT 1
+  REGEX "^#define GAME_RELEASE_VERSION_INTERNAL "
 )
 
-if(VERSION_LINE MATCHES "\"([0-9]+)\\.([0-9]+)\\.([0-9]+)\"")
+if(VERSION_LINE MATCHES "([0-9]+)\\.([0-9]+)\\.([0-9]+)")
   set(VERSION_MAJOR ${CMAKE_MATCH_1})
   set(VERSION_MINOR ${CMAKE_MATCH_2})
   set(VERSION_PATCH ${CMAKE_MATCH_3})
-elseif(VERSION_LINE MATCHES "\"([0-9]+)\\.([0-9]+)\"")
+elseif(VERSION_LINE MATCHES "([0-9]+)\\.([0-9]+)")
   set(VERSION_MAJOR ${CMAKE_MATCH_1})
   set(VERSION_MINOR ${CMAKE_MATCH_2})
   set(VERSION_PATCH "0")
@@ -282,7 +282,7 @@ if(NOT MSVC AND NOT HAIKU)
   endif()
 
   if(TARGET_OS STREQUAL "mac")
-    add_cxx_compiler_flag_if_supported(OUR_FLAGS_OWN -std=gnu++17)
+    add_cxx_compiler_flag_if_supported(OUR_FLAGS_OWN -std=gnu++20)
   endif()
 
   if(SECURITY_COMPILER_FLAGS)
@@ -347,6 +347,7 @@ if(NOT MSVC AND NOT HAIKU)
   add_cxx_compiler_flag_if_supported(OUR_FLAGS_OWN -Wsuggest-override)
   add_cxx_compiler_flag_if_supported(OUR_FLAGS_OWN -Wdynamic-class-memaccess) # clang
   add_cxx_compiler_flag_if_supported(OUR_FLAGS_OWN -Wclass-memaccess) # gcc
+  add_cxx_compiler_flag_if_supported(OUR_FLAGS_OWN -Wno-deprecated-enum-float-conversion) # c++20 arithmetic between floating-point type and enumeration type
   add_linker_flag_if_supported(OUR_FLAGS_LINK -Wno-alloc-size-larger-than) # save.cpp with LTO
   # add_cxx_compiler_flag_if_supported(OUR_FLAGS_OWN -Wdouble-promotion) # Many occurrences
   # add_cxx_compiler_flag_if_supported(OUR_FLAGS_OWN -Wnull-dereference) # Many occurrences
@@ -689,6 +690,8 @@ if(TARGET_OS STREQUAL "windows")
   set(PLATFORM_LIBS)
   list(APPEND PLATFORM_LIBS shlwapi) # PathIsRelativeW
   list(APPEND PLATFORM_LIBS version ws2_32) # Windows sockets
+  list(APPEND PLATFORM_LIBS advapi32) # Reg* and Crypt* functions
+  list(APPEND PLATFORM_LIBS bcrypt userenv) # for Rust (https://github.com/rust-lang/rust/issues/91974)
   list(APPEND PLATFORM_LIBS ole32) # CoInitialize(Ex)
   list(APPEND PLATFORM_LIBS shell32)
   list(APPEND PLATFORM_LIBS ntdll) # https://github.com/ddnet/ddnet/issues/6725
@@ -1837,6 +1840,11 @@ foreach(target ${TARGETS})
     target_compile_options(${target} PRIVATE /GS) # Protect the stack pointer.
     target_compile_options(${target} PRIVATE /wd4996) # Use of non-_s functions.
     target_compile_options(${target} PRIVATE /utf-8) # Use UTF-8 for source files.
+    # Enable Edit & Continue (Hot Reload) support
+    if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.25)
+      set_property(TARGET ${target} PROPERTY MSVC_DEBUG_INFORMATION_FORMAT $<$<CONFIG:Debug>:EditAndContinue>)
+      target_link_options(${target} PRIVATE $<$<CONFIG:Debug>:/INCREMENTAL>)
+    endif()
   endif()
   if(OUR_FLAGS_LINK)
     target_link_libraries(${target} ${OUR_FLAGS_LINK})
@@ -1877,7 +1885,7 @@ foreach(target ${TARGETS_LINK})
 endforeach()
 
 foreach(target ${TARGETS_OWN})
-  set_property(TARGET ${target} PROPERTY CXX_STANDARD 17)
+  set_property(TARGET ${target} PROPERTY CXX_STANDARD 20)
   set_property(TARGET ${target} PROPERTY CXX_STANDARD_REQUIRED ON)
   set_property(TARGET ${target} PROPERTY CXX_EXTENSIONS OFF)
 
@@ -1885,6 +1893,7 @@ foreach(target ${TARGETS_OWN})
     target_compile_options(${target} PRIVATE /wd4244) # Possible loss of data (float -> int, int -> float, etc.).
     target_compile_options(${target} PRIVATE /wd4267) # Possible loss of data (size_t - int on win64).
     target_compile_options(${target} PRIVATE /wd4800) # Implicit conversion of int to bool.
+    target_compile_options(${target} PRIVATE /wd5055) # C++20 operator deprecated between enumerations and floating-point types
   endif()
   if(TARGET_OS STREQUAL "windows")
     # See https://learn.microsoft.com/en-us/windows/win32/winprog/using-the-windows-headers
@@ -1944,7 +1953,7 @@ foreach(target ${TARGETS_OWN})
     target_compile_definitions(${target} PRIVATE CONF_INFORM_UPDATE)
   endif()
   if(STEAM)
-    target_compile_definitions(${target} PRIVATE PLATFORM_SUFFIX="-steam")
+    target_compile_definitions(${target} PRIVATE PLATFORM_SUFFIX=-steam)
   endif()
   if(DISCORD)
     target_compile_definitions(${target} PRIVATE CONF_DISCORD)
@@ -1953,10 +1962,7 @@ foreach(target ${TARGETS_OWN})
     endif()
   endif()
   if(VERSION)
-    target_compile_definitions(${target} PRIVATE GAME_RELEASE_VERSION="${VERSION}")
-  endif()
-  if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
-    target_compile_definitions(${target} PRIVATE CONF_WEBASM)
+    target_compile_definitions(${target} PRIVATE GAME_RELEASE_VERSION_INTERNAL=${VERSION})
   endif()
   if(TARGET_OS STREQUAL "android")
     if(ANDROID_PACKAGE_NAME)

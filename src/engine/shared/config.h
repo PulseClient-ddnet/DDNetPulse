@@ -14,6 +14,8 @@
 // include protocol for MAX_CLIENT used in config_variables
 #include <engine/shared/protocol.h>
 
+static constexpr const char *DEFAULT_SAVED_RCON_USER = "local-server";
+
 #define CONFIG_FILE "settings_ddnet.cfg"
 #define PULSE_CONFIG_FILE "settings_pulse.cfg"
 #define AUTOEXEC_FILE "autoexec.cfg"

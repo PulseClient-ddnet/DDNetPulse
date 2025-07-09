@@ -36,7 +36,7 @@ Ui()->DoScrollbarOption(value, value, &button, Localize(text), min, max, pScale,
     { \
         for(int KeyId = 0; KeyId < KEY_LAST; KeyId++) \
         { \
-            const char *pBind = m_pClient->m_Binds.Get(KeyId, Mod); \
+            const char *pBind = GameClient()->m_Binds.Get(KeyId, Mod); \
             if(!pBind[0]) \
                 continue; \
             if(str_comp(pBind, key_info.m_pCommand) == 0) \

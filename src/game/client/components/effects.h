@@ -9,19 +9,27 @@
 
 class CEffects : public CComponent
 {
+private:
 	bool m_Add5hz;
+	int64_t m_LastUpdate5hz = 0;
+
 	bool m_Add50hz;
+	int64_t m_LastUpdate50hz = 0;
+
 	bool m_Add100hz;
+	int64_t m_LastUpdate100hz = 0;
+
+	int64_t m_SkidSoundTimer = 0;
 
 public:
 	CEffects();
-	virtual int Sizeof() const override { return sizeof(*this); }
+	int Sizeof() const override { return sizeof(*this); }
 
-	virtual void OnRender() override;
+	void OnRender() override;
 
 	void BulletTrail(vec2 Pos, float Alpha = 1.f, float TimePassed = 0.f);
 	void SmokeTrail(vec2 Pos, vec2 Vel, float Alpha = 1.f, float TimePassed = 0.f);
-	void SkidTrail(vec2 Pos, vec2 Vel, float Alpha = 1.0f);
+	void SkidTrail(vec2 Pos, vec2 Vel, int Direction, float Alpha = 1.0f);
 	void Explosion(vec2 Pos, float Alpha = 1.0f);
 	void HammerHit(vec2 Pos, float Alpha = 1.0f);
 	void AirJump(vec2 Pos, float Alpha = 1.0f);

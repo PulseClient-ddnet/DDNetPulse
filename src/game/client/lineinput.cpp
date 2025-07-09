@@ -28,6 +28,7 @@ void CLineInput::SetBuffer(char *pStr, size_t MaxSize, size_t MaxChars)
 	m_MaxSize = MaxSize;
 	m_MaxChars = MaxChars;
 	m_WasChanged = m_pStr && pLastStr && m_WasChanged;
+	m_WasCursorChanged = m_pStr && pLastStr && m_WasCursorChanged;
 	if(!pLastStr)
 	{
 		m_CursorPos = m_SelectionStart = m_SelectionEnd = m_LastCompositionCursorPos = 0;
@@ -59,8 +60,8 @@ void CLineInput::SetRange(const char *pString, size_t Begin, size_t End)
 {
 	if(Begin > End)
 		std::swap(Begin, End);
-	Begin = clamp<size_t>(Begin, 0, m_Len);
-	End = clamp<size_t>(End, 0, m_Len);
+	Begin = std::clamp<size_t>(Begin, 0, m_Len);
+	End = std::clamp<size_t>(End, 0, m_Len);
 
 	size_t RemovedCharSize, RemovedCharCount;
 	str_utf8_stats(m_pStr + Begin, End - Begin + 1, m_MaxChars, &RemovedCharSize, &RemovedCharCount);
@@ -158,7 +159,7 @@ void CLineInput::MoveCursor(EMoveDirection Direction, bool MoveWord, const char 
 
 void CLineInput::SetCursorOffset(size_t Offset)
 {
-	m_SelectionStart = m_SelectionEnd = m_LastCompositionCursorPos = m_CursorPos = clamp<size_t>(Offset, 0, m_Len);
+	m_SelectionStart = m_SelectionEnd = m_LastCompositionCursorPos = m_CursorPos = std::clamp<size_t>(Offset, 0, m_Len);
 	m_WasCursorChanged = true;
 }
 
@@ -167,8 +168,8 @@ void CLineInput::SetSelection(size_t Start, size_t End)
 	dbg_assert(m_CursorPos == Start || m_CursorPos == End, "Selection and cursor offset got desynchronized");
 	if(Start > End)
 		std::swap(Start, End);
-	m_SelectionStart = clamp<size_t>(Start, 0, m_Len);
-	m_SelectionEnd = clamp<size_t>(End, 0, m_Len);
+	m_SelectionStart = std::clamp<size_t>(Start, 0, m_Len);
+	m_SelectionEnd = std::clamp<size_t>(End, 0, m_Len);
 	m_WasCursorChanged = true;
 }
 

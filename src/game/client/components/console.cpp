@@ -433,7 +433,7 @@ bool CGameConsole::CInstance::OnInput(const IInput::CEvent &Event)
 			}
 			else
 			{
-				SelectNextSearchMatch(m_pGameConsole->m_pClient->Input()->ShiftIsPressed() ? -1 : 1);
+				SelectNextSearchMatch(m_pGameConsole->GameClient()->Input()->ShiftIsPressed() ? -1 : 1);
 			}
 
 			Handled = true;
@@ -481,7 +481,7 @@ bool CGameConsole::CInstance::OnInput(const IInput::CEvent &Event)
 		}
 		else if(Event.m_Key == KEY_TAB)
 		{
-			const int Direction = m_pGameConsole->m_pClient->Input()->ShiftIsPressed() ? -1 : 1;
+			const int Direction = m_pGameConsole->GameClient()->Input()->ShiftIsPressed() ? -1 : 1;
 
 			if(!m_Searching)
 			{
@@ -1037,7 +1037,7 @@ void CGameConsole::OnRender()
 	CInstance *pConsole = CurrentConsole();
 
 	const float MaxConsoleHeight = Screen.h * 3.5 / 5.0f;
-	float Progress = clamp((Client()->GlobalTime() - (m_StateChangeEnd - m_StateChangeDuration)) / m_StateChangeDuration, 0.0f, 1.0f);
+	float Progress = std::clamp((Client()->GlobalTime() - (m_StateChangeEnd - m_StateChangeDuration)) / m_StateChangeDuration, 0.0f, 1.0f);
 
 	if(Progress >= 1.0f)
 	{
@@ -1531,7 +1531,7 @@ bool CGameConsole::OnInput(const IInput::CEvent &Event)
 		Toggle(m_ConsoleType);
 	else if(!CurrentConsole()->OnInput(Event))
 	{
-		if(m_pClient->Input()->ModifierIsPressed() && Event.m_Flags & IInput::FLAG_PRESS && Event.m_Key == KEY_C)
+		if(GameClient()->Input()->ModifierIsPressed() && Event.m_Flags & IInput::FLAG_PRESS && Event.m_Key == KEY_C)
 			m_WantsSelectionCopy = true;
 	}
 
@@ -1568,7 +1568,7 @@ void CGameConsole::Toggle(int Type)
 			ConsoleForType(Type)->m_Input.Deactivate();
 			Input()->MouseModeRelative();
 			Ui()->SetEnabled(true);
-			m_pClient->OnRelease();
+			GameClient()->OnRelease();
 			m_ConsoleState = CONSOLE_CLOSING;
 		}
 	}
