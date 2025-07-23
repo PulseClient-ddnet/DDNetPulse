@@ -1239,6 +1239,10 @@ void CChat::OnRender()
 #endif
 		return;
 
+	// Check focus mode settings
+	if(g_Config.m_ClFocusMode && g_Config.m_ClFocusModeHideChat)
+		return;
+
 	y -= ScaledFontSize;
 
 	OnPrepareLines(y);

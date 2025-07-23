@@ -736,7 +736,16 @@ void CNamePlates::RenderNamePlateGame(vec2 Position, const CNetObj_PlayerInfo *p
 
 	Data.m_InGame = true;
 
+	// Check focus mode settings
+	bool FocusModeActive = g_Config.m_ClFocusMode;
+	bool HideNamesInFocusMode = g_Config.m_ClFocusModeHideNames;
+
 	Data.m_ShowName = pPlayerInfo->m_Local ? g_Config.m_ClNamePlatesOwn : g_Config.m_ClNamePlates;
+	// Hide names if focus mode is active and hide names is enabled
+	if(FocusModeActive && HideNamesInFocusMode)
+	{
+		Data.m_ShowName = false;
+	}
 	Data.m_pName = GameClient()->m_aClients[pPlayerInfo->m_ClientId].m_aName;
 	Data.m_ShowFriendMark = Data.m_ShowName && g_Config.m_ClNamePlatesFriendMark && GameClient()->m_aClients[pPlayerInfo->m_ClientId].m_Friend;
 	Data.m_ShowClientId = Data.m_ShowName && (g_Config.m_Debug || g_Config.m_ClNamePlatesIds);

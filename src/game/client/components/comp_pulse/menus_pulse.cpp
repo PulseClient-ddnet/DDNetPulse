@@ -331,7 +331,7 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 			END_LABEL(LeftSection)
 			;
 
-	}
+		}
 
 		// Right Section - Visual Effects
 		{
@@ -413,9 +413,29 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 					GameClient()->m_Binds.Bind(NewId, Key.m_pCommand, false, NewModifierCombination);
 			}
 			ScoreboardRect.HSplitTop(5.0f, nullptr, &ScoreboardRect);
+			END_LABEL(RightSection);
+
+
+			// Focus Mode Settings Box
+			CUIRect FocusModeRect;
+			DRAW_BOX(RightSection, FocusModeRect, 200.0f, defaultCol, 10.0f);
+			s_ScrollRegion.AddRect(FocusModeRect);
+			BOX_LABEL(FocusModeRect, Section, "Focus Mode Settings", 40.0f, 10.0f);
+			BUTTON(FocusModeRect, Button, 20.0f, &g_Config.m_ClFocusMode, "Enable Focus Mode", g_Config.m_ClFocusMode);
+
+			if(g_Config.m_ClFocusMode)
+			{
+				BUTTON(FocusModeRect, Button, 20.0f, &g_Config.m_ClFocusModeHideNames, "Hide Player Names", g_Config.m_ClFocusModeHideNames);
+				BUTTON(FocusModeRect, Button, 20.0f, &g_Config.m_ClFocusModeHideEffects, "Hide Visual Effects", g_Config.m_ClFocusModeHideEffects);
+				BUTTON(FocusModeRect, Button, 20.0f, &g_Config.m_ClFocusModeHideUI, "Hide Unnecessary UI", g_Config.m_ClFocusModeHideUI);
+				BUTTON(FocusModeRect, Button, 20.0f, &g_Config.m_ClFocusModeHideChat, "Hide Chat", g_Config.m_ClFocusModeHideChat);
+				BUTTON(FocusModeRect, Button, 20.0f, &g_Config.m_ClFocusModeHideScoreboard, "Hide Scoreboard", g_Config.m_ClFocusModeHideScoreboard);
+			}
+			END_LABEL(RightSection);
+			s_ScrollRegion.End();
 		}
-		s_ScrollRegion.End();
 	}
+
 	else if(s_CurTab == PULSE_TAB_CONSOLE)
 	{
 		CUIRect Left, Right;
@@ -430,11 +450,11 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 		{
 			Right.Draw(ColorRGBA(0.0f, 0.0f, 0.0f, 0.3f), IGraphics::CORNER_ALL, 5.0f);
 			RenderConsoleImages(Right);
-			
+
 			SCROLLBAR(ConsoleRect, Button, 20.0f, &g_Config.m_ClCustomConsoleAlpha, 0, 100, "Console Alpha");
 			SCROLLBAR(ConsoleRect, Button, 20.0f, &g_Config.m_ClCustomConsoleFading, 100, 0, "Console Brightness");
 
-			
+
 			CUIRect OpenFolderButton;
 			ConsoleRect.HSplitTop(20.0f, &OpenFolderButton, &ConsoleRect);
 			static CButtonContainer s_OpenFolderButton;

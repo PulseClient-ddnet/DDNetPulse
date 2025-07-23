@@ -66,3 +66,11 @@ MACRO_CONFIG_INT(ClJumpEffectSound, p_effect_sound_jump, 1, 0, 1, CFGFLAG_CLIENT
 //Scoreboard
 MACRO_CONFIG_COL(ClFoeColor, p_blacklist_p_color, 65457, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Blacklist players color")
 MACRO_CONFIG_COL(ClFriendColor, p_friend_color, 7995321, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Friends color")
+
+// Focus Mode Settings
+MACRO_CONFIG_INT(ClFocusMode, p_focus_mode, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Enable focus mode to minimize visual distractions")
+MACRO_CONFIG_INT(ClFocusModeHideNames, p_focus_mode_hide_names, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Hide player names in focus mode")
+MACRO_CONFIG_INT(ClFocusModeHideEffects, p_focus_mode_hide_effects, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Hide visual effects in focus mode")
+MACRO_CONFIG_INT(ClFocusModeHideUI, p_focus_mode_hide_ui, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Hide unnecessary UI elements in focus mode")
+MACRO_CONFIG_INT(ClFocusModeHideChat, p_focus_mode_hide_chat, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Hide chat in focus mode")
+MACRO_CONFIG_INT(ClFocusModeHideScoreboard, p_focus_mode_hide_scoreboard, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Hide scoreboard in focus mode")
