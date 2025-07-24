@@ -124,6 +124,8 @@ static const char *s_apSplashTexts[] = {
 	"hi - always ",
 	"pipotam",
 	"try volleyball!",
+	"no u",
+	"connect dummy? more like skill issue"
 };
 
 static const char *GetRandomSplashText()
