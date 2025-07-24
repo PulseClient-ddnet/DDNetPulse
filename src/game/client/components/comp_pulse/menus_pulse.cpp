@@ -328,8 +328,14 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 				SCROLLBAR(PlayerAuraRect, Button, 20.0f, &g_Config.m_ClToggleAuraParticlesNum, 0, 300, "Particles Number");
 				SCROLLBAR(PlayerAuraRect, Button, 20.0f, &g_Config.m_ClToggleAuraRadius, 0, 600, "Aura Radius");
 			}
-			END_LABEL(LeftSection)
-			;
+			END_LABEL(LeftSection);
+
+			CUIRect FunRect;
+			DRAW_BOX(LeftSection, FunRect, 80.0f, defaultCol, 10.0f);
+			s_ScrollRegion.AddRect(FunRect);
+			BOX_LABEL(FunRect, Section, "Fun Settings", 40.0f, 10.0f);
+			BUTTON(FunRect, Button, 20.0f, &g_Config.m_ClDeathPhrases, "Funny death phrases on death", g_Config.m_ClDeathPhrases);
+			END_LABEL(LeftSection);
 
 		}
 
@@ -418,7 +424,12 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 
 			// Focus Mode Settings Box
 			CUIRect FocusModeRect;
-			DRAW_BOX(RightSection, FocusModeRect, 200.0f, defaultCol, 10.0f);
+
+			if(g_Config.m_ClFocusMode)
+			{DRAW_BOX(RightSection, FocusModeRect, 180.0f, defaultCol, 10.0f);}
+			else
+			{DRAW_BOX(RightSection, FocusModeRect, 80.0f, defaultCol, 10.0f);}
+
 			s_ScrollRegion.AddRect(FocusModeRect);
 			BOX_LABEL(FocusModeRect, Section, "Focus Mode Settings", 40.0f, 10.0f);
 			BUTTON(FocusModeRect, Button, 20.0f, &g_Config.m_ClFocusMode, "Enable Focus Mode", g_Config.m_ClFocusMode);
