@@ -1135,6 +1135,26 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker, int Conn, bool Dumm
 			m_GameWorld.ReleaseHooked(pMsg->m_Victim);
 		}
 
+		// pulse: funny phrase if the local player died
+		if(pMsg->m_Victim == m_Snap.m_LocalClientId && g_Config.m_ClDeathPhrases)
+		{
+			static const char *s_aFunnyPhrases[] = {
+				"Oof! Gravity wins again!",
+				"You died. But your fashion lives on!",
+				"Respawn therapy in progress...",
+				"That looked like it hurt!",
+				"Pro tip: Try not to die!",
+				"You have been out-teed!",
+				"Oops! That wasn't supposed to happen.",
+				"Achievement unlocked: Sudden Demise!",
+				"You died. But at least you looked cool!",
+				"Back to the tee drawing board!"
+			};
+			constexpr int NumPhrases = sizeof(s_aFunnyPhrases) / sizeof(s_aFunnyPhrases[0]);
+			int PhraseId = rand() % NumPhrases;
+			m_Chat.Echo(s_aFunnyPhrases[PhraseId]);
+		}
+
 		// if we are spectating a static id set (team 0) and somebody killed, and its not a guy in solo, we remove him from the list
 		// never remove players from the list if it is a pvp server
 		if(IsMultiViewIdSet() && m_MultiViewTeam == 0 && m_aMultiViewId[pMsg->m_Victim] && !m_aClients[pMsg->m_Victim].m_Spec && !m_MultiView.m_Solo && !m_GameInfo.m_Pvp)
