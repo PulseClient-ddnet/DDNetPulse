@@ -249,6 +249,68 @@ void CRenderTools::GetRenderTeeAnimScaleAndBaseSize(const CTeeRenderInfo *pInfo,
 	BaseSize = pInfo->m_Size;
 }
 
+void CRenderTools::CalculateSquashStretchScaling(vec2 Velocity, float &ScaleX, float &ScaleY)
+{
+	// Only apply squash and stretch if the feature is enabled
+	if(!g_Config.m_ClPlayerSquashStretch)
+	{
+		ScaleX = 1.0f;
+		ScaleY = 1.0f;
+		return;
+	}
+
+	float VelX = absolute(Velocity.x);
+	float VelY = absolute(Velocity.y);
+	float ImpactEffect = 0.0f;
+
+#ifdef CONF_FAMILY_WINDOWS
+	if(Velocity.w > 0.5f)
+		ImpactEffect = 1.0f;
+#else
+	if(reinterpret_cast<const float*>(&Velocity)[2] > 0.5f)
+		ImpactEffect = 1.0f;
+#endif
+
+	const float LowSpeed = 20.0f;
+	const float HighSpeed = 50.0f;
+
+	float VelMagnitude = length(Velocity);
+	VelMagnitude = std::clamp(VelMagnitude, 0.0f, 100.0f);
+
+	float t = 0.0f;
+	if(VelMagnitude > LowSpeed)
+		t = std::clamp((VelMagnitude - LowSpeed) / (HighSpeed - LowSpeed), 0.0f, 1.0f);
+
+	if(t <= 0.0f && ImpactEffect < 0.5f)
+	{
+		ScaleX = 1.0f;
+		ScaleY = 1.0f;
+		return;
+	}
+
+	bool IsHorizontal = VelX > VelY;
+
+	float MaxStretch = IsHorizontal ? 1.2f : 1.15f; // max stretch factor
+	float Stretch = 1.0f + t * (MaxStretch - 1.0f);
+
+	if(ImpactEffect > 0.5f)
+		Stretch *= 1.15f;
+
+	float Inverse = 1.0f / Stretch;
+
+	if(IsHorizontal)
+	{
+		ScaleX = std::clamp(Stretch, 0.85f, 1.2f);
+		ScaleY = std::clamp(Inverse, 0.85f, 1.2f);
+	}
+	else
+	{
+		ScaleY = std::clamp(Stretch, 0.85f, 1.2f);
+		ScaleX = std::clamp(Inverse, 0.85f, 1.2f);
+	}
+}
+
+
 void CRenderTools::GetRenderTeeBodyScale(float BaseSize, float &BodyScale)
 {
 	BodyScale = g_Config.m_ClFatSkins ? BaseSize * 1.3f : BaseSize;
@@ -343,22 +405,26 @@ void CRenderTools::GetRenderTeeOffsetToRenderedTee(const CAnimState *pAnim, cons
 	TeeOffsetToMid.y = -MidOfRendered;
 }
 
-void CRenderTools::RenderTee(const CAnimState *pAnim, const CTeeRenderInfo *pInfo, int Emote, vec2 Dir, vec2 Pos, float Alpha)
+void CRenderTools::RenderTee(const CAnimState *pAnim, const CTeeRenderInfo *pInfo, int Emote, vec2 Dir, vec2 Pos, float Alpha, vec2 Velocity)
 {
 	if(pInfo->m_aSixup[g_Config.m_ClDummy].PartTexture(protocol7::SKINPART_BODY).IsValid())
-		RenderTee7(pAnim, pInfo, Emote, Dir, Pos, Alpha);
+		RenderTee7(pAnim, pInfo, Emote, Dir, Pos, Alpha, Velocity);
 	else
-		RenderTee6(pAnim, pInfo, Emote, Dir, Pos, Alpha);
+		RenderTee6(pAnim, pInfo, Emote, Dir, Pos, Alpha, Velocity);
 
 	Graphics()->SetColor(1.f, 1.f, 1.f, 1.f);
 	Graphics()->QuadsSetRotation(0);
 }
 
-void CRenderTools::RenderTee7(const CAnimState *pAnim, const CTeeRenderInfo *pInfo, int Emote, vec2 Dir, vec2 Pos, float Alpha)
+void CRenderTools::RenderTee7(const CAnimState *pAnim, const CTeeRenderInfo *pInfo, int Emote, vec2 Dir, vec2 Pos, float Alpha, vec2 Velocity)
 {
 	vec2 Direction = Dir;
 	vec2 Position = Pos;
 	const bool IsBot = pInfo->m_aSixup[g_Config.m_ClDummy].m_BotTexture.IsValid();
+
+	// Calculate squash and stretch scaling based on velocity
+	float SquashScaleX, SquashScaleY;
+	CalculateSquashStretchScaling(Velocity, SquashScaleX, SquashScaleY);
 
 	// first pass we draw the outline
 	// second pass we draw the filling
@@ -373,12 +439,15 @@ void CRenderTools::RenderTee7(const CAnimState *pAnim, const CTeeRenderInfo *pIn
 			if(Filling == 1)
 			{
 				vec2 BodyPos = Position + vec2(pAnim->GetBody()->m_X, pAnim->GetBody()->m_Y) * AnimScale;
-				IGraphics::CQuadItem BodyItem(BodyPos.x, BodyPos.y, BaseSize, BaseSize);
+				// Apply squash and stretch scaling to body size
+				float ScaledBodySizeX = BaseSize * SquashScaleX;
+				float ScaledBodySizeY = BaseSize * SquashScaleY;
+				IGraphics::CQuadItem BodyItem(BodyPos.x, BodyPos.y, ScaledBodySizeX, ScaledBodySizeY);
 				IGraphics::CQuadItem Item;
 
 				if(IsBot && !OutLine)
 				{
-					IGraphics::CQuadItem BotItem(BodyPos.x + (2.f / 3.f) * AnimScale, BodyPos.y + (-16 + 2.f / 3.f) * AnimScale, BaseSize, BaseSize); // x+0.66, y+0.66 to correct some rendering bug
+					IGraphics::CQuadItem BotItem(BodyPos.x + (2.f / 3.f) * AnimScale, BodyPos.y + (-16 + 2.f / 3.f) * AnimScale, ScaledBodySizeX, ScaledBodySizeY); // x+0.66, y+0.66 to correct some rendering bug
 
 					// draw bot visuals (background)
 					Graphics()->TextureSet(pInfo->m_aSixup[g_Config.m_ClDummy].m_BotTexture);
@@ -544,6 +613,10 @@ void CRenderTools::RenderTee7(const CAnimState *pAnim, const CTeeRenderInfo *pIn
 
 			float w = BaseSize / 2.1f;
 			float h = w;
+			
+			// Apply squash and stretch scaling to feet
+			w *= SquashScaleX;
+			h *= SquashScaleY;
 
 			Graphics()->QuadsSetRotation(pFoot->m_Angle * pi * 2);
 
@@ -573,12 +646,16 @@ void CRenderTools::RenderTee7(const CAnimState *pAnim, const CTeeRenderInfo *pIn
 	}
 }
 
-void CRenderTools::RenderTee6(const CAnimState *pAnim, const CTeeRenderInfo *pInfo, int Emote, vec2 Dir, vec2 Pos, float Alpha) const
+void CRenderTools::RenderTee6(const CAnimState *pAnim, const CTeeRenderInfo *pInfo, int Emote, vec2 Dir, vec2 Pos, float Alpha, vec2 Velocity) const
 {
 	vec2 Direction = Dir;
 	vec2 Position = Pos;
 
 	const CSkin::CSkinTextures *pSkinTextures = pInfo->m_CustomColoredSkin ? &pInfo->m_ColorableRenderSkin : &pInfo->m_OriginalRenderSkin;
+
+	// Calculate squash and stretch scaling based on velocity
+	float SquashScaleX, SquashScaleY;
+	CalculateSquashStretchScaling(Velocity, SquashScaleX, SquashScaleY);
 
 	// first pass we draw the outline
 	// second pass we draw the filling
@@ -599,8 +676,13 @@ void CRenderTools::RenderTee6(const CAnimState *pAnim, const CTeeRenderInfo *pIn
 				vec2 BodyPos = Position + vec2(pAnim->GetBody()->m_X, pAnim->GetBody()->m_Y) * AnimScale;
 				float BodyScale;
 				GetRenderTeeBodyScale(BaseSize, BodyScale);
+				
+				// Apply squash and stretch scaling to body
+				float ScaledBodyScaleX = BodyScale * SquashScaleX;
+				float ScaledBodyScaleY = BodyScale * SquashScaleY;
+				
 				Graphics()->TextureSet(OutLine == 1 ? pSkinTextures->m_BodyOutline : pSkinTextures->m_Body);
-				Graphics()->RenderQuadContainerAsSprite(m_TeeQuadContainerIndex, OutLine, BodyPos.x, BodyPos.y, BodyScale, BodyScale);
+				Graphics()->RenderQuadContainerAsSprite(m_TeeQuadContainerIndex, OutLine, BodyPos.x, BodyPos.y, ScaledBodyScaleX, ScaledBodyScaleY);
 
 				// draw eyes
 				if(Pass == 1)
@@ -648,6 +730,10 @@ void CRenderTools::RenderTee6(const CAnimState *pAnim, const CTeeRenderInfo *pIn
 
 			float w = BaseSize;
 			float h = BaseSize / 2;
+			
+			// Apply squash and stretch scaling to feet
+			w *= SquashScaleX;
+			h *= SquashScaleY;
 
 			int QuadOffset = 7;
 			if(Dir.x < 0 && pInfo->m_FeetFlipped)

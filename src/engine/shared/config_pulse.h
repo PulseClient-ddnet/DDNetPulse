@@ -38,6 +38,8 @@ MACRO_CONFIG_INT(ClHoverMessagesMaxNotifications, p_hover_message_max_notificati
 MACRO_CONFIG_INT(ClTrailStyle, p_toggle_trails, 0, 0, 3, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Player trail style (0 = off, 1 = sparkle, 2 = ring, 3 = rainbow)")
 MACRO_CONFIG_INT(ClPlayerIdleAura, p_idle_aura, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "")
 
+MACRO_CONFIG_INT(ClPlayerSquashStretch, p_squash_stretch, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Enable squash and stretch animation for player sprites based on velocity")
+
 
 MACRO_CONFIG_INT(ClPlayerIdleAuraTimer, p_idle_aura_timer, 2, 2, 30, CFGFLAG_CLIENT | CFGFLAG_SAVE, "")
 MACRO_CONFIG_INT(ClToggleAuraParticlesNum, p_toggle_aura_parsicle_num, 12, 0, 300, CFGFLAG_CLIENT | CFGFLAG_SAVE, "")
