@@ -345,7 +345,7 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 			CUIRect VisualRect;
 
 			// Player Effects Box
-			DRAW_BOX(RightSection, VisualRect, 100.0f, defaultCol, 10.0f);
+			DRAW_BOX(RightSection, VisualRect, 120.0f, defaultCol, 10.0f);
 			s_ScrollRegion.AddRect(VisualRect);
 			BOX_LABEL(VisualRect, Section, "Player Effects", 40.0f, 10.0f);
 			BUTTON(VisualRect, Button, 20.0f, &g_Config.m_ClPlayerIdleAura, "Idle Player Aura", g_Config.m_ClPlayerIdleAura);
