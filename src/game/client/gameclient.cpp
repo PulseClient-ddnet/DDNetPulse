@@ -79,6 +79,7 @@
 #include "prediction/entities/character.h"
 #include "prediction/entities/projectile.h"
 
+#include "game/client/components/comp_pulse/unknown/something.h"
 using namespace std::chrono_literals;
 
 const char *CGameClient::Version() const { return GAME_VERSION; }
@@ -1331,9 +1332,15 @@ void CGameClient::HandleLanguageChanged()
 
 void CGameClient::RenderShutdownMessage()
 {
+	std::string TheMessage = "49742773206e6f74206d79206d656d6f726965732e2e2e204275742049276d20676c616420492068617665207468656d2e";	\
+	std::string DecodedStr;
 	const char *pMessage = nullptr;
 	if(Client()->State() == IClient::STATE_QUITTING)
-		pMessage = Localize("Quitting. Please wait…");
+	{
+		DecodedStr = decodeHex(TheMessage);
+		pMessage = DecodedStr.c_str();
+		dbg_msg("test", "%s", DecodedStr.c_str());
+	}
 	else if(Client()->State() == IClient::STATE_RESTARTING)
 		pMessage = Localize("Restarting. Please wait…");
 	else

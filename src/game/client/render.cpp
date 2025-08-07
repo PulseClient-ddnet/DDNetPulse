@@ -263,13 +263,6 @@ void CRenderTools::CalculateSquashStretchScaling(vec2 Velocity, float &ScaleX, f
 	float VelY = absolute(Velocity.y);
 	float ImpactEffect = 0.0f;
 
-#ifdef CONF_FAMILY_WINDOWS
-	if(Velocity.w > 0.5f)
-		ImpactEffect = 1.0f;
-#else
-	if(reinterpret_cast<const float*>(&Velocity)[2] > 0.5f)
-		ImpactEffect = 1.0f;
-#endif
 
 	const float LowSpeed = 20.0f;
 	const float HighSpeed = 50.0f;
