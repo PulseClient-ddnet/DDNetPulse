@@ -349,7 +349,7 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 			s_ScrollRegion.AddRect(VisualRect);
 			BOX_LABEL(VisualRect, Section, "Player Effects", 40.0f, 10.0f);
 			BUTTON(VisualRect, Button, 20.0f, &g_Config.m_ClPlayerIdleAura, "Idle Player Aura", g_Config.m_ClPlayerIdleAura);
-			BUTTON(VisualRect, Button, 20.0f, &g_Config.m_ClPlayerSquashStretch, "Squash & Stretch Animation", g_Config.m_ClPlayerSquashStretch);
+			BUTTON(VisualRect, Button, 20.0f, &g_Config.m_ClPlayerSquashStretch, "Squash & Stretch Animation (beta)", g_Config.m_ClPlayerSquashStretch);
 
 			if(g_Config.m_ClPlayerIdleAura)
 			{
