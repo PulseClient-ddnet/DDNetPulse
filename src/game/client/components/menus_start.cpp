@@ -25,78 +25,78 @@ using namespace FontIcons;
 
 static const char *s_apSplashTexts[] = {
 	"Hook. Fail. Repeat.",
-    	"Made with love and checkpoints!",
-    	"Cendren was here.",
-    	"n9 did it first.",
-    	"Now with 100% more ragequits.",
-    	"Teleport abuse not included.",
-    	"Save your hammerhits, they matter.",
-    	"This map is easy... said no one ever.",
-    	"Rank 1? In your dreams.",
-    	"Who needs friends when you have dummy?",
-    	"Did you just skip 7 minutes?",
-    	"Sawblade lovers anonymous.",
-    	"Rated E for Everyone’s Screams.",
-    	"Your dummy is judging you.",
-    	"Made with more triggers than emotions.",
-    	"Even n9 failed this one. Probably.",
-    	"Edgehook? More like edge-nope.",
-    	"You can't out-wallhammer your problems.",
-    	"Speedrunners hate this one trick!",
-    	"Unfreeze me, I swear I won’t troll.",
-    	"KoG’s playground, DDNet’s battlefield.",
-    	"Lost in CP3 again, aren’t you?",
-    	"You thought that was the finish? Cute.",
-    	"Still loading… like your team skills.",
-    	"Map rated 2★, ego rated 5★.",
-    	"Inspired by Aoe, failed like you.",
-    	"This phrase was placed here by Tee gods.",
-    	"Welcome to hook school – you’re late.",
-    	"Lag is just a feature.",
-    	"Reset timer. Reset hope.",
-    	"Hold F to pay respects to your dummy.",
-    	"You didn’t triple hook, you triple failed.",
-    	"n3xt plz!",
-    	"You can't hammer your way out of this one.",
-    	"That wasn’t lag, that was skill delay.",
-    	"Now featuring invisible fails!",
-    	"Climb like nobody's watching.",
-    	"Maps don’t break you, CP9 does.",
-    	"Your dummy abandoned you.",
-    	"Made by players. Cursed by players.",
-    	"Finish the map, they said.",
-    	"Where walljumps go to die.",
-    	"Hitting lasers like it’s a feature.",
-    	"Triggered? So is this map.",
-    	"Rank farming intensifies.",
-    	"100% skill, 0% sanity.",
-    	"Spectate the pros. Copy. Fail.",
-    	"Mapmaker’s revenge starts here.",
-    	"One more try. One more life.",
-    	"What’s a solo part between friends?",
-    	"Manual edgehook required. Good luck.",
-    	"In tees we trust.",
-    	"Tee lost. Please return to DDNet.",
-    	"Checkpoint roulette: Try again.",
-    	"Trust your dummy... or don’t.",
-    	"Legend says Aoe beat it blindfolded.",
-    	"Press F1 to uninstall.",
-    	"You vs. the dummy she told you not to worry about.",
-    	"This phrase is harder than the map.",
+	"Made with love and checkpoints!",
+	"Cendren was here.",
+	"n9 did it first.",
+	"Now with 100% more ragequits.",
+	"Teleport abuse not included.",
+	"Save your hammerhits, they matter.",
+	"This map is easy... said no one ever.",
+	"Rank 1? In your dreams.",
+	"Who needs friends when you have dummy?",
+	"Did you just skip 7 minutes?",
+	"Sawblade lovers anonymous.",
+	"Rated E for Everyone’s Screams.",
+	"Your dummy is judging you.",
+	"Made with more triggers than emotions.",
+	"Even n9 failed this one. Probably.",
+	"Edgehook? More like edge-nope.",
+	"You can't out-wallhammer your problems.",
+	"Speedrunners hate this one trick!",
+	"Unfreeze me, I swear I won’t troll.",
+	"KoG’s playground, DDNet’s battlefield.",
+	"Lost in CP3 again, aren’t you?",
+	"You thought that was the finish? Cute.",
+	"Still loading… like your team skills.",
+	"Map rated 2★, ego rated 5★.",
+	"Inspired by Aoe, failed like you.",
+	"This phrase was placed here by Tee gods.",
+	"Welcome to hook school – you’re late.",
+	"Lag is just a feature.",
+	"Reset timer. Reset hope.",
+	"Hold F to pay respects to your dummy.",
+	"You didn’t triple hook, you triple failed.",
+	"n3xt plz!",
+	"You can't hammer your way out of this one.",
+	"That wasn’t lag, that was skill delay.",
+	"Now featuring invisible fails!",
+	"Climb like nobody's watching.",
+	"Maps don’t break you, CP9 does.",
+	"Your dummy abandoned you.",
+	"Made by players. Cursed by players.",
+	"Finish the map, they said.",
+	"Where walljumps go to die.",
+	"Hitting lasers like it’s a feature.",
+	"Triggered? So is this map.",
+	"Rank farming intensifies.",
+	"100% skill, 0% sanity.",
+	"Spectate the pros. Copy. Fail.",
+	"Mapmaker’s revenge starts here.",
+	"One more try. One more life.",
+	"What’s a solo part between friends?",
+	"Manual edgehook required. Good luck.",
+	"In tees we trust.",
+	"Tee lost. Please return to DDNet.",
+	"Checkpoint roulette: Try again.",
+	"Trust your dummy... or don’t.",
+	"Legend says Aoe beat it blindfolded.",
+	"Press F1 to uninstall.",
+	"You vs. the dummy she told you not to worry about.",
+	"This phrase is harder than the map.",
 	"Aoe finished before you even spawned.",
-    	"n9’s ghost approved this run.",
-    	"You're not Aoe. Accept it.",
-    	"Cendren would have edgehooked that...",
-    	"n9 did it backwards.",
-    	"StormA paused. You're safe.",
-    	"Even Brokecdx couldn't break this.",
-    	"n9 finished this map blindfolded.",
-    	"Cendren wrote a book on this part.",
-    	"Aoe says hi. Also, get good.",
-    	"StormA already reviewed your demo.",
-    	"n9 could finish this with a spoon.",
-    	"This map once feared Aoe.",
-    	"You just failed where Cendren flexed.",
+	"n9’s ghost approved this run.",
+	"You're not Aoe. Accept it.",
+	"Cendren would have edgehooked that...",
+	"n9 did it backwards.",
+	"StormA paused. You're safe.",
+	"Even Brokecdx couldn't break this.",
+	"n9 finished this map blindfolded.",
+	"Cendren wrote a book on this part.",
+	"Aoe says hi. Also, get good.",
+	"StormA already reviewed your demo.",
+	"n9 could finish this with a spoon.",
+	"This map once feared Aoe.",
+	"You just failed where Cendren flexed.",
 	"x lines of code",
 	"absolutely no bots",
 	"waiting for noob school 3",
@@ -128,10 +128,7 @@ static const char *s_apSplashTexts[] = {
 	"connect dummy? more like skill issue"
 };
 
-static const char *GetRandomSplashText()
-{
-	return s_apSplashTexts[secure_rand() % std::size(s_apSplashTexts)];
-}
+static const char *GetRandomSplashText() { return s_apSplashTexts[secure_rand() % std::size(s_apSplashTexts)]; }
 
 void CMenusStart::RenderStartMenu(CUIRect MainView)
 {
@@ -183,7 +180,7 @@ void CMenusStart::RenderStartMenu(CUIRect MainView)
 		TextRender()->TextColor(1.0f, 0.8f, 0.0f, 1.0f);
 		TextRender()->SetFontPreset(EFontPreset::MINECRAFT_FONT);
 
-		TextRender()->TextRotated(x, y - 30, PulseSize, pi/7.0f, s_pCurrentSplashText);
+		TextRender()->TextRotated(x, y - 30, PulseSize, pi / 7.0f, s_pCurrentSplashText);
 
 		TextRender()->SetFontPreset(EFontPreset::DEFAULT_FONT);
 		TextRender()->TextColor(TextRender()->DefaultTextColor());
@@ -201,25 +198,19 @@ void CMenusStart::RenderStartMenu(CUIRect MainView)
 
 	ExtMenu.HSplitBottom(20.0f, &ExtMenu, &Button);
 	static CButtonContainer s_DiscordButton;
-	if(GameClient()->m_Menus.DoButton_Menu(&s_DiscordButton, Localize("Discord"), 0, &Button, BUTTONFLAG_LEFT, nullptr, IGraphics::CORNER_ALL, 5.0f, 0.0f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)))
-	{
-		Client()->ViewLink(Localize("https://ddnet.org/discord"));
-	}
+	if(GameClient()->m_Menus.DoButton_Menu(&s_DiscordButton, Localize("Discord"), 0, &Button, BUTTONFLAG_LEFT, nullptr, IGraphics::CORNER_ALL, 5.0f, 0.0f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f))) { Client()->ViewLink(Localize("https://ddnet.org/discord")); }
 
 	ExtMenu.HSplitBottom(5.0f, &ExtMenu, nullptr); // little space
 	ExtMenu.HSplitBottom(20.0f, &ExtMenu, &Button);
 	static CButtonContainer s_LearnButton;
-	if(GameClient()->m_Menus.DoButton_Menu(&s_LearnButton, Localize("Learn"), 0, &Button, BUTTONFLAG_LEFT, nullptr, IGraphics::CORNER_ALL, 5.0f, 0.0f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)))
-	{
-		Client()->ViewLink(Localize("https://wiki.ddnet.org/"));
-	}
+	if(GameClient()->m_Menus.DoButton_Menu(&s_LearnButton, Localize("Learn"), 0, &Button, BUTTONFLAG_LEFT, nullptr, IGraphics::CORNER_ALL, 5.0f, 0.0f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f))) { Client()->ViewLink(Localize("https://wiki.ddnet.org/")); }
 
 	ExtMenu.HSplitBottom(5.0f, &ExtMenu, nullptr); // little space
 	ExtMenu.HSplitBottom(20.0f, &ExtMenu, &Button);
 	static CButtonContainer s_TutorialButton;
 	static float s_JoinTutorialTime = 0.0f;
 	if(GameClient()->m_Menus.DoButton_Menu(&s_TutorialButton, Localize("Tutorial"), 0, &Button, BUTTONFLAG_LEFT, nullptr, IGraphics::CORNER_ALL, 5.0f, 0.0f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)) ||
-		(s_JoinTutorialTime != 0.0f && Client()->LocalTime() >= s_JoinTutorialTime))
+	   (s_JoinTutorialTime != 0.0f && Client()->LocalTime() >= s_JoinTutorialTime))
 	{
 		// Activate internet tab before joining tutorial to make sure the server info
 		// for the tutorial servers is available.
@@ -246,10 +237,7 @@ void CMenusStart::RenderStartMenu(CUIRect MainView)
 	ExtMenu.HSplitBottom(5.0f, &ExtMenu, nullptr); // little space
 	ExtMenu.HSplitBottom(20.0f, &ExtMenu, &Button);
 	static CButtonContainer s_WebsiteButton;
-	if(GameClient()->m_Menus.DoButton_Menu(&s_WebsiteButton, Localize("Website"), 0, &Button, BUTTONFLAG_LEFT, nullptr, IGraphics::CORNER_ALL, 5.0f, 0.0f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)))
-	{
-		Client()->ViewLink("https://ddnet.org/");
-	}
+	if(GameClient()->m_Menus.DoButton_Menu(&s_WebsiteButton, Localize("Website"), 0, &Button, BUTTONFLAG_LEFT, nullptr, IGraphics::CORNER_ALL, 5.0f, 0.0f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f))) { Client()->ViewLink("https://ddnet.org/"); }
 
 	ExtMenu.HSplitBottom(5.0f, &ExtMenu, nullptr); // little space
 	ExtMenu.HSplitBottom(20.0f, &ExtMenu, &Button);
@@ -266,14 +254,8 @@ void CMenusStart::RenderStartMenu(CUIRect MainView)
 	bool UsedEscape = false;
 	if(GameClient()->m_Menus.DoButton_Menu(&s_QuitButton, Localize("Quit"), 0, &Button, BUTTONFLAG_LEFT, nullptr, IGraphics::CORNER_ALL, Rounding, 0.5f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)) || (UsedEscape = Ui()->ConsumeHotkey(CUi::HOTKEY_ESCAPE)) || CheckHotKey(KEY_Q))
 	{
-		if(UsedEscape || GameClient()->Editor()->HasUnsavedData() || (GameClient()->CurrentRaceTime() / 60 >= g_Config.m_ClConfirmQuitTime && g_Config.m_ClConfirmQuitTime >= 0))
-		{
-			GameClient()->m_Menus.ShowQuitPopup();
-		}
-		else
-		{
-			Client()->Quit();
-		}
+		if(UsedEscape || GameClient()->Editor()->HasUnsavedData() || (GameClient()->CurrentRaceTime() / 60 >= g_Config.m_ClConfirmQuitTime && g_Config.m_ClConfirmQuitTime >= 0)) { GameClient()->m_Menus.ShowQuitPopup(); }
+		else { Client()->Quit(); }
 	}
 
 	Menu.HSplitBottom(100.0f, &Menu, nullptr);
@@ -289,14 +271,8 @@ void CMenusStart::RenderStartMenu(CUIRect MainView)
 	const bool LocalServerRunning = GameClient()->m_LocalServer.IsServerRunning();
 	if(GameClient()->m_Menus.DoButton_Menu(&s_LocalServerButton, LocalServerRunning ? Localize("Stop server") : Localize("Run server"), 0, &Button, BUTTONFLAG_LEFT, g_Config.m_ClShowStartMenuImages ? "local_server" : nullptr, IGraphics::CORNER_ALL, Rounding, 0.5f, LocalServerRunning ? ColorRGBA(0.0f, 1.0f, 0.0f, 0.25f) : ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)) || (CheckHotKey(KEY_R) && Input()->KeyPress(KEY_R)))
 	{
-		if(LocalServerRunning)
-		{
-			GameClient()->m_LocalServer.KillServer();
-		}
-		else
-		{
-			GameClient()->m_LocalServer.RunServer({});
-		}
+		if(LocalServerRunning) { GameClient()->m_LocalServer.KillServer(); }
+		else { GameClient()->m_LocalServer.RunServer({}); }
 	}
 
 	Menu.HSplitBottom(5.0f, &Menu, nullptr); // little space
@@ -311,18 +287,12 @@ void CMenusStart::RenderStartMenu(CUIRect MainView)
 	Menu.HSplitBottom(5.0f, &Menu, nullptr); // little space
 	Menu.HSplitBottom(40.0f, &Menu, &Button);
 	static CButtonContainer s_DemoButton;
-	if(GameClient()->m_Menus.DoButton_Menu(&s_DemoButton, Localize("Demos"), 0, &Button, BUTTONFLAG_LEFT, g_Config.m_ClShowStartMenuImages ? "demos" : nullptr, IGraphics::CORNER_ALL, Rounding, 0.5f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)) || CheckHotKey(KEY_D))
-	{
-		NewPage = CMenus::PAGE_DEMOS;
-	}
+	if(GameClient()->m_Menus.DoButton_Menu(&s_DemoButton, Localize("Demos"), 0, &Button, BUTTONFLAG_LEFT, g_Config.m_ClShowStartMenuImages ? "demos" : nullptr, IGraphics::CORNER_ALL, Rounding, 0.5f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)) || CheckHotKey(KEY_D)) { NewPage = CMenus::PAGE_DEMOS; }
 
 	Menu.HSplitBottom(5.0f, &Menu, nullptr); // little space
 	Menu.HSplitBottom(40.0f, &Menu, &Button);
 	static CButtonContainer s_PlayButton;
-	if(GameClient()->m_Menus.DoButton_Menu(&s_PlayButton, Localize("Play", "Start menu"), 0, &Button, BUTTONFLAG_LEFT, g_Config.m_ClShowStartMenuImages ? "play_game" : nullptr, IGraphics::CORNER_ALL, Rounding, 0.5f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)) || Ui()->ConsumeHotkey(CUi::HOTKEY_ENTER) || CheckHotKey(KEY_P))
-	{
-		NewPage = g_Config.m_UiPage >= CMenus::PAGE_INTERNET && g_Config.m_UiPage <= CMenus::PAGE_FAVORITE_COMMUNITY_5 ? g_Config.m_UiPage : CMenus::PAGE_INTERNET;
-	}
+	if(GameClient()->m_Menus.DoButton_Menu(&s_PlayButton, Localize("Play", "Start menu"), 0, &Button, BUTTONFLAG_LEFT, g_Config.m_ClShowStartMenuImages ? "play_game" : nullptr, IGraphics::CORNER_ALL, Rounding, 0.5f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)) || Ui()->ConsumeHotkey(CUi::HOTKEY_ENTER) || CheckHotKey(KEY_P)) { NewPage = g_Config.m_UiPage >= CMenus::PAGE_INTERNET && g_Config.m_UiPage <= CMenus::PAGE_FAVORITE_COMMUNITY_5 ? g_Config.m_UiPage : CMenus::PAGE_INTERNET; }
 
 	// render version
 	CUIRect CurVersion, ConsoleButton;
@@ -336,10 +306,7 @@ void CMenusStart::RenderStartMenu(CUIRect MainView)
 	static CButtonContainer s_ConsoleButton;
 	TextRender()->SetFontPreset(EFontPreset::ICON_FONT);
 	TextRender()->SetRenderFlags(ETextRenderFlags::TEXT_RENDER_FLAG_ONLY_ADVANCE_WIDTH | ETextRenderFlags::TEXT_RENDER_FLAG_NO_X_BEARING | ETextRenderFlags::TEXT_RENDER_FLAG_NO_Y_BEARING | ETextRenderFlags::TEXT_RENDER_FLAG_NO_PIXEL_ALIGNMENT | ETextRenderFlags::TEXT_RENDER_FLAG_NO_OVERSIZE);
-	if(GameClient()->m_Menus.DoButton_Menu(&s_ConsoleButton, FONT_ICON_TERMINAL, 0, &ConsoleButton, BUTTONFLAG_LEFT, nullptr, IGraphics::CORNER_ALL, 5.0f, 0.0f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.1f)))
-	{
-		GameClient()->m_GameConsole.Toggle(CGameConsole::CONSOLETYPE_LOCAL);
-	}
+	if(GameClient()->m_Menus.DoButton_Menu(&s_ConsoleButton, FONT_ICON_TERMINAL, 0, &ConsoleButton, BUTTONFLAG_LEFT, nullptr, IGraphics::CORNER_ALL, 5.0f, 0.0f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.1f))) { GameClient()->m_GameConsole.Toggle(CGameConsole::CONSOLETYPE_LOCAL); }
 	TextRender()->SetRenderFlags(0);
 	TextRender()->SetFontPreset(EFontPreset::DEFAULT_FONT);
 

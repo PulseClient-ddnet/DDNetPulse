@@ -136,10 +136,7 @@ void CMenus::RenderConsoleImages(CUIRect MainView)
 						s_vConsoleImages.push_back(Image);
 						dbg_msg("console_images", "Successfully loaded image: %s", Image.m_aName);
 					}
-					else
-					{
-						dbg_msg("console_images", "Failed to load image: %s", aFullPath);
-					}
+					else { dbg_msg("console_images", "Failed to load image: %s", aFullPath); }
 				}
 			}
 		}
@@ -208,7 +205,6 @@ void CMenus::RenderConsoleImages(CUIRect MainView)
 
 			str_copy(g_Config.m_ClAssetConsole, a_cleanName, sizeof(g_Config.m_ClAssetConsole));
 
-
 			//dbg_msg("console_images", "Selected image: %s for %s console", a_cleanName, s_SelectedConsoleType == 0 ? "default" : "RCON");
 		}
 	}
@@ -238,10 +234,7 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 	{
 		TabBar.VSplitLeft(TabWidth, &Button, &TabBar);
 		const int Corners = Tab == PULSE_TAB_GLOBAL ? IGraphics::CORNER_L : Tab == NUMBER_OF_PULSE_TABS - 1 ? IGraphics::CORNER_R : IGraphics::CORNER_NONE;
-		if(DoButton_MenuTab(&s_aPageTabs[Tab], apTabNames[Tab], s_CurTab == Tab, &Button, Corners, nullptr, nullptr, nullptr, nullptr, 4.0f))
-		{
-			s_CurTab = Tab;
-		}
+		if(DoButton_MenuTab(&s_aPageTabs[Tab], apTabNames[Tab], s_CurTab == Tab, &Button, Corners, nullptr, nullptr, nullptr, nullptr, 4.0f)) { s_CurTab = Tab; }
 	}
 
 	if(s_CurTab == PULSE_TAB_GLOBAL)
@@ -300,7 +293,6 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 				CUIRect LaserPreview;
 				LASER_PREVIEW(LaserRect, LaserPreview, LaserPreviewHeight, g_Config.m_ClLaserRifleInnerColor, g_Config.m_ClLaserRifleOutlineColor, LASERTYPE_RIFLE);
 				LASER_PREVIEW(LaserRect, LaserPreview, LaserPreviewHeight, g_Config.m_ClLaserShotgunInnerColor, g_Config.m_ClLaserShotgunOutlineColor, LASERTYPE_SHOTGUN);
-
 			}
 			END_LABEL(LeftSection);
 
@@ -336,7 +328,6 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 			BOX_LABEL(FunRect, Section, "Fun Settings", 40.0f, 10.0f);
 			BUTTON(FunRect, Button, 20.0f, &g_Config.m_ClDeathPhrases, "Funny death phrases on death", g_Config.m_ClDeathPhrases);
 			END_LABEL(LeftSection);
-
 		}
 
 		// Right Section - Visual Effects
@@ -351,10 +342,7 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 			BUTTON(VisualRect, Button, 20.0f, &g_Config.m_ClPlayerIdleAura, "Idle Player Aura", g_Config.m_ClPlayerIdleAura);
 			BUTTON(VisualRect, Button, 20.0f, &g_Config.m_ClPlayerSquashStretch, "Squash & Stretch Animation (beta)", g_Config.m_ClPlayerSquashStretch);
 
-			if(g_Config.m_ClPlayerIdleAura)
-			{
-				SCROLLBAR(VisualRect, Button, 20.0f, &g_Config.m_ClPlayerIdleAuraTimer, 2, 30, "Aura Timer");
-			}
+			if(g_Config.m_ClPlayerIdleAura) { SCROLLBAR(VisualRect, Button, 20.0f, &g_Config.m_ClPlayerIdleAuraTimer, 2, 30, "Aura Timer"); }
 			END_LABEL(RightSection);
 
 			// Hover Messages Box
@@ -378,15 +366,9 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 			s_ScrollRegion.AddRect(DuckRect);
 			BOX_LABEL(DuckRect, Section, "Duck Settings", 40.0f, 10.0f);
 			BUTTON(DuckRect, Button, 20.0f, &g_Config.m_ClShowFlags, "Show Nameplates Flags (Deep/Jetpack/etc)", g_Config.m_ClShowFlags);
-			if(g_Config.m_ClShowFlags)
-			{
-				SCROLLBAR(DuckRect, Button, 20.0f, &g_Config.m_ClShowFlagsSize, -50, 100, "Nameplates Flags Size");
-			}
+			if(g_Config.m_ClShowFlags) { SCROLLBAR(DuckRect, Button, 20.0f, &g_Config.m_ClShowFlagsSize, -50, 100, "Nameplates Flags Size"); }
 			BUTTON(DuckRect, Button, 20.0f, &g_Config.m_ClShowDJ, "Show Double Jumps", g_Config.m_ClShowDJ);
-			if(g_Config.m_ClShowDJ)
-			{
-				SCROLLBAR(DuckRect, Button, 20.0f, &g_Config.m_ClShowJumpsSize, -50, 100, "Double Jumps Size");
-			}
+			if(g_Config.m_ClShowDJ) { SCROLLBAR(DuckRect, Button, 20.0f, &g_Config.m_ClShowJumpsSize, -50, 100, "Double Jumps Size"); }
 			END_LABEL(RightSection);
 
 			CUIRect ScoreboardRect;
@@ -422,14 +404,11 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 			ScoreboardRect.HSplitTop(5.0f, nullptr, &ScoreboardRect);
 			END_LABEL(RightSection);
 
-
 			// Focus Mode Settings Box
 			CUIRect FocusModeRect;
 
-			if(g_Config.m_ClFocusMode)
-			{DRAW_BOX(RightSection, FocusModeRect, 180.0f, defaultCol, 10.0f);}
-			else
-			{DRAW_BOX(RightSection, FocusModeRect, 80.0f, defaultCol, 10.0f);}
+			if(g_Config.m_ClFocusMode) { DRAW_BOX(RightSection, FocusModeRect, 180.0f, defaultCol, 10.0f); }
+			else { DRAW_BOX(RightSection, FocusModeRect, 80.0f, defaultCol, 10.0f); }
 
 			s_ScrollRegion.AddRect(FocusModeRect);
 			BOX_LABEL(FocusModeRect, Section, "Focus Mode Settings", 40.0f, 10.0f);
@@ -465,7 +444,6 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 
 			SCROLLBAR(ConsoleRect, Button, 20.0f, &g_Config.m_ClCustomConsoleAlpha, 0, 100, "Console Alpha");
 			SCROLLBAR(ConsoleRect, Button, 20.0f, &g_Config.m_ClCustomConsoleFading, 100, 0, "Console Brightness");
-
 
 			CUIRect OpenFolderButton;
 			ConsoleRect.HSplitTop(20.0f, &OpenFolderButton, &ConsoleRect);
@@ -630,10 +608,7 @@ void CMenus::RenderSettingsProfs(CUIRect MainView)
 		str_format(aName, sizeof(aName), "%s", m_Dummy ? g_Config.m_ClDummyName : g_Config.m_PlayerName);
 		str_format(aClan, sizeof(aClan), "%s", m_Dummy ? g_Config.m_ClDummyClan : g_Config.m_PlayerClan);
 	}
-	else
-	{
-		MainView.HSplitTop(80.0f, nullptr, &MainView);
-	}
+	else { MainView.HSplitTop(80.0f, nullptr, &MainView); }
 
 	//===BUTTONS AND CHECK BOX===
 	CUIRect DummyCheck, CustomCheck;
@@ -877,10 +852,7 @@ void CMenus::RenderSettingsProfs(CUIRect MainView)
 	}
 
 	const int NewSelected = s_ListBox.DoEnd();
-	if(s_SelectedProfile != NewSelected)
-	{
-		s_SelectedProfile = NewSelected;
-	}
+	if(s_SelectedProfile != NewSelected) { s_SelectedProfile = NewSelected; }
 	static CButtonContainer s_ProfilesFile;
 	FileButton.VSplitLeft(130.0f, &FileButton, nullptr);
 	if(DoButton_Menu(&s_ProfilesFile, Localize("Profiles file"), 0, &FileButton))
