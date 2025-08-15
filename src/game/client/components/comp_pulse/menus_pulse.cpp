@@ -320,6 +320,7 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 				SCROLLBAR(PlayerAuraRect, Button, 20.0f, &g_Config.m_ClToggleAuraParticlesNum, 0, 300, "Particles Number");
 				SCROLLBAR(PlayerAuraRect, Button, 20.0f, &g_Config.m_ClToggleAuraRadius, 0, 600, "Aura Radius");
 			}
+			//TODO: types
 			END_LABEL(LeftSection);
 
 			CUIRect FunRect;
@@ -336,13 +337,10 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 			CUIRect VisualRect;
 
 			// Player Effects Box
-			DRAW_BOX(RightSection, VisualRect, 120.0f, defaultCol, 10.0f);
+			DRAW_BOX(RightSection, VisualRect, 80.0f, defaultCol, 10.0f);
 			s_ScrollRegion.AddRect(VisualRect);
 			BOX_LABEL(VisualRect, Section, "Player Effects", 40.0f, 10.0f);
-			BUTTON(VisualRect, Button, 20.0f, &g_Config.m_ClPlayerIdleAura, "Idle Player Aura", g_Config.m_ClPlayerIdleAura);
 			BUTTON(VisualRect, Button, 20.0f, &g_Config.m_ClPlayerSquashStretch, "Squash & Stretch Animation (beta)", g_Config.m_ClPlayerSquashStretch);
-
-			if(g_Config.m_ClPlayerIdleAura) { SCROLLBAR(VisualRect, Button, 20.0f, &g_Config.m_ClPlayerIdleAuraTimer, 2, 30, "Aura Timer"); }
 			END_LABEL(RightSection);
 
 			// Hover Messages Box

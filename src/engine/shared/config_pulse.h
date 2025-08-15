@@ -42,6 +42,7 @@ MACRO_CONFIG_INT(ClPlayerSquashStretch, p_squash_stretch, 1, 0, 1, CFGFLAG_CLIEN
 
 
 MACRO_CONFIG_INT(ClPlayerIdleAuraTimer, p_idle_aura_timer, 2, 2, 30, CFGFLAG_CLIENT | CFGFLAG_SAVE, "")
+MACRO_CONFIG_INT(ClIdleAuraType, p_idle_aura_type, 1, 1, 5, CFGFLAG_CLIENT | CFGFLAG_SAVE, "")
 MACRO_CONFIG_INT(ClToggleAuraParticlesNum, p_toggle_aura_parsicle_num, 12, 0, 300, CFGFLAG_CLIENT | CFGFLAG_SAVE, "")
 MACRO_CONFIG_INT(ClToggleAuraRadius, p_toggle_aura_radius, 30, 0, 600, CFGFLAG_CLIENT | CFGFLAG_SAVE, "")
 

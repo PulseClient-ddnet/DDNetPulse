@@ -76,6 +76,7 @@
 #include "components/spectator.h"
 #include "components/statboard.h"
 #include "components/voting.h"
+#include "components/comp_pulse/afk_aura.h"
 #include "prediction/entities/character.h"
 #include "prediction/entities/projectile.h"
 
@@ -161,7 +162,8 @@ void CGameClient::OnConsoleInit()
 					      &m_GameConsole,
 					      &m_MenuBackground,
 					      &m_WebSocket,
-					      &m_HoverNotification});
+					      &m_HoverNotification,
+					      &m_AFKAura});
 
 	// build the input stack
 	m_vpInput.insert(m_vpInput.end(), {&m_Menus.m_Binder, // this will take over all input when we want to bind a key

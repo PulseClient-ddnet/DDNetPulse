@@ -67,7 +67,7 @@
 //PULSE
 //#include "components/comp_pulse/colormode.h" TODO: ADD
 #include "components/comp_pulse/hover_notification.h"
-#include "components/comp_pulse/players_extended.h"
+#include "components/comp_pulse/afk_aura.h"
 #include "components/comp_pulse/skinprofiles.h"
 #include "components/comp_pulse/socket_request.h"
 
@@ -178,6 +178,7 @@ public:
 	CEffects m_Effects;
 	CScoreboard m_Scoreboard;
 	CStatboard m_Statboard;
+	CPlayers m_Players;
 	CSounds m_Sounds;
 	CEmoticon m_Emoticon;
 	CDamageInd m_DamageInd;
@@ -204,7 +205,7 @@ public:
 	CTooltips m_Tooltips;
 	// Pulse Components
 	CSkinProfiles m_SkinProfiles;
-	CPlayerExtended m_Players; // <- **EXTEND CPlayers**
+	CAfkAura m_AFKAura;
 
 	CLocalServer m_LocalServer;
 

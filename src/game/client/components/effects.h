@@ -42,6 +42,7 @@ public:
 	void Confetti(vec2 Pos, float Alpha = 1.0f);
 	//mefr
 	void PlayerTrail(vec2 Pos, float Alpha = 1.0f);
+	void AfkAura(vec2 Pos, float Alpha, vec4 BodyColor);
 	//void PlayerAura(vec2 Pos, float Alpha = 1.0f);
 
 	void Update();
