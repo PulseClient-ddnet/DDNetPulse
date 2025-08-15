@@ -577,6 +577,9 @@ protected:
 	std::vector<CButtonContainer> m_vButtonContainersJoystickAbsolute = {{}, {}};
 	std::vector<CButtonContainer> m_vButtonContainersNamePlateShow = {{}, {}, {}, {}};
 	std::vector<CButtonContainer> m_vButtonContainersNamePlateKeyPresses = {{}, {}, {}, {}};
+	//PULSE
+	std::vector<CButtonContainer> MVButtonContainersIdleAura = {{}, {}, {}, {}, {}};
+
 
 	class CMapListItem
 	{

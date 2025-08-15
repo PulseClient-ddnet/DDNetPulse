@@ -320,9 +320,14 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 				SCROLLBAR(PlayerAuraRect, Button, 20.0f, &g_Config.m_ClToggleAuraParticlesNum, 0, 300, "Particles Number");
 				SCROLLBAR(PlayerAuraRect, Button, 20.0f, &g_Config.m_ClToggleAuraRadius, 0, 600, "Aura Radius");
 			}
-			//TODO: types
-			END_LABEL(LeftSection);
 
+			if(DoLine_RadioMenu(PlayerAuraRect, Localize("Idle Aura Pattern"),
+				   MVButtonContainersIdleAura,
+				   {Localize("Starfall"), Localize("Spiral"), Localize("Clock"), Localize("Peace"), Localize("Circles")},
+				   {1, 2, 3, 4, 5},
+				   g_Config.m_ClIdleAuraType)){}
+
+			END_LABEL(LeftSection);
 			CUIRect FunRect;
 			DRAW_BOX(LeftSection, FunRect, 80.0f, defaultCol, 10.0f);
 			s_ScrollRegion.AddRect(FunRect);
