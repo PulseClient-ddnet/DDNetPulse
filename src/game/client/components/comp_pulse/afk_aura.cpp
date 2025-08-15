@@ -1,18 +1,9 @@
 #include "afk_aura.h"
-#include <base/math.h>
 #include <game/client/gameclient.h>
 #include <game/client/components/effects.h>
 
-CAfkAura::CAfkAura()
-{
-	m_LastMovementTime = 0.0f;
-	m_LastPosition = vec2(0, 0);
-	m_AuraPosition = vec2(0, 0);
-	m_AuraActive = false;
-	m_AuraParticlesCreated = false;
-}
 
-void CAfkAura::OnInit(){}
+void CAfkAura::OnInit() {}
 
 void CAfkAura::OnRender()
 {
@@ -77,9 +68,8 @@ void CAfkAura::OnRender()
 			GameClient()->m_aClients[ClientId].m_RenderInfo.m_ColorBody.g,
 			GameClient()->m_aClients[ClientId].m_RenderInfo.m_ColorBody.b,
 			1.0f
-		);
+			);
 
 		GameClient()->m_Effects.AfkAura(m_AuraPosition, Alpha, BodyColor);
 	}
 }
-

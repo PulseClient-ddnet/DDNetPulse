@@ -6,22 +6,18 @@
 
 class CAfkAura : public CComponent
 {
-public:
-	CAfkAura();
+	float m_LastMovementTime = 0.0f;
+	vec2 m_LastPosition = vec2(0, 0);
+	vec2 m_AuraPosition = vec2(0, 0);
+	bool m_AuraActive = false;
+	bool m_AuraParticlesCreated = false;
+	float m_FadeOutStartTime;
 
+public:
 	virtual void OnRender() override;
 
 	virtual int Sizeof() const override { return sizeof(*this); }
 	virtual void OnInit() override;
-
-
-private:
-	float m_LastMovementTime;
-	vec2 m_LastPosition;
-	vec2 m_AuraPosition;
-	bool m_AuraActive;
-	bool m_AuraParticlesCreated;
-	float m_FadeOutStartTime;
 };
 
-#endif 
+#endif
