@@ -38,6 +38,8 @@ CHud::CHud()
 		m_aPlayerPositionContainers[i].Reset();
 		m_aPlayerPrevPosition[i] = -INFINITY;
 	}
+
+	m_CurrentCursorSize = 64;
 }
 
 void CHud::ResetHudContainers()
@@ -104,7 +106,7 @@ void CHud::OnInit()
 	{
 		float ScaleX, ScaleY;
 		RenderTools()->GetSpriteScale(g_pData->m_Weapons.m_aId[i].m_pSpriteCursor, ScaleX, ScaleY);
-		m_aCursorOffset[i] = RenderTools()->QuadContainerAddSprite(m_HudQuadContainerIndex, 64.f * ScaleX, 64.f * ScaleY);
+		m_aCursorOffset[i] = RenderTools()->QuadContainerAddSprite(m_HudQuadContainerIndex, g_Config.m_ClWeaponCursorSize * ScaleX, g_Config.m_ClWeaponCursorSize * ScaleY);
 	}
 
 	// the flags
@@ -113,6 +115,8 @@ void CHud::OnInit()
 	PreparePlayerStateQuads();
 
 	Graphics()->QuadContainerUpload(m_HudQuadContainerIndex);
+
+	m_CurrentCursorSize = g_Config.m_ClWeaponCursorSize;
 }
 
 void CHud::RenderGameTimer()
@@ -1657,6 +1661,9 @@ void CHud::OnRender()
 	if(!GameClient()->m_Snap.m_pGameInfoObj)
 		return;
 
+	// Check for cursor size changes and update if necessary
+	UpdateCursorQuads();
+
 	m_Width = 300.0f * Graphics()->ScreenAspect();
 	m_Height = 300.0f;
 	Graphics()->MapScreen(0.0f, 0.0f, m_Width, m_Height);
@@ -1897,5 +1904,38 @@ void CHud::RenderRecord()
 		str_time_float(PlayerRecord, TIME_HOURS_CENTISECS, aTime, sizeof(aTime));
 		str_format(aBuf, sizeof(aBuf), "%s%s", PlayerRecord > 3600 ? "" : "   ", aTime);
 		TextRender()->Text(53, 82, 6, aBuf, -1.0f);
+	}
+}
+
+void CHud::UpdateCursorQuads()
+{
+	// Check if cursor size has changed
+	if(m_CurrentCursorSize != g_Config.m_ClWeaponCursorSize)
+	{
+		// Clear existing cursor quads
+		Graphics()->QuadContainerReset(m_HudQuadContainerIndex);
+		
+		// Re-add ammo, health, and armor quads
+		PrepareAmmoHealthAndArmorQuads();
+		
+		// Re-add cursor quads with new size
+		for(int i = 0; i < NUM_WEAPONS; ++i)
+		{
+			float ScaleX, ScaleY;
+			RenderTools()->GetSpriteScale(g_pData->m_Weapons.m_aId[i].m_pSpriteCursor, ScaleX, ScaleY);
+			m_aCursorOffset[i] = RenderTools()->QuadContainerAddSprite(m_HudQuadContainerIndex, g_Config.m_ClWeaponCursorSize * ScaleX, g_Config.m_ClWeaponCursorSize * ScaleY);
+		}
+		
+		// Re-add flag quad
+		m_FlagOffset = RenderTools()->QuadContainerAddSprite(m_HudQuadContainerIndex, 0.f, 0.f, 8.f, 16.f);
+		
+		// Re-add player state quads
+		PreparePlayerStateQuads();
+		
+		// Upload the updated quad container
+		Graphics()->QuadContainerUpload(m_HudQuadContainerIndex);
+		
+		// Update tracked cursor size
+		m_CurrentCursorSize = g_Config.m_ClWeaponCursorSize;
 	}
 }

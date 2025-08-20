@@ -80,3 +80,6 @@ MACRO_CONFIG_INT(ClFocusModeHideScoreboard, p_focus_mode_hide_scoreboard, 0, 0, 
 
 // deatch phrases
 MACRO_CONFIG_INT(ClDeathPhrases, p_death_phrases, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Enable death phrases")
+
+//cursor
+MACRO_CONFIG_INT(ClWeaponCursorSize, cl_weapon_cursor_size, 64, 16, 128, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Size of the in-game weapon cursor")

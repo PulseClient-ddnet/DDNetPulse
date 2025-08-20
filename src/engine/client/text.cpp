@@ -1410,33 +1410,27 @@ public:
 
 	void TextRotated(float x, float y, float Size, float Rotation, const char *pText, float LineWidth = -1.0f) override
 	{
-		// Calculate text dimensions for centering
 		float TextWidthValue = TextWidth(Size, pText, -1, LineWidth);
 		float TextHeight = Size;
 		
-		// Center the text around rotation point
 		x -= TextWidthValue/2;
 		y -= TextHeight/2;
 		
-		// Create text container with rotation
 		CTextCursor Cursor;
 		SetCursor(&Cursor, x, y, Size, TEXTFLAG_RENDER);
 		Cursor.m_LineWidth = LineWidth;
 		
-		// Store rotation in render flags
 		unsigned OldRenderFlags = m_RenderFlags;
-		m_RenderFlags |= TEXT_RENDER_FLAG_NO_AUTOMATIC_QUAD_UPLOAD; // Prevent automatic quad upload
+		m_RenderFlags |= TEXT_RENDER_FLAG_NO_AUTOMATIC_QUAD_UPLOAD;
 		
 		STextContainerIndex TextCont;
 		if(CreateTextContainer(TextCont, &Cursor, pText, -1))
 		{
 			if((Cursor.m_Flags & TEXTFLAG_RENDER) != 0)
 			{
-				// Apply rotation to the text container
 				STextContainer &Container = GetTextContainer(TextCont);
 				for(auto &Quad : Container.m_StringInfo.m_vCharacterQuads)
 				{
-					// Rotate each vertex around the center point
 					float CenterX = x + TextWidthValue/2;
 					float CenterY = y + TextHeight/2;
 					
@@ -1452,7 +1446,6 @@ public:
 					}
 				}
 				
-				// Upload and render the rotated text
 				UploadTextContainer(TextCont);
 				RenderTextContainer(TextCont, m_Color, m_OutlineColor);
 			}

@@ -103,6 +103,9 @@ class CHud : public CComponent
 	void RenderWarmupTimer();
 	void RenderLocalTime(float x);
 
+	//pulse
+	void UpdateCursorQuads();
+
 	static constexpr float MOVEMENT_INFORMATION_LINE_HEIGHT = 8.0f;
 
 public:
@@ -168,6 +171,8 @@ private:
 	int m_PracticeModeOffset;
 	int m_Team0ModeOffset;
 	int m_LockModeOffset;
+	//pulse
+	int m_CurrentCursorSize;
 };
 
 #endif

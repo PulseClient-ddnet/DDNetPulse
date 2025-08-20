@@ -426,6 +426,22 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 				BUTTON(FocusModeRect, Button, 20.0f, &g_Config.m_ClFocusModeHideScoreboard, "Hide Scoreboard", g_Config.m_ClFocusModeHideScoreboard);
 			}
 			END_LABEL(RightSection);
+
+			CUIRect CursorModeRect;
+			DRAW_BOX(RightSection, CursorModeRect, 140.0f, defaultCol, 10.0f);
+			s_ScrollRegion.AddRect(CursorModeRect);
+			BOX_LABEL(CursorModeRect, Section, "Cursor Settings", 40.0f, 10.0f);
+			SCROLLBAR(CursorModeRect, Button, 20.0f, &g_Config.m_ClPlayerIdleAuraTimer, 2, 30, "Aura Timer (seconds)"); //#define SCROLLBAR(section, button, height, value, min, max, text) \
+
+
+			float multiplier = g_Config.m_ClWeaponCursorSize / 64.0f;
+			char aMultiplierText[16];
+			str_format(aMultiplierText, sizeof(aMultiplierText), "  (%.1fx)", multiplier);
+			CursorModeRect.HSplitTop(20.0f, &Button, &CursorModeRect);
+			Ui()->DoScrollbarOption(&g_Config.m_ClWeaponCursorSize, &g_Config.m_ClWeaponCursorSize, &Button, Localize("Cursor scaling"), 16, 128, &CUi::ms_LinearScrollbarScale, 0, aMultiplierText);
+
+			END_LABEL(RightSection);
+
 			s_ScrollRegion.End();
 		}
 	}
