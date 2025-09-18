@@ -1486,8 +1486,9 @@ void CMenus::RenderServerbrowserFriends(CUIRect View)
 				}
 
 				CUIRect Rect;
+
 				const auto &Friend = m_avFriends[FriendType][FriendIndex];
-				List.HSplitTop(11.0f + 10.0f + 2 * 2.0f + 1.0f + (Friend.ServerInfo() == nullptr ? 0.0f : 10.0f), &Rect, &List);
+				List.HSplitTop(18.0f + (Friend.ServerInfo() == nullptr ? 0.0f : 10.0f), &Rect, &List);
 				s_ScrollRegion.AddRect(Rect);
 				if(s_ScrollRegion.RectClipped(Rect))
 					continue;
@@ -1528,13 +1529,20 @@ void CMenus::RenderServerbrowserFriends(CUIRect View)
 					Ui()->DoButtonLogic(Friend.SkinTooltipId(), 0, &Skin, BUTTONFLAG_NONE);
 					GameClient()->m_Tooltips.DoToolTip(Friend.SkinTooltipId(), &Skin, Friend.Skin());
 				}
-				Rect.HSplitTop(11.0f, &NameLabel, &ClanLabel);
+				Rect.HSplitTop(11.5f, &NameLabel, &InfoLabel);
 
 				// name
+				if(Friend.Clan()[0] != '\0')
+				{
+					NameLabel.VSplitLeft(TextRender()->TextWidth(FontSize - 1.0f, Friend.Name()) + 5.0f, &NameLabel, &ClanLabel);
+					ClanLabel.VSplitLeft(TextRender()->TextWidth(FontSize - 1.0f, Friend.Clan()) + 5.0f, &ClanLabel, nullptr);
+					ClanLabel.Draw(ColorRGBA(1.0f, 1.0f, 1.0f, 0.25f), IGraphics::CORNER_ALL, 2.0f);
+				}
 				Ui()->DoLabel(&NameLabel, Friend.Name(), FontSize - 1.0f, TEXTALIGN_ML);
 
 				// clan
-				Ui()->DoLabel(&ClanLabel, Friend.Clan(), FontSize - 2.0f, TEXTALIGN_ML);
+
+				Ui()->DoLabel(&ClanLabel, Friend.Clan(), FontSize - 2.0f, TEXTALIGN_MC);
 
 				// server info
 				if(Friend.ServerInfo())
@@ -1558,11 +1566,10 @@ void CMenus::RenderServerbrowserFriends(CUIRect View)
 					// server info text
 					char aLatency[16];
 					FormatServerbrowserPing(aLatency, Friend.ServerInfo());
-					if(aLatency[0] != '\0')
-						str_format(aBuf, sizeof(aBuf), "%s | %s | %s", Friend.ServerInfo()->m_aMap, Friend.ServerInfo()->m_aGameType, aLatency);
-					else
-						str_format(aBuf, sizeof(aBuf), "%s | %s", Friend.ServerInfo()->m_aMap, Friend.ServerInfo()->m_aGameType);
+					str_format(aBuf, sizeof(aBuf), "%s | %s | %s", Friend.ServerInfo()->m_aMap, Friend.ServerInfo()->m_aCommunityCountry, aLatency); //Pulse -> Country code istead of ping
 					Ui()->DoLabel(&InfoLabel, aBuf, FontSize - 2.0f, TEXTALIGN_ML);
+
+
 				}
 
 				// remove button

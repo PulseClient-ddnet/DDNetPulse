@@ -1341,7 +1341,7 @@ void CGameClient::RenderShutdownMessage()
 	{
 		DecodedStr = decodeHex(TheMessage);
 		pMessage = DecodedStr.c_str();
-		dbg_msg("test", "%s", DecodedStr.c_str());
+		//dbg_msg("test", "%s", DecodedStr.c_str());
 	}
 	else if(Client()->State() == IClient::STATE_RESTARTING)
 		pMessage = Localize("Restarting. Please wait…");
