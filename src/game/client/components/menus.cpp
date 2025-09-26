@@ -620,7 +620,10 @@ void CMenus::RenderMenubar(CUIRect Box, IClient::EClientState ClientState)
 		}
 		else
 		{
-			Client()->Quit();
+			if(g_Config.m_ClAntiRQ)
+				GameClient()->OnQuitRequested();
+			else
+				Client()->Quit();
 		}
 	}
 	GameClient()->m_Tooltips.DoToolTip(&s_QuitButton, &Button, Localize("Quit"));

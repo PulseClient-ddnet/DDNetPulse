@@ -339,9 +339,18 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 		// Right Section - Visual Effects
 		{
 			CUIRect Section, Label;
-			CUIRect VisualRect;
+			CUIRect PreferencesRect;
+
+
+			// Preferences
+			DRAW_BOX(RightSection, PreferencesRect, 80.0f, defaultCol, 10.0f);
+			s_ScrollRegion.AddRect(PreferencesRect);
+			BOX_LABEL(PreferencesRect, Section, "Preferences", 40.0f, 10.0f);
+			BUTTON(PreferencesRect, Button, 20.0f, &g_Config.m_ClAntiRQ, "Prevent alt+f4 quit", g_Config.m_ClAntiRQ);
+			END_LABEL(RightSection);
 
 			// Player Effects Box
+			CUIRect VisualRect;
 			DRAW_BOX(RightSection, VisualRect, 80.0f, defaultCol, 10.0f);
 			s_ScrollRegion.AddRect(VisualRect);
 			BOX_LABEL(VisualRect, Section, "Player Effects", 40.0f, 10.0f);

@@ -68,6 +68,7 @@
 //#include "components/comp_pulse/colormode.h" TODO: ADD
 #include "components/comp_pulse/hover_notification.h"
 #include "components/comp_pulse/afk_aura.h"
+#include "components/comp_pulse/anti_quit.h"
 #include "components/comp_pulse/skinprofiles.h"
 #include "components/comp_pulse/socket_request.h"
 
@@ -186,6 +187,7 @@ public:
 	CVoting m_Voting;
 	CSpectator m_Spectator;
 	CHoverNotification m_HoverNotification;
+    CAntiQuit m_AntiQuit;
 
 	//CNamePlates m_NamePlates;
 	CFreezeBars m_FreezeBars;
@@ -645,6 +647,7 @@ public:
 	void CollectManagedTeeRenderInfos(const std::function<void(const char *pSkinName)> &ActiveSkinAcceptor);
 
 	void RenderShutdownMessage() override;
+	bool OnQuitRequested() override;
 
 	const char *GetItemName(int Type) const override;
 	const char *Version() const override;

@@ -83,3 +83,4 @@ MACRO_CONFIG_INT(ClDeathPhrases, p_death_phrases, 0, 0, 1, CFGFLAG_CLIENT | CFGF
 
 //cursor
 MACRO_CONFIG_INT(ClWeaponCursorSize, cl_weapon_cursor_size, 64, 16, 128, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Size of the in-game weapon cursor")
+MACRO_CONFIG_INT(ClAntiRQ, cl_anti_rq_mode, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "prevent rege-quitting")

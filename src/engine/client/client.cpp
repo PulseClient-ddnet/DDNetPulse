@@ -3235,10 +3235,12 @@ void CClient::Run()
 		// update input
 		if(Input()->Update())
 		{
-			if(State() == IClient::STATE_QUITTING)
+			// Give the game client a chance to handle quit requests (e.g. show confirmation).
+			if(GameClient()->OnQuitRequested())
+			{
+				SetState(IClient::STATE_QUITTING);
 				break;
-			else
-				SetState(IClient::STATE_QUITTING); // SDL_QUIT
+			}
 		}
 
 		char aFile[IO_MAX_PATH_LENGTH];

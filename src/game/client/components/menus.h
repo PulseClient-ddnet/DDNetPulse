@@ -185,7 +185,6 @@ protected:
 
 	int m_MenuPage;
 	int m_GamePage;
-	int m_Popup;
 	bool m_ShowStart;
 	bool m_MenuActive;
 
@@ -620,6 +619,8 @@ public:
 	void RenderBackground();
 
 	CMenusKeyBinder m_Binder;
+
+	int m_Popup;
 
 	CMenus();
 	int Sizeof() const override { return sizeof(*this); }

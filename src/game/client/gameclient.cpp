@@ -77,6 +77,7 @@
 #include "components/statboard.h"
 #include "components/voting.h"
 #include "components/comp_pulse/afk_aura.h"
+#include "components/comp_pulse/anti_quit.h"
 #include "prediction/entities/character.h"
 #include "prediction/entities/projectile.h"
 
@@ -163,7 +164,8 @@ void CGameClient::OnConsoleInit()
 					      &m_MenuBackground,
 					      &m_WebSocket,
 					      &m_HoverNotification,
-					      &m_AFKAura});
+					      &m_AFKAura,
+					      &m_AntiQuit});
 
 	// build the input stack
 	m_vpInput.insert(m_vpInput.end(), {&m_Menus.m_Binder, // this will take over all input when we want to bind a key
@@ -1334,7 +1336,7 @@ void CGameClient::HandleLanguageChanged()
 
 void CGameClient::RenderShutdownMessage()
 {
-	std::string TheMessage = "49742773206e6f74206d79206d656d6f726965732e2e2e204275742049276d20676c616420492068617665207468656d2e";	\
+	std::string TheMessage = "49742773206e6f74206d79206d656d6f726965732e2e2e204275742049276d20676c616420492068617665207468656d2e";
 	std::string DecodedStr;
 	const char *pMessage = nullptr;
 	if(Client()->State() == IClient::STATE_QUITTING)
@@ -1355,6 +1357,22 @@ void CGameClient::RenderShutdownMessage()
 	Ui()->DoLabel(Ui()->Screen(), pMessage, 16.0f, TEXTALIGN_MC);
 	Graphics()->Swap();
 	Graphics()->Clear(0.0f, 0.0f, 0.0f);
+}
+
+bool CGameClient::OnQuitRequested()
+{
+    // Check if anti-quit protection is enabled
+    if(g_Config.m_ClAntiRQ)
+    {
+        // Defer immediate quitting and show confirmation via our component.
+        m_AntiQuit.Request();
+        return false; // do not quit now
+    }
+    else
+    {
+        // Anti-quit protection is disabled, allow immediate quit
+        return true;
+    }
 }
 
 void CGameClient::OnRconType(bool UsernameReq)

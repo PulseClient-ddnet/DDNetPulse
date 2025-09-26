@@ -406,6 +406,9 @@ public:
 
 	virtual bool CanDisplayWarning() const = 0;
 	virtual void RenderShutdownMessage() = 0;
+	// Called when the OS requests quit (e.g. Alt+F4, window close). Return true to allow immediate quit,
+	// false to defer (e.g. show confirmation) and keep running.
+	virtual bool OnQuitRequested() = 0;
 
 	virtual CNetObjHandler *GetNetObjHandler() = 0;
 	virtual protocol7::CNetObjHandler *GetNetObjHandler7() = 0;
