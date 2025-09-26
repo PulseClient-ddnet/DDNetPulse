@@ -1488,7 +1488,7 @@ void CMenus::RenderServerbrowserFriends(CUIRect View)
 				CUIRect Rect;
 
 				const auto &Friend = m_avFriends[FriendType][FriendIndex];
-				List.HSplitTop(18.0f + (Friend.ServerInfo() == nullptr ? 0.0f : 10.0f), &Rect, &List);
+				List.HSplitTop(14.0f + (Friend.ServerInfo() == nullptr ? 0.0f : 10.0f), &Rect, &List);
 				s_ScrollRegion.AddRect(Rect);
 				if(s_ScrollRegion.RectClipped(Rect))
 					continue;
