@@ -51,10 +51,10 @@ MACRO_CONFIG_INT(ClBetterLasers, p_better_laser, 1, 0, 1, CFGFLAG_CLIENT | CFGFL
 
 // All DClient variables are defined here
 
-MACRO_CONFIG_INT(ClShowFlags, dc_show_flags, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Tee stats (Deep/Jetpack/etc)")
-MACRO_CONFIG_INT(ClShowFlagsSize, dc_show_flags_size, 30, -50, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Size of tee stat indicators")
-MACRO_CONFIG_INT(ClShowDJ, dc_show_jumps, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show remaining double jumps of a tee")
-MACRO_CONFIG_INT(ClShowJumpsSize, dc_show_jumps_size, 30, -50, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Size of double jump indicators")
+MACRO_CONFIG_INT(ClShowFlags, cl_show_flags, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Tee stats (Deep/Jetpack/etc)")
+MACRO_CONFIG_INT(ClShowFlagsSize, cl_show_flags_size, 30, -50, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Size of tee stat indicators")
+MACRO_CONFIG_INT(ClShowDJ, cl_show_jumps, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show remaining double jumps of a tee")
+MACRO_CONFIG_INT(ClShowJumpsSize, cl_show_jumps_size, 30, -50, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Size of double jump indicators")
 //MACRO_CONFIG_INT(ClFreeMouse, dc_free_mouse, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Free mouse mode (WIP)")
 //MACRO_CONFIG_INT(ClUnlockZoom, dc_unlock_zoom, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Disable camera zoom lock")
 
