@@ -159,6 +159,9 @@ void CHoverNotification::Start(const char *pText, float Duration)
 
 		AddToHistory(pText);
 		UpdatePositions();
+
+		// Log the notification text to the console
+		Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server_msg", pText);
 	}
 }
 
