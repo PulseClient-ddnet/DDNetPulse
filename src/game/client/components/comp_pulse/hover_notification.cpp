@@ -161,7 +161,7 @@ void CHoverNotification::Start(const char *pText, float Duration)
 		UpdatePositions();
 
 		// Log the notification text to the console
-		Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server_msg", pText);
+		Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server_msg", pText, color_cast<ColorRGBA>(ColorHSLA(g_Config.m_ClMessageHighlightColor)));
 	}
 }
 
