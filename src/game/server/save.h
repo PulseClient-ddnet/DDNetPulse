@@ -2,8 +2,11 @@
 #define GAME_SERVER_SAVE_H
 
 #include <base/vmath.h>
+
 #include <engine/shared/protocol.h>
-#include <game/generated/protocol.h>
+
+#include <generated/protocol.h>
+
 #include <game/team_state.h>
 
 #include <optional>
@@ -38,7 +41,7 @@ public:
 	CSaveTee();
 	~CSaveTee() = default;
 	void Save(CCharacter *pchr, bool AddPenalty = true);
-	bool Load(CCharacter *pchr, int Team, bool IsSwap = false);
+	bool Load(CCharacter *pchr, std::optional<int> Team = std::nullopt);
 	char *GetString(const CSaveTeam *pTeam);
 	int FromString(const char *pString);
 	void LoadHookedPlayer(const CSaveTeam *pTeam);
@@ -72,8 +75,9 @@ private:
 	int m_TeeFinished;
 	int m_IsSolo;
 
-	struct WeaponStat
+	class CWeaponStat
 	{
+	public:
 		int m_AmmoRegenStart;
 		int m_Ammo;
 		int m_Ammocost;
@@ -156,7 +160,7 @@ public:
 	CSaveHotReloadTee() = default;
 	~CSaveHotReloadTee() = default;
 	void Save(CCharacter *pChr, bool AddPenalty = true);
-	bool Load(CCharacter *pChr, int Team, bool IsSwap = false);
+	bool Load(CCharacter *pChr, int Team);
 
 private:
 	CSaveTee m_SaveTee;

@@ -36,9 +36,12 @@ class CBinds : public CComponent
 	};
 	CBindSlot GetBindSlot(const char *pBindString) const;
 
+	// free buffer after use
+	char *GetKeyBindCommand(int ModifierCombination, int Key) const;
+
 public:
 	CBinds();
-	~CBinds();
+	~CBinds() override;
 	int Sizeof() const override { return sizeof(*this); }
 
 	class CBindsSpecial : public CComponent
@@ -58,9 +61,10 @@ public:
 		MODIFIER_ALT,
 		MODIFIER_SHIFT,
 		MODIFIER_GUI,
+
 		MODIFIER_COUNT,
-		MODIFIER_COMBINATION_COUNT = 1 << MODIFIER_COUNT
 	};
+	static constexpr auto MODIFIER_COMBINATION_COUNT = 1 << MODIFIER_COUNT;
 
 	CBindsSpecial m_SpecialBinds;
 
@@ -72,7 +76,7 @@ public:
 	static int GetModifierMask(IInput *pInput);
 	static int GetModifierMaskOfKey(int Key);
 	static const char *GetModifierName(int Modifier);
-	static void GetKeyBindModifiersName(int ModifierCombination, char *pBuf, size_t BufSize);
+	void GetKeyBindName(int Key, int ModifierMask, char *pBuf, size_t BufSize) const;
 
 	void OnConsoleInit() override;
 	bool OnInput(const IInput::CEvent &Event) override;

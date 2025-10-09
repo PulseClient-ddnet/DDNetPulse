@@ -3,9 +3,9 @@
 #ifndef GAME_SERVER_GAMEWORLD_H
 #define GAME_SERVER_GAMEWORLD_H
 
-#include <game/gamecore.h>
-
 #include "save.h"
+
+#include <game/gamecore.h>
 
 #include <vector>
 
@@ -156,12 +156,6 @@ public:
 	void Snap(int SnappingClient);
 
 	/*
-		Function: PostSnap
-			Called after all clients received their snapshot.
-	*/
-	void PostSnap();
-
-	/*
 		Function: Tick
 			Calls Tick on all the entities in the world to progress
 			the world to the next tick.
@@ -202,7 +196,9 @@ public:
 	CTuningParams *Tuning();
 
 	CTuningParams *m_pTuningList;
+	const CTuningParams *TuningList() const { return m_pTuningList; }
 	CTuningParams *TuningList() { return m_pTuningList; }
+	const CTuningParams *GetTuning(int i) const { return &TuningList()[i]; }
 	CTuningParams *GetTuning(int i) { return &TuningList()[i]; }
 };
 

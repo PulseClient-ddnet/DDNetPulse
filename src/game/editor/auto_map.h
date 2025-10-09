@@ -1,9 +1,9 @@
 #ifndef GAME_EDITOR_AUTO_MAP_H
 #define GAME_EDITOR_AUTO_MAP_H
 
-#include <vector>
-
 #include "component.h"
+
+#include <vector>
 
 class CAutoMapper : public CEditorComponent
 {
@@ -85,7 +85,7 @@ public:
 	bool IsLoaded() const { return m_FileLoaded; }
 
 private:
-	std::vector<CConfiguration> m_vConfigs = {};
+	std::vector<CConfiguration> m_vConfigs;
 	bool m_FileLoaded = false;
 };
 

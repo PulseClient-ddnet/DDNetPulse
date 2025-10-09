@@ -1,20 +1,17 @@
 #include "backend_opengl.h"
 
-#include <engine/graphics.h>
-
-#include <engine/client/backend_sdl.h>
-
 #include <base/detect.h>
 #include <base/system.h>
 
+#include <engine/client/backend_sdl.h>
+#include <engine/graphics.h>
+
 #if defined(BACKEND_AS_OPENGL_ES) || !defined(CONF_BACKEND_OPENGL_ES)
 
+#include <engine/client/backend/glsl_shader_compiler.h>
 #include <engine/client/backend/opengl/opengl_sl.h>
 #include <engine/client/backend/opengl/opengl_sl_program.h>
 #include <engine/client/blocklist_driver.h>
-
-#include <engine/client/backend/glsl_shader_compiler.h>
-
 #include <engine/gfx/image_manipulation.h>
 
 #ifndef BACKEND_AS_OPENGL_ES
@@ -1839,14 +1836,11 @@ void CCommandProcessorFragment_OpenGL2::Cmd_RenderTex3D(const CCommandBuffer::SC
 void CCommandProcessorFragment_OpenGL2::Cmd_CreateBufferObject(const CCommandBuffer::SCommand_CreateBufferObject *pCommand)
 {
 	void *pUploadData = pCommand->m_pUploadData;
-	int Index = pCommand->m_BufferIndex;
+	const int Index = pCommand->m_BufferIndex;
 	// create necessary space
 	if((size_t)Index >= m_vBufferObjectIndices.size())
 	{
-		for(int i = m_vBufferObjectIndices.size(); i < Index + 1; ++i)
-		{
-			m_vBufferObjectIndices.emplace_back(0);
-		}
+		m_vBufferObjectIndices.resize(Index + 1, 0);
 	}
 
 	GLuint VertBufferId = 0;
@@ -1932,17 +1926,14 @@ void CCommandProcessorFragment_OpenGL2::Cmd_DeleteBufferObject(const CCommandBuf
 
 void CCommandProcessorFragment_OpenGL2::Cmd_CreateBufferContainer(const CCommandBuffer::SCommand_CreateBufferContainer *pCommand)
 {
-	int Index = pCommand->m_BufferContainerIndex;
+	const int Index = pCommand->m_BufferContainerIndex;
 	// create necessary space
 	if((size_t)Index >= m_vBufferContainers.size())
 	{
-		for(int i = m_vBufferContainers.size(); i < Index + 1; ++i)
-		{
-			SBufferContainer Container;
-			Container.m_ContainerInfo.m_Stride = 0;
-			Container.m_ContainerInfo.m_VertBufferBindingIndex = -1;
-			m_vBufferContainers.push_back(Container);
-		}
+		SBufferContainer Container;
+		Container.m_ContainerInfo.m_Stride = 0;
+		Container.m_ContainerInfo.m_VertBufferBindingIndex = -1;
+		m_vBufferContainers.resize(Index + 1, Container);
 	}
 
 	SBufferContainer &BufferContainer = m_vBufferContainers[Index];

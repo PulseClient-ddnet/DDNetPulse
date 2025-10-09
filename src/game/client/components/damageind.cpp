@@ -1,14 +1,16 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#include "damageind.h"
+
 #include <base/color.h>
+
 #include <engine/demo.h>
 #include <engine/graphics.h>
-#include <game/client/gameclient.h>
-#include <game/client/render.h>
-#include <game/generated/client_data.h>
-#include <game/generated/protocol.h>
 
-#include "damageind.h"
+#include <generated/client_data.h>
+#include <generated/protocol.h>
+
+#include <game/client/gameclient.h>
 
 CDamageInd::CDamageInd()
 {
@@ -85,9 +87,9 @@ void CDamageInd::OnInit()
 
 	m_DmgIndQuadContainerIndex = Graphics()->CreateQuadContainer(false);
 	float ScaleX, ScaleY;
-	RenderTools()->GetSpriteScale(SPRITE_STAR1, ScaleX, ScaleY);
+	Graphics()->GetSpriteScale(SPRITE_STAR1, ScaleX, ScaleY);
 	Graphics()->QuadsSetSubset(0, 0, 1, 1);
-	RenderTools()->QuadContainerAddSprite(m_DmgIndQuadContainerIndex, 48.f * ScaleX, 48.f * ScaleY);
+	Graphics()->QuadContainerAddSprite(m_DmgIndQuadContainerIndex, 48.f * ScaleX, 48.f * ScaleY);
 	Graphics()->QuadContainerUpload(m_DmgIndQuadContainerIndex);
 }
 

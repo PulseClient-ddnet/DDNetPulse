@@ -1,3 +1,5 @@
+// Taken from https://clang.llvm.org/docs/ThreadSafetyAnalysis.html
+
 #ifndef BASE_LOCK_H
 #define BASE_LOCK_H
 
@@ -72,7 +74,7 @@
 	THREAD_ANNOTATION_ATTRIBUTE__(no_thread_safety_analysis)
 
 /**
- * @defgroup Locks
+ * @defgroup Locks Locks
  * @see Threads
  */
 

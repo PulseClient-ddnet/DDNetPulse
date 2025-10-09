@@ -54,7 +54,7 @@ private:
 
 	vec2 m_LastTargetPos;
 	float m_DyncamSmoothingSpeedBias;
-	bool m_IsSpectatingPlayer;
+	bool m_CanUseCameraInfo;
 	bool m_UsingAutoSpecCamera;
 
 	char m_aAutoSpecCameraTooltip[512];
@@ -68,7 +68,7 @@ public:
 	 * @param Steps - Zoom steps, 0.0f converts to default zoom (returns 1.0f)
 	 * @return converted zoom value
 	 **/
-	static inline float ZoomStepsToValue(float Steps) { return std::pow(CCamera::ZOOM_STEP, Steps); }
+	static float ZoomStepsToValue(float Steps) { return std::pow(CCamera::ZOOM_STEP, Steps); }
 
 	vec2 m_Center;
 	bool m_ZoomSet;
@@ -105,7 +105,7 @@ public:
 
 	void UpdateCamera();
 	void ResetAutoSpecCamera();
-	bool SpectatingPlayer() const { return m_IsSpectatingPlayer; }
+	bool SpectatingPlayer() const { return m_CanUseCameraInfo; }
 	bool CanUseAutoSpecCamera() const;
 	void ToggleAutoSpecCamera();
 	void UpdateAutoSpecCameraTooltip();

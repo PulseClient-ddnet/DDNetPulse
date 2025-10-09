@@ -2,17 +2,18 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef GAME_CLIENT_COMPONENTS_CHAT_H
 #define GAME_CLIENT_COMPONENTS_CHAT_H
-#include <vector>
-
 #include <engine/console.h>
 #include <engine/shared/config.h>
 #include <engine/shared/protocol.h>
 #include <engine/shared/ringbuffer.h>
 
+#include <generated/protocol7.h>
+
 #include <game/client/component.h>
 #include <game/client/lineinput.h>
 #include <game/client/render.h>
-#include <game/generated/protocol7.h>
+
+#include <vector>
 
 constexpr auto SAVES_FILE = "ddnet-saves.txt";
 
@@ -35,6 +36,7 @@ class CChat : public CComponent
 		CLine();
 		void Reset(CChat &This);
 
+		bool m_Initialized;
 		int64_t m_Time;
 		float m_aYOffset[2];
 		int m_ClientId;
@@ -69,11 +71,17 @@ class CChat : public CComponent
 		// client IDs for special messages
 		CLIENT_MSG = -2,
 		SERVER_MSG = -1,
+	};
 
+	enum
+	{
 		MODE_NONE = 0,
 		MODE_ALL,
 		MODE_TEAM,
+	};
 
+	enum
+	{
 		CHAT_SERVER = 0,
 		CHAT_HIGHLIGHT,
 		CHAT_CLIENT,

@@ -1,15 +1,18 @@
 /* (c) Shereef Marzouk. See "licence DDRace.txt" and the readme.txt in the root of the distribution for more information. */
-#include <base/system.h>
-#include <engine/shared/config.h>
-#include <game/mapitems.h>
-#include <game/server/entities/character.h>
-#include <game/team_state.h>
+#include "teams.h"
 
 #include "gamecontroller.h"
 #include "player.h"
 #include "score.h"
-#include "teams.h"
 #include "teehistorian.h"
+
+#include <base/system.h>
+
+#include <engine/shared/config.h>
+
+#include <game/mapitems.h>
+#include <game/server/entities/character.h>
+#include <game/team_state.h>
 
 CGameTeams::CGameTeams(CGameContext *pGameContext) :
 	m_pGameContext(pGameContext)
@@ -379,30 +382,32 @@ void CGameTeams::CheckTeamFinished(int Team)
 
 const char *CGameTeams::SetCharacterTeam(int ClientId, int Team)
 {
+	int CurrentTeam = m_Core.Team(ClientId);
+
 	if(ClientId < 0 || ClientId >= MAX_CLIENTS)
 		return "Invalid client ID";
 	if(Team < 0 || Team > NUM_DDRACE_TEAMS)
 		return "Invalid team number";
 	if(Team != TEAM_SUPER && m_aTeamState[Team] > ETeamState::OPEN && !m_aPractice[Team] && !m_aTeamFlock[Team])
 		return "This team started already";
-	if(m_Core.Team(ClientId) == Team)
+	if(CurrentTeam == Team)
 		return "You are in this team already";
 	if(!Character(ClientId))
 		return "Your character is not valid";
 	if(Team == TEAM_SUPER && !Character(ClientId)->IsSuper())
 		return "You can't join super team if you don't have super rights";
-	if(Team != TEAM_SUPER && Character(ClientId)->m_DDRaceState != ERaceState::NONE)
+	if(Team != TEAM_SUPER && Character(ClientId)->m_DDRaceState != ERaceState::NONE && (m_aTeamState[CurrentTeam] < ETeamState::FINISHED || Team != 0))
 		return "You have started racing already";
 	// No cheating through noob filter with practice and then leaving team
-	if(m_aPractice[m_Core.Team(ClientId)] && !m_pGameContext->PracticeByDefault())
+	if(m_aPractice[CurrentTeam] && !m_pGameContext->PracticeByDefault())
 		return "You have used practice mode already";
 
 	// you can not join a team which is currently in the process of saving,
 	// because the save-process can fail and then the team is reset into the game
 	if(Team != TEAM_SUPER && GetSaving(Team))
-		return "Your team is currently saving";
-	if(m_Core.Team(ClientId) != TEAM_SUPER && GetSaving(m_Core.Team(ClientId)))
 		return "This team is currently saving";
+	if(CurrentTeam != TEAM_SUPER && GetSaving(CurrentTeam))
+		return "Your team is currently saving";
 
 	SetForceCharacterTeam(ClientId, Team);
 	return nullptr;
@@ -552,24 +557,24 @@ CClientMask CGameTeams::TeamMask(int Team, int ExceptId, int Asker, int VersionF
 				}
 			} // See everything of yourself
 		}
-		else if(GetPlayer(i)->m_SpectatorId != SPEC_FREEVIEW)
+		else if(GetPlayer(i)->SpectatorId() != SPEC_FREEVIEW)
 		{ // Spectating specific player
-			if(GetPlayer(i)->m_SpectatorId != Asker)
+			if(GetPlayer(i)->SpectatorId() != Asker)
 			{ // Actions of other players
-				if(!Character(GetPlayer(i)->m_SpectatorId))
+				if(!Character(GetPlayer(i)->SpectatorId()))
 					continue; // Player is currently dead
 				if(GetPlayer(i)->m_ShowOthers == SHOW_OTHERS_ONLY_TEAM)
 				{
-					if(m_Core.Team(GetPlayer(i)->m_SpectatorId) != Team && m_Core.Team(GetPlayer(i)->m_SpectatorId) != TEAM_SUPER)
+					if(m_Core.Team(GetPlayer(i)->SpectatorId()) != Team && m_Core.Team(GetPlayer(i)->SpectatorId()) != TEAM_SUPER)
 						continue; // In different teams
 				}
 				else if(GetPlayer(i)->m_ShowOthers == SHOW_OTHERS_OFF)
 				{
 					if(m_Core.GetSolo(Asker))
 						continue; // When in solo part don't show others
-					if(m_Core.GetSolo(GetPlayer(i)->m_SpectatorId))
+					if(m_Core.GetSolo(GetPlayer(i)->SpectatorId()))
 						continue; // When in solo part don't show others
-					if(m_Core.Team(GetPlayer(i)->m_SpectatorId) != Team && m_Core.Team(GetPlayer(i)->m_SpectatorId) != TEAM_SUPER)
+					if(m_Core.Team(GetPlayer(i)->SpectatorId()) != Team && m_Core.Team(GetPlayer(i)->SpectatorId()) != TEAM_SUPER)
 						continue; // In different teams
 				}
 			} // See everything of player you're spectating
@@ -933,8 +938,8 @@ void CGameTeams::SwapTeamCharacters(CPlayer *pPrimaryPlayer, CPlayer *pTargetPla
 	CSaveTee SecondarySavedTee;
 	SecondarySavedTee.Save(pTargetPlayer->GetCharacter());
 
-	PrimarySavedTee.Load(pTargetPlayer->GetCharacter(), Team, true);
-	SecondarySavedTee.Load(pPrimaryPlayer->GetCharacter(), Team, true);
+	PrimarySavedTee.Load(pTargetPlayer->GetCharacter());
+	SecondarySavedTee.Load(pPrimaryPlayer->GetCharacter());
 
 	if(Team >= 1 && !m_aTeamFlock[Team])
 	{
@@ -1241,12 +1246,12 @@ void CGameTeams::ResetSavedTeam(int ClientId, int Team)
 	}
 }
 
-int CGameTeams::GetFirstEmptyTeam() const
+std::optional<int> CGameTeams::GetFirstEmptyTeam() const
 {
 	for(int i = 1; i < TEAM_SUPER; i++)
 		if(m_aTeamState[i] == ETeamState::EMPTY)
 			return i;
-	return -1;
+	return std::nullopt;
 }
 
 bool CGameTeams::TeeStarted(int ClientId) const
@@ -1320,7 +1325,11 @@ void CGameTeams::SetPractice(int Team, bool Enabled)
 	if(Team < TEAM_FLOCK || Team >= TEAM_SUPER)
 		return;
 	if(g_Config.m_SvTeam != SV_TEAM_FORCED_SOLO && Team == TEAM_FLOCK)
-		return;
+	{
+		// allow to enable practice in team 0, for practice by default
+		if(!g_Config.m_SvTestingCommands)
+			return;
+	}
 
 	m_aPractice[Team] = Enabled;
 }

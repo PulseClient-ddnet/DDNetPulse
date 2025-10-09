@@ -1,15 +1,13 @@
 #ifndef ENGINE_CLIENT_BACKEND_SDL_H
 #define ENGINE_CLIENT_BACKEND_SDL_H
 
-#include <SDL_video.h>
-
 #include <base/detect.h>
 
+#include <engine/client/backend/backend_base.h>
+#include <engine/client/graphics_threaded.h>
 #include <engine/graphics.h>
 
-#include <engine/client/graphics_threaded.h>
-
-#include <engine/client/backend/backend_base.h>
+#include <SDL_video.h>
 
 #include <atomic>
 #include <condition_variable>
@@ -77,7 +75,7 @@ protected:
 	void StartProcessor(ICommandProcessor *pProcessor);
 	void StopProcessor();
 
-	bool HasWarning()
+	bool HasWarning() const
 	{
 		return m_Warning.m_WarningType != GFX_WARNING_TYPE_NONE;
 	}
@@ -102,7 +100,6 @@ public:
 // takes care of implementation independent operations
 class CCommandProcessorFragment_General
 {
-	void Cmd_Nop();
 	void Cmd_Signal(const CCommandBuffer::SCommand_Signal *pCommand);
 
 public:
@@ -187,7 +184,7 @@ class CCommandProcessor_SDL_GL : public CGraphicsBackend_Threaded::ICommandProce
 
 public:
 	CCommandProcessor_SDL_GL(EBackendType BackendType, int GLMajor, int GLMinor, int GLPatch);
-	virtual ~CCommandProcessor_SDL_GL();
+	~CCommandProcessor_SDL_GL() override;
 	void RunBuffer(CCommandBuffer *pBuffer) override;
 
 	const SGfxErrorContainer &GetError() const override;
@@ -301,7 +298,7 @@ public:
 
 	TGLBackendReadPresentedImageData &GetReadPresentedImageDataFuncUnsafe() override;
 
-	bool ShowMessageBox(unsigned Type, const char *pTitle, const char *pMsg) override;
+	std::optional<int> ShowMessageBox(const IGraphics::CMessageBox &MessageBox) override;
 
 	static bool IsModernAPI(EBackendType BackendType);
 };

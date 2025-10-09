@@ -1,17 +1,16 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 
-#include <algorithm>
-#include <chrono>
-#include <cmath>
-#include <vector>
+#include "menus.h"
 
+#include <base/color.h>
 #include <base/log.h>
 #include <base/math.h>
 #include <base/system.h>
 #include <base/vmath.h>
 
 #include <engine/client.h>
+#include <engine/client/updater.h>
 #include <engine/config.h>
 #include <engine/editor.h>
 #include <engine/friends.h>
@@ -23,9 +22,8 @@
 #include <engine/storage.h>
 #include <engine/textrender.h>
 
-#include <game/generated/protocol.h>
-
-#include <engine/client/updater.h>
+#include <generated/client_data.h>
+#include <generated/protocol.h>
 
 #include <game/client/animstate.h>
 #include <game/client/components/binds.h>
@@ -34,10 +32,12 @@
 #include <game/client/components/sounds.h>
 #include <game/client/gameclient.h>
 #include <game/client/ui_listbox.h>
-#include <game/generated/client_data.h>
 #include <game/localization.h>
 
-#include "menus.h"
+#include <algorithm>
+#include <chrono>
+#include <cmath>
+#include <vector>
 
 using namespace FontIcons;
 using namespace std::chrono_literals;
@@ -105,12 +105,12 @@ int CMenus::DoButton_Toggle(const void *pId, int Checked, const CUIRect *pRect, 
 	Graphics()->QuadsBegin();
 	if(!Active)
 		Graphics()->SetColor(1.0f, 1.0f, 1.0f, 0.5f);
-	RenderTools()->SelectSprite(Checked ? SPRITE_GUIBUTTON_ON : SPRITE_GUIBUTTON_OFF);
+	Graphics()->SelectSprite(Checked ? SPRITE_GUIBUTTON_ON : SPRITE_GUIBUTTON_OFF);
 	IGraphics::CQuadItem QuadItem(pRect->x, pRect->y, pRect->w, pRect->h);
 	Graphics()->QuadsDrawTL(&QuadItem, 1);
 	if(Ui()->HotItem() == pId && Active)
 	{
-		RenderTools()->SelectSprite(SPRITE_GUIBUTTON_HOVER);
+		Graphics()->SelectSprite(SPRITE_GUIBUTTON_HOVER);
 		QuadItem = IGraphics::CQuadItem(pRect->x, pRect->y, pRect->w, pRect->h);
 		Graphics()->QuadsDrawTL(&QuadItem, 1);
 	}
@@ -245,7 +245,7 @@ int CMenus::DoButton_MenuTab(CButtonContainer *pButtonContainer, const char *pTe
 	return Ui()->DoButtonLogic(pButtonContainer, Checked, pRect, BUTTONFLAG_LEFT);
 }
 
-int CMenus::DoButton_GridHeader(const void *pId, const char *pText, int Checked, const CUIRect *pRect)
+int CMenus::DoButton_GridHeader(const void *pId, const char *pText, int Checked, const CUIRect *pRect, int Align)
 {
 	if(Checked == 2)
 		pRect->Draw(ColorRGBA(1, 0.98f, 0.5f, 0.55f), IGraphics::CORNER_T, 5.0f);
@@ -253,8 +253,8 @@ int CMenus::DoButton_GridHeader(const void *pId, const char *pText, int Checked,
 		pRect->Draw(ColorRGBA(1, 1, 1, 0.5f), IGraphics::CORNER_T, 5.0f);
 
 	CUIRect Temp;
-	pRect->VSplitLeft(5.0f, nullptr, &Temp);
-	Ui()->DoLabel(&Temp, pText, pRect->h * CUi::ms_FontmodHeight, TEXTALIGN_ML);
+	pRect->VMargin(5.0f, &Temp);
+	Ui()->DoLabel(&Temp, pText, pRect->h * CUi::ms_FontmodHeight, Align);
 	return Ui()->DoButtonLogic(pId, Checked, pRect, BUTTONFLAG_LEFT);
 }
 
@@ -319,18 +319,18 @@ void CMenus::DoLaserPreview(const CUIRect *pRect, const ColorHSLA LaserOutlineCo
 	{
 	case LASERTYPE_RIFLE:
 		Graphics()->TextureSet(GameClient()->m_GameSkin.m_SpriteWeaponLaser);
-		RenderTools()->SelectSprite(SPRITE_WEAPON_LASER_BODY);
+		Graphics()->SelectSprite(SPRITE_WEAPON_LASER_BODY);
 		Graphics()->QuadsBegin();
 		Graphics()->QuadsSetSubset(0, 0, 1, 1);
-		RenderTools()->DrawSprite(Section.x + 30.0f, Section.y + Section.h / 2.0f, 60.0f);
+		Graphics()->DrawSprite(Section.x + 30.0f, Section.y + Section.h / 2.0f, 60.0f);
 		Graphics()->QuadsEnd();
 		break;
 	case LASERTYPE_SHOTGUN:
 		Graphics()->TextureSet(GameClient()->m_GameSkin.m_SpriteWeaponShotgun);
-		RenderTools()->SelectSprite(SPRITE_WEAPON_SHOTGUN_BODY);
+		Graphics()->SelectSprite(SPRITE_WEAPON_SHOTGUN_BODY);
 		Graphics()->QuadsBegin();
 		Graphics()->QuadsSetSubset(0, 0, 1, 1);
-		RenderTools()->DrawSprite(Section.x + 30.0f, Section.y + Section.h / 2.0f, 60.0f);
+		Graphics()->DrawSprite(Section.x + 30.0f, Section.y + Section.h / 2.0f, 60.0f);
 		Graphics()->QuadsEnd();
 		break;
 	case LASERTYPE_DRAGGER:
@@ -463,51 +463,6 @@ ColorHSLA CMenus::DoButton_ColorPicker(const CUIRect *pRect, unsigned int *pHsla
 	return HslaColor;
 }
 
-int CMenus::DoButton_FoldableSection(SFoldableSection *pSection, const char *pText, float FontSize, const CUIRect *pRect, float CornerRounding)
-{
-	CUIRect Box, Label;
-	pRect->VSplitLeft(pRect->h, &Box, &Label);
-	Label.VSplitLeft(5.0f, nullptr, &Label);
-
-	int Checked = (int)pSection->m_Opened;
-	pRect->Draw(ColorRGBA(0, 0, 0, (Checked ? 0.4f : 0.25f) * Ui()->ButtonColorMul(pSection)), !Checked ? IGraphics::CORNER_ALL : IGraphics::CORNER_TL | IGraphics::CORNER_TR, CornerRounding);
-
-	TextRender()->SetRenderFlags(ETextRenderFlags::TEXT_RENDER_FLAG_ONLY_ADVANCE_WIDTH | ETextRenderFlags::TEXT_RENDER_FLAG_NO_X_BEARING | ETextRenderFlags::TEXT_RENDER_FLAG_NO_Y_BEARING | ETextRenderFlags::TEXT_RENDER_FLAG_NO_OVERSIZE);
-	TextRender()->SetFontPreset(EFontPreset::ICON_FONT);
-	Ui()->DoLabel(&Box, Checked ? FONT_ICON_CIRCLE_CHEVRON_DOWN : FONT_ICON_CIRCLE_CHEVRON_RIGHT, FontSize, TEXTALIGN_MC);
-	TextRender()->SetFontPreset(EFontPreset::DEFAULT_FONT);
-
-	TextRender()->SetRenderFlags(0);
-	Ui()->DoLabel(&Label, pText, FontSize, TEXTALIGN_ML);
-
-	if(Ui()->DoButtonLogic(pSection, 0, pRect, 0))
-		pSection->m_Opened = !pSection->m_Opened;
-
-	return pSection->m_Opened;
-}
-
-int CMenus::DoFoldableSection(SFoldableSection *pSection, const char *pText, float FontSize, CUIRect *pRect, CUIRect *pRectAfter, float CornerRounding, const std::function<int()> &fnRender)
-{
-	const float Margin = 10.0f;
-	const float HeaderHeight = FontSize + 5.0f + Margin;
-
-	CUIRect Button;
-
-	pRect->HSplitTop(HeaderHeight, &Button, pRect);
-	pRect->HSplitTop(pSection->m_Height, pRect, pRectAfter);
-
-	if(DoButton_FoldableSection(pSection, pText, FontSize, &Button, CornerRounding))
-	{
-		if(pSection->m_Height > 0)
-			pRect->Draw(ColorRGBA(0, 0, 0, 0.15f), IGraphics::CORNER_BL | IGraphics::CORNER_BR, CornerRounding);
-		pSection->m_Height = fnRender();
-	}
-	else
-		pSection->m_Height = 0;
-
-	return HeaderHeight + pSection->m_Height;
-}
-
 int CMenus::DoButton_CheckBoxAutoVMarginAndSet(const void *pId, const char *pText, int *pValue, CUIRect *pRect, float VMargin)
 {
 	CUIRect CheckBoxRect;
@@ -571,9 +526,7 @@ int CMenus::DoKeyReader(const void *pId, const CUIRect *pRect, int Key, int Modi
 		aBuf[0] = '\0';
 	else
 	{
-		char aModifiers[128];
-		CBinds::GetKeyBindModifiersName(*pNewModifierCombination, aModifiers, sizeof(aModifiers));
-		str_format(aBuf, sizeof(aBuf), "%s%s", aModifiers, Input()->KeyName(NewKey));
+		GameClient()->m_Binds.GetKeyBindName(NewKey, *pNewModifierCombination, aBuf, sizeof(aBuf));
 	}
 
 	const ColorRGBA Color = m_Binder.m_pKeyReaderId == pId && m_Binder.m_TakeKey ? ColorRGBA(0.0f, 1.0f, 0.0f, 0.4f) : ColorRGBA(1.0f, 1.0f, 1.0f, 0.5f * Ui()->ButtonColorMul(pId));
@@ -656,19 +609,9 @@ void CMenus::RenderMenubar(CUIRect Box, IClient::EClientState ClientState)
 			NewPage = PAGE_DEMOS;
 		}
 		GameClient()->m_Tooltips.DoToolTip(&s_DemoButton, &Button, Localize("Demos"));
-	}
+		Box.VSplitRight(10.0f, &Box, nullptr);
 
-	Box.VSplitRight(10.0f, &Box, nullptr);
-
-	TextRender()->SetRenderFlags(0);
-	TextRender()->SetFontPreset(EFontPreset::DEFAULT_FONT);
-
-	if(ClientState == IClient::STATE_OFFLINE)
-	{
 		Box.VSplitLeft(33.0f, &Button, &Box);
-
-		TextRender()->SetFontPreset(EFontPreset::ICON_FONT);
-		TextRender()->SetRenderFlags(ETextRenderFlags::TEXT_RENDER_FLAG_ONLY_ADVANCE_WIDTH | ETextRenderFlags::TEXT_RENDER_FLAG_NO_X_BEARING | ETextRenderFlags::TEXT_RENDER_FLAG_NO_Y_BEARING | ETextRenderFlags::TEXT_RENDER_FLAG_NO_PIXEL_ALIGNMENT | ETextRenderFlags::TEXT_RENDER_FLAG_NO_OVERSIZE);
 
 		bool GotNewsOrUpdate = false;
 
@@ -777,6 +720,9 @@ void CMenus::RenderMenubar(CUIRect Box, IClient::EClientState ClientState)
 	}
 	else
 	{
+		TextRender()->SetRenderFlags(0);
+		TextRender()->SetFontPreset(EFontPreset::DEFAULT_FONT);
+
 		// online menus
 		Box.VSplitLeft(90.0f, &Button, &Box);
 		static CButtonContainer s_GameButton;
@@ -813,6 +759,25 @@ void CMenus::RenderMenubar(CUIRect Box, IClient::EClientState ClientState)
 		{
 			NewPage = PAGE_CALLVOTE;
 			m_ControlPageOpening = true;
+		}
+
+		if(Box.w >= 10.0f + 33.0f + 10.0f)
+		{
+			TextRender()->SetFontPreset(EFontPreset::ICON_FONT);
+			TextRender()->SetRenderFlags(ETextRenderFlags::TEXT_RENDER_FLAG_ONLY_ADVANCE_WIDTH | ETextRenderFlags::TEXT_RENDER_FLAG_NO_X_BEARING | ETextRenderFlags::TEXT_RENDER_FLAG_NO_Y_BEARING | ETextRenderFlags::TEXT_RENDER_FLAG_NO_PIXEL_ALIGNMENT | ETextRenderFlags::TEXT_RENDER_FLAG_NO_OVERSIZE);
+
+			Box.VSplitRight(10.0f, &Box, nullptr);
+			Box.VSplitRight(33.0f, &Box, &Button);
+			static CButtonContainer s_DemoButton;
+			if(DoButton_MenuTab(&s_DemoButton, FONT_ICON_CLAPPERBOARD, ActivePage == PAGE_DEMOS, &Button, IGraphics::CORNER_T, &m_aAnimatorsSmallPage[SMALL_TAB_DEMOBUTTON]))
+			{
+				NewPage = PAGE_DEMOS;
+			}
+			GameClient()->m_Tooltips.DoToolTip(&s_DemoButton, &Button, Localize("Demos"));
+			Box.VSplitRight(10.0f, &Box, nullptr);
+
+			TextRender()->SetRenderFlags(0);
+			TextRender()->SetFontPreset(EFontPreset::DEFAULT_FONT);
 		}
 	}
 
@@ -931,6 +896,7 @@ void CMenus::OnInterfacesInit(CGameClient *pClient)
 	CComponentInterfaces::OnInterfacesInit(pClient);
 	m_CommunityIcons.OnInterfacesInit(pClient);
 	m_MenusStart.OnInterfacesInit(pClient);
+	m_MenusIngameTouchControls.OnInterfacesInit(pClient);
 }
 
 void CMenus::OnInit()
@@ -1003,7 +969,7 @@ void CMenus::OnInit()
 
 	// Quad for the direction arrows above the player
 	m_DirectionQuadContainerIndex = Graphics()->CreateQuadContainer(false);
-	RenderTools()->QuadContainerAddSprite(m_DirectionQuadContainerIndex, 0.f, 0.f, 22.f);
+	Graphics()->QuadContainerAddSprite(m_DirectionQuadContainerIndex, 0.f, 0.f, 22.f);
 	Graphics()->QuadContainerUpload(m_DirectionQuadContainerIndex);
 }
 
@@ -1069,10 +1035,7 @@ void CMenus::PopupWarning(const char *pTopic, const char *pBody, const char *pBu
 {
 	// no multiline support for console
 	std::string BodyStr = pBody;
-	while(BodyStr.find('\n') != std::string::npos)
-	{
-		BodyStr.replace(BodyStr.find('\n'), 1, " ");
-	}
+	std::replace(BodyStr.begin(), BodyStr.end(), '\n', ' ');
 	log_warn("client", "%s: %s", pTopic, BodyStr.c_str());
 
 	Ui()->SetActiveItem(nullptr);
@@ -1257,6 +1220,10 @@ void CMenus::Render()
 			else if(m_GamePage == PAGE_CALLVOTE)
 			{
 				RenderServerControl(MainView);
+			}
+			else if(m_GamePage == PAGE_DEMOS)
+			{
+				RenderDemoBrowser(MainView);
 			}
 			else if(m_GamePage == PAGE_SETTINGS)
 			{
@@ -1621,11 +1588,16 @@ void CMenus::RenderPopupFullscreen(CUIRect Screen)
 			if(!m_vpFilteredDemos[m_DemolistSelectedIndex]->m_IsDir && !str_endswith(aBufNew, ".demo"))
 				str_append(aBufNew, ".demo");
 
-			if(!str_valid_filename(m_DemoRenameInput.GetString()))
+			if(str_comp(aBufOld, aBufNew) == 0)
+			{
+				// Nothing to rename, also same capitalization
+			}
+			else if(!str_valid_filename(m_DemoRenameInput.GetString()))
 			{
 				PopupMessage(Localize("Error"), Localize("This name cannot be used for files and folders"), Localize("Ok"), POPUP_RENAME_DEMO);
 			}
-			else if(Storage()->FileExists(aBufNew, m_vpFilteredDemos[m_DemolistSelectedIndex]->m_StorageType))
+			else if(str_utf8_comp_nocase(aBufOld, aBufNew) != 0 && // Allow renaming if it only changes capitalization to support case-insensitive filesystems
+				Storage()->FileExists(aBufNew, m_vpFilteredDemos[m_DemolistSelectedIndex]->m_StorageType))
 			{
 				PopupMessage(Localize("Error"), Localize("A demo with this name already exists"), Localize("Ok"), POPUP_RENAME_DEMO);
 			}
@@ -1760,6 +1732,16 @@ void CMenus::RenderPopupFullscreen(CUIRect Screen)
 		TextBox.VSplitLeft(10.0f, nullptr, &TextBox);
 		Ui()->DoLabel(&Label, Localize("Video name:"), 12.8f, TEXTALIGN_ML);
 		Ui()->DoEditBox(&m_DemoRenderInput, &TextBox, 12.8f);
+
+		// Warn about disconnect if online
+		if(Client()->State() == IClient::STATE_ONLINE)
+		{
+			Box.HSplitBottom(10.0f, &Box, nullptr);
+			Box.HSplitBottom(20.0f, &Box, &Row);
+			SLabelProperties LabelProperties;
+			LabelProperties.SetColor(ColorRGBA(1.0f, 0.0f, 0.0f));
+			Ui()->DoLabel(&Row, Localize("You will be disconnected from the server."), 12.8f, TEXTALIGN_MC, LabelProperties);
+		}
 	}
 	else if(m_Popup == POPUP_RENDER_DONE)
 	{

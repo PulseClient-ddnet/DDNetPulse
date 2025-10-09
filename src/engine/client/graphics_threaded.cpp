@@ -4,11 +4,6 @@
 #include <base/detect.h>
 #include <base/log.h>
 #include <base/math.h>
-
-#if defined(CONF_FAMILY_UNIX)
-#include <pthread.h>
-#endif
-
 #include <base/system.h>
 
 #include <engine/console.h>
@@ -20,8 +15,8 @@
 #include <engine/shared/jobs.h>
 #include <engine/storage.h>
 
-#include <game/generated/client_data.h>
-#include <game/generated/client_data7.h>
+#include <generated/data_types.h>
+
 #include <game/localization.h>
 
 #if defined(CONF_VIDEORECORDER)
@@ -221,7 +216,7 @@ void CGraphics_Threaded::MapScreen(float TopLeftX, float TopLeftY, float BottomR
 	m_State.m_ScreenBR.y = BottomRightY;
 }
 
-void CGraphics_Threaded::GetScreen(float *pTopLeftX, float *pTopLeftY, float *pBottomRightX, float *pBottomRightY)
+void CGraphics_Threaded::GetScreen(float *pTopLeftX, float *pTopLeftY, float *pBottomRightX, float *pBottomRightY) const
 {
 	*pTopLeftX = m_State.m_ScreenTL.x;
 	*pTopLeftY = m_State.m_ScreenTL.y;
@@ -1450,6 +1445,7 @@ void CGraphics_Threaded::RenderQuadLayer(int BufferContainerIndex, SQuadRenderIn
 		});
 
 		mem_copy(Cmd.m_pQuadInfo, pQuadInfo, sizeof(SQuadRenderInfo) * QuadNum);
+		m_pCommandBuffer->AddRenderCalls(((QuadNum - 1) / gs_GraphicsMaxQuadsRenderCount) + 1);
 	}
 	else
 	{
@@ -1460,9 +1456,8 @@ void CGraphics_Threaded::RenderQuadLayer(int BufferContainerIndex, SQuadRenderIn
 		});
 
 		*Cmd.m_pQuadInfo = *pQuadInfo;
+		m_pCommandBuffer->AddRenderCalls(1);
 	}
-
-	m_pCommandBuffer->AddRenderCalls(((QuadNum - 1) / gs_GraphicsMaxQuadsRenderCount) + 1);
 }
 
 void CGraphics_Threaded::RenderText(int BufferContainerIndex, int TextQuadNum, int TextureSize, int TextureTextIndex, int TextureTextOutlineIndex, const ColorRGBA &TextColor, const ColorRGBA &TextOutlineColor)
@@ -2898,12 +2893,14 @@ std::optional<SWarning> CGraphics_Threaded::CurrentWarning()
 	}
 }
 
-bool CGraphics_Threaded::ShowMessageBox(unsigned Type, const char *pTitle, const char *pMsg)
+std::optional<int> CGraphics_Threaded::ShowMessageBox(const CMessageBox &MessageBox)
 {
 	if(m_pBackend == nullptr)
-		return false;
+	{
+		return std::nullopt;
+	}
 	m_pBackend->WaitForIdle();
-	return m_pBackend->ShowMessageBox(Type, pTitle, pMsg);
+	return m_pBackend->ShowMessageBox(MessageBox);
 }
 
 bool CGraphics_Threaded::IsBackendInitialized()

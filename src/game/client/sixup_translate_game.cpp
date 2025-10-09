@@ -1,10 +1,12 @@
 #include <base/system.h>
+
 #include <engine/shared/protocol7.h>
-#include <game/gamecore.h>
-#include <game/generated/protocol7.h>
-#include <game/localization.h>
+
+#include <generated/protocol7.h>
 
 #include <game/client/gameclient.h>
+#include <game/gamecore.h>
+#include <game/localization.h>
 
 enum
 {
@@ -104,7 +106,11 @@ void CGameClient::ApplySkin7InfoFromSnapObj(const protocol7::CNetObj_De_ClientIn
 	Msg.m_ClientId = ClientId;
 	for(int Part = 0; Part < protocol7::NUM_SKINPARTS; Part++)
 	{
-		IntsToStr(pObj->m_aaSkinPartNames[Part], 6, aSkinPartNames[Part], std::size(aSkinPartNames[Part]));
+		IntsToStr(
+			pObj->m_aaSkinPartNames[Part],
+			std::size(pObj->m_aaSkinPartNames[Part]),
+			aSkinPartNames[Part],
+			std::size(aSkinPartNames[Part]));
 		Msg.m_apSkinPartNames[Part] = aSkinPartNames[Part];
 		Msg.m_aUseCustomColors[Part] = pObj->m_aUseCustomColors[Part];
 		Msg.m_aSkinPartColors[Part] = pObj->m_aSkinPartColors[Part];
@@ -281,6 +287,18 @@ void *CGameClient::TranslateGameMsg(int *pMsgId, CUnpacker *pUnpacker, int Conn)
 		pMsg->m_Diff = pMsg7->m_Diff;
 		pMsg->m_RecordPersonal = pMsg7->m_RecordPersonal;
 		pMsg->m_RecordServer = pMsg7->m_RecordServer;
+
+		return s_aRawMsg;
+	}
+	else if(*pMsgId == protocol7::NETMSGTYPE_SV_CHECKPOINT)
+	{
+		*pMsgId = NETMSGTYPE_SV_DDRACETIME;
+		protocol7::CNetMsg_Sv_Checkpoint *pMsg7 = (protocol7::CNetMsg_Sv_Checkpoint *)pRawMsg;
+		::CNetMsg_Sv_DDRaceTime *pMsg = (::CNetMsg_Sv_DDRaceTime *)s_aRawMsg;
+
+		pMsg->m_Time = 1;
+		pMsg->m_Finish = 0;
+		pMsg->m_Check = pMsg7->m_Diff / 10;
 
 		return s_aRawMsg;
 	}

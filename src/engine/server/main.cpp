@@ -5,15 +5,13 @@
 #include <engine/engine.h>
 #include <engine/map.h>
 #include <engine/server.h>
-#include <engine/storage.h>
-
 #include <engine/server/antibot.h>
 #include <engine/server/databases/connection.h>
 #include <engine/server/server.h>
 #include <engine/server/server_logger.h>
-
 #include <engine/shared/assertion_logger.h>
 #include <engine/shared/config.h>
+#include <engine/storage.h>
 
 #include <game/version.h>
 
@@ -92,11 +90,6 @@ int main(int argc, const char **argv)
 	vpLoggers.push_back(pFutureAssertionLogger);
 	log_set_global_logger(log_logger_collection(std::move(vpLoggers)).release());
 
-	if(secure_random_init() != 0)
-	{
-		log_error("secure", "could not initialize secure RNG");
-		return -1;
-	}
 	if(MysqlInit() != 0)
 	{
 		log_error("mysql", "failed to initialize MySQL library");
@@ -211,7 +204,6 @@ int main(int argc, const char **argv)
 	delete pKernel;
 
 	MysqlUninit();
-	secure_random_uninit();
 
 	return Ret;
 }

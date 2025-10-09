@@ -2,6 +2,7 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 
 #include "gameworld.h"
+
 #include "entities/character.h"
 #include "entity.h"
 #include "gamecontext.h"
@@ -124,19 +125,6 @@ void CGameWorld::Snap(int SnappingClient)
 		{
 			m_pNextTraverseEntity = pEnt->m_pNextTypeEntity;
 			pEnt->Snap(SnappingClient);
-			pEnt = m_pNextTraverseEntity;
-		}
-	}
-}
-
-void CGameWorld::PostSnap()
-{
-	for(auto *pEnt : m_apFirstEntityTypes)
-	{
-		for(; pEnt;)
-		{
-			m_pNextTraverseEntity = pEnt->m_pNextTypeEntity;
-			pEnt->PostSnap();
 			pEnt = m_pNextTraverseEntity;
 		}
 	}

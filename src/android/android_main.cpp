@@ -6,17 +6,15 @@
 
 #include <engine/shared/linereader.h>
 
+#include <SDL.h>
+#include <jni.h>
+
 #include <string>
 #include <vector>
 
-#include <jni.h>
-
-#include <SDL.h>
-
 static bool UnpackAsset(const char *pFilename)
 {
-	char aAssetFilename[IO_MAX_PATH_LENGTH];
-	str_copy(aAssetFilename, "asset_integrity_files/");
+	char aAssetFilename[IO_MAX_PATH_LENGTH] = "asset_integrity_files/";
 	str_append(aAssetFilename, pFilename);
 
 	// This uses SDL_RWFromFile because it can read Android assets,
@@ -91,8 +89,7 @@ static bool EqualIntegrityFiles(const char *pAssetFilename, const char *pStorage
 	}
 	aStorageMainSha256[sizeof(aStorageMainSha256) - 1] = '\0';
 
-	char aAssetFilename[IO_MAX_PATH_LENGTH];
-	str_copy(aAssetFilename, "asset_integrity_files/");
+	char aAssetFilename[IO_MAX_PATH_LENGTH] = "asset_integrity_files/";
 	str_append(aAssetFilename, pAssetFilename);
 
 	SDL_RWops *pAssetFile = SDL_RWFromFile(aAssetFilename, "rb");

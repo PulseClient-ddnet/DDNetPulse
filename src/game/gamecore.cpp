@@ -7,6 +7,7 @@
 #include "teamscore.h"
 
 #include <base/system.h>
+
 #include <engine/shared/config.h>
 
 #include <limits>
@@ -758,3 +759,5 @@ void CWorldCore::InitSwitchers(int HighestSwitchNumber)
 		}
 	}
 }
+
+const CTuningParams CTuningParams::DEFAULT;

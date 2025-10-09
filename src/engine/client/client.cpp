@@ -1,6 +1,12 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 
+#include "client.h"
+
+#include "demoedit.h"
+#include "friends.h"
+#include "serverbrowser.h"
+
 #include <base/hash.h>
 #include <base/hash_ctxt.h>
 #include <base/log.h>
@@ -8,24 +14,19 @@
 #include <base/math.h>
 #include <base/system.h>
 
-#include <engine/external/json-parser/json.h>
-
 #include <engine/config.h>
 #include <engine/console.h>
 #include <engine/discord.h>
 #include <engine/editor.h>
 #include <engine/engine.h>
+#include <engine/external/json-parser/json.h>
 #include <engine/favorites.h>
 #include <engine/graphics.h>
 #include <engine/input.h>
 #include <engine/keys.h>
 #include <engine/map.h>
+#include <engine/notifications.h>
 #include <engine/serverbrowser.h>
-#include <engine/sound.h>
-#include <engine/steam.h>
-#include <engine/storage.h>
-#include <engine/textrender.h>
-
 #include <engine/shared/assertion_logger.h>
 #include <engine/shared/compression.h>
 #include <engine/shared/config.h>
@@ -39,17 +40,16 @@
 #include <engine/shared/protocol.h>
 #include <engine/shared/protocol7.h>
 #include <engine/shared/protocol_ex.h>
+#include <engine/shared/protocolglue.h>
 #include <engine/shared/snapshot.h>
 #include <engine/shared/uuid_manager.h>
+#include <engine/sound.h>
+#include <engine/steam.h>
+#include <engine/storage.h>
+#include <engine/textrender.h>
 
 #include <game/generated/client_data.h>
-#include <game/generated/protocol.h>
-#include <game/generated/protocol7.h>
-#include <game/generated/protocolglue.h>
 
-#include <engine/shared/protocolglue.h>
-
-#include <game/client/projectile_data.h>
 #include <game/localization.h>
 #include <game/version.h>
 
@@ -79,9 +79,10 @@
 #include "engine/shared/console.h"
 #include "game/client/components/console.h"
 
+#include <generated/protocolglue.h>
+
 #include <chrono>
 #include <limits>
-#include <new>
 #include <stack>
 #include <thread>
 #include <tuple>
@@ -95,9 +96,9 @@ static bool Debug = g_Config.m_ClDebug;
 
 CClient::CClient() :
 	m_DemoPlayer(&m_SnapshotDelta, true, [&]() { UpdateDemoIntraTimers(); }),
-	m_InputtimeMarginGraph(128),
-	m_aGametimeMarginGraphs{128, 128},
-	m_FpsGraph(4096)
+	m_InputtimeMarginGraph(128, 2, true),
+	m_aGametimeMarginGraphs{{128, 2, true}, {128, 2, true}},
+	m_FpsGraph(4096, 0, true)
 {
 	m_StateStartTime = time_get();
 	for(auto &DemoRecorder : m_aDemoRecorder)
@@ -698,6 +699,7 @@ void CClient::DisconnectWithReason(const char *pReason)
 	}
 
 	m_aRconAuthed[0] = 0;
+	// Make sure to clear credentials completely from memory
 	mem_zero(m_aRconUsername, sizeof(m_aRconUsername));
 	mem_zero(m_aRconPassword, sizeof(m_aRconPassword));
 	m_MapDetailsPresent = false;
@@ -1015,21 +1017,22 @@ void CClient::RenderGraphs()
 	if(!g_Config.m_DbgGraphs)
 		return;
 
+	// Make sure graph positions and sizes are aligned with pixels to avoid lines overlapping graph edges
 	Graphics()->MapScreen(0, 0, Graphics()->ScreenWidth(), Graphics()->ScreenHeight());
-	float w = Graphics()->ScreenWidth() / 4.0f;
-	float h = Graphics()->ScreenHeight() / 6.0f;
-	float sp = Graphics()->ScreenWidth() / 100.0f;
-	float x = Graphics()->ScreenWidth() - w - sp;
+	const float GraphW = std::round(Graphics()->ScreenWidth() / 4.0f);
+	const float GraphH = std::round(Graphics()->ScreenHeight() / 6.0f);
+	const float GraphSpacing = std::round(Graphics()->ScreenWidth() / 100.0f);
+	const float GraphX = Graphics()->ScreenWidth() - GraphW - GraphSpacing;
 
 	TextRender()->TextColor(TextRender()->DefaultTextColor());
-	TextRender()->Text(x, sp * 5 - 12.0f - 10.0f, 12.0f, Localize("Press Ctrl+Shift+G to disable debug graphs."));
+	TextRender()->Text(GraphX, GraphSpacing * 5 - 12.0f - 10.0f, 12.0f, Localize("Press Ctrl+Shift+G to disable debug graphs."));
 
 	m_FpsGraph.Scale(time_freq());
-	m_FpsGraph.Render(Graphics(), TextRender(), x, sp * 5, w, h, "FPS");
+	m_FpsGraph.Render(Graphics(), TextRender(), GraphX, GraphSpacing * 5, GraphW, GraphH, "FPS");
 	m_InputtimeMarginGraph.Scale(5 * time_freq());
-	m_InputtimeMarginGraph.Render(Graphics(), TextRender(), x, sp * 6 + h, w, h, "Prediction Margin");
+	m_InputtimeMarginGraph.Render(Graphics(), TextRender(), GraphX, GraphSpacing * 6 + GraphH, GraphW, GraphH, "Prediction Margin");
 	m_aGametimeMarginGraphs[g_Config.m_ClDummy].Scale(5 * time_freq());
-	m_aGametimeMarginGraphs[g_Config.m_ClDummy].Render(Graphics(), TextRender(), x, sp * 7 + h * 2, w, h, "Gametime Margin");
+	m_aGametimeMarginGraphs[g_Config.m_ClDummy].Render(Graphics(), TextRender(), GraphX, GraphSpacing * 7 + GraphH * 2, GraphW, GraphH, "Gametime Margin");
 }
 
 void CClient::Restart()
@@ -2104,8 +2107,7 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket, int Conn, bool Dummy)
 
 					if(!Dummy)
 					{
-						// for antiping: if the projectile netobjects from the server contains extra data, this is removed and the original content restored before recording demo
-						SnapshotRemoveExtraProjectileInfo(pTmpBuffer3);
+						GameClient()->ProcessDemoSnapshot(pTmpBuffer3);
 
 						unsigned char aSnapSeven[CSnapshot::MAX_SIZE];
 						CSnapshot *pSnapSeven = (CSnapshot *)aSnapSeven;
@@ -3081,7 +3083,7 @@ void CClient::Run()
 	if(!InitNetworkClient(aNetworkError, sizeof(aNetworkError)))
 	{
 		log_error("client", "%s", aNetworkError);
-		ShowMessageBox("Network Error", aNetworkError);
+		ShowMessageBox({.m_pTitle = "Network Error", .m_pMessage = aNetworkError});
 		return;
 	}
 
@@ -3089,7 +3091,7 @@ void CClient::Run()
 	{
 		const char *pErrorMessage = "Failed to initialize the HTTP client.";
 		log_error("client", "%s", pErrorMessage);
-		ShowMessageBox("HTTP Error", pErrorMessage);
+		ShowMessageBox({.m_pTitle = "HTTP Error", .m_pMessage = pErrorMessage});
 		return;
 	}
 
@@ -3097,11 +3099,21 @@ void CClient::Run()
 	m_pGraphics = CreateEngineGraphicsThreaded();
 	Kernel()->RegisterInterface(m_pGraphics); // IEngineGraphics
 	Kernel()->RegisterInterface(static_cast<IGraphics *>(m_pGraphics), false);
-	if(m_pGraphics->Init() != 0)
 	{
-		log_error("client", "couldn't init graphics");
-		ShowMessageBox("Graphics Error", "The graphics could not be initialized.");
-		return;
+		CMemoryLogger MemoryLogger;
+		MemoryLogger.SetParent(log_get_scope_logger());
+		bool Success;
+		{
+			CLogScope LogScope(&MemoryLogger);
+			Success = m_pGraphics->Init() == 0;
+		}
+		if(!Success)
+		{
+			log_error("client", "Failed to initialize the graphics (see details above)");
+			std::string Message = std::string("Failed to initialize the graphics. See details below.\n\n") + MemoryLogger.ConcatenatedLines();
+			ShowMessageBox({.m_pTitle = "Graphics Error", .m_pMessage = Message.c_str()});
+			return;
+		}
 	}
 
 	// make sure the first frame just clears everything to prevent undesired colors when waiting for io
@@ -4572,10 +4584,11 @@ void CClient::HandleConnectLink(const char *pLink)
 {
 	// Chrome works fine with ddnet:// but not with ddnet:
 	// Check ddnet:// before ddnet: because we don't want the // as part of connect command
-	if(str_startswith(pLink, CONNECTLINK_DOUBLE_SLASH))
-		str_copy(m_aCmdConnect, pLink + sizeof(CONNECTLINK_DOUBLE_SLASH) - 1);
-	else if(str_startswith(pLink, CONNECTLINK_NO_SLASH))
-		str_copy(m_aCmdConnect, pLink + sizeof(CONNECTLINK_NO_SLASH) - 1);
+	const char *pConnectLink = nullptr;
+	if((pConnectLink = str_startswith(pLink, CONNECTLINK_DOUBLE_SLASH)))
+		str_copy(m_aCmdConnect, pConnectLink);
+	else if((pConnectLink = str_startswith(pLink, CONNECTLINK_NO_SLASH)))
+		str_copy(m_aCmdConnect, pConnectLink);
 	else
 		str_copy(m_aCmdConnect, pLink);
 	// Edge appends / to the URL
@@ -4622,26 +4635,6 @@ static bool SaveUnknownCommandCallback(const char *pCommand, void *pUser)
 	return true;
 }
 
-static Uint32 GetSdlMessageBoxFlags(IClient::EMessageBoxType Type)
-{
-	switch(Type)
-	{
-	case IClient::MESSAGE_BOX_TYPE_ERROR:
-		return SDL_MESSAGEBOX_ERROR;
-	case IClient::MESSAGE_BOX_TYPE_WARNING:
-		return SDL_MESSAGEBOX_WARNING;
-	case IClient::MESSAGE_BOX_TYPE_INFO:
-		return SDL_MESSAGEBOX_INFORMATION;
-	}
-	dbg_assert(false, "Type invalid");
-	return 0;
-}
-
-static void ShowMessageBox(const char *pTitle, const char *pMessage, IClient::EMessageBoxType Type = IClient::MESSAGE_BOX_TYPE_ERROR)
-{
-	SDL_ShowSimpleMessageBox(GetSdlMessageBoxFlags(Type), pTitle, pMessage, nullptr);
-}
-
 /*
 	Server Time
 	Client Mirror Time
@@ -4658,7 +4651,7 @@ static void ShowMessageBox(const char *pTitle, const char *pMessage, IClient::EM
 extern "C" int TWMain(int argc, const char **argv)
 #elif defined(CONF_PLATFORM_ANDROID)
 static int gs_AndroidStarted = false;
-extern "C" __attribute__((visibility("default"))) int SDL_main(int argc, char *argv[]);
+extern "C" [[gnu::visibility("default")]] int SDL_main(int argc, char *argv[]);
 int SDL_main(int argc, char *argv2[])
 #else
 int main(int argc, const char **argv)
@@ -4672,7 +4665,7 @@ int main(int argc, const char **argv)
 	// not to be initialized correctly when starting the app again.
 	if(gs_AndroidStarted)
 	{
-		::ShowMessageBox("Android Error", "The app was started, but not closed properly, this causes bugs. Please restart or manually close this task.");
+		ShowMessageBoxWithoutGraphics({.m_pTitle = "Android Error", .m_pMessage = "The app was started, but not closed properly, this causes bugs. Please restart or manually close this task."});
 		std::exit(0);
 	}
 	gs_AndroidStarted = true;
@@ -4717,7 +4710,7 @@ int main(int argc, const char **argv)
 	if(pAndroidInitError != nullptr)
 	{
 		log_error("android", "%s", pAndroidInitError);
-		::ShowMessageBox("Android Error", pAndroidInitError);
+		ShowMessageBoxWithoutGraphics({.m_pTitle = "Android Error", .m_pMessage = pAndroidInitError});
 		std::exit(0);
 	}
 #endif
@@ -4757,10 +4750,6 @@ int main(int argc, const char **argv)
 		PerformFinalCleanup();
 	};
 
-	const bool RandInitFailed = secure_random_init() != 0;
-	if(!RandInitFailed)
-		CleanerFunctions.emplace([]() { secure_random_uninit(); });
-
 	// Register SDL for cleanup before creating the kernel and client,
 	// so SDL is shutdown after kernel and client. Otherwise the client
 	// may crash when shutting down after SDL is already shutdown.
@@ -4784,23 +4773,73 @@ int main(int argc, const char **argv)
 	dbg_assert_set_handler([MainThreadId, pClient](const char *pMsg) {
 		if(MainThreadId != std::this_thread::get_id())
 			return;
-		char aVersionStr[128];
-		if(!os_version_str(aVersionStr, sizeof(aVersionStr)))
-			str_copy(aVersionStr, "unknown");
-		char aGpuInfo[256];
+		char aOsVersionString[128];
+		if(!os_version_str(aOsVersionString, sizeof(aOsVersionString)))
+		{
+			str_copy(aOsVersionString, "unknown");
+		}
+		char aGpuInfo[512];
 		pClient->GetGpuInfoString(aGpuInfo);
-		char aMessage[768];
+		char aMessage[2048];
 		str_format(aMessage, sizeof(aMessage),
 			"An assertion error occurred. Please write down or take a screenshot of the following information and report this error.\n"
-			"Please also share the assert log which you should find in the 'dumps' folder in your config directory.\n\n"
+			"Please also share the assert log"
+#if defined(CONF_CRASHDUMP)
+			" and crash log"
+#endif
+			" which you should find in the 'dumps' folder in your config directory.\n\n"
 			"%s\n\n"
-			"Platform: %s\n"
-			"Game version: %s %s\n"
+			"Platform: %s (%s)\n"
+			"Configuration: base"
+#if defined(CONF_AUTOUPDATE)
+			" + autoupdate"
+#endif
+#if defined(CONF_CRASHDUMP)
+			" + crashdump"
+#endif
+#if defined(CONF_DEBUG)
+			" + debug"
+#endif
+#if defined(CONF_DISCORD)
+			" + discord"
+#endif
+#if defined(CONF_VIDEORECORDER)
+			" + videorecorder"
+#endif
+#if defined(CONF_WEBSOCKETS)
+			" + websockets"
+#endif
+			"\n"
+			"Game version: %s %s %s\n"
 			"OS version: %s\n\n"
 			"%s", // GPU info
-			pMsg, CONF_PLATFORM_STRING, GAME_RELEASE_VERSION, GIT_SHORTREV_HASH != nullptr ? GIT_SHORTREV_HASH : "", aVersionStr,
+			pMsg,
+			CONF_PLATFORM_STRING, CONF_ARCH_ENDIAN_STRING,
+			GAME_NAME, GAME_RELEASE_VERSION, GIT_SHORTREV_HASH != nullptr ? GIT_SHORTREV_HASH : "",
+			aOsVersionString,
 			aGpuInfo);
-		pClient->ShowMessageBox("Assertion Error", aMessage);
+		// Also log all of this information to the assertion log file
+		log_error("assertion", "%s", aMessage);
+		std::vector<IGraphics::CMessageBoxButton> vButtons;
+		// Storage may not have been initialized yet and viewing files is not supported on Android yet
+#if !defined(CONF_PLATFORM_ANDROID)
+		if(pClient->Storage() != nullptr)
+		{
+			vButtons.push_back({.m_pLabel = "Show dumps"});
+		}
+#endif
+		vButtons.push_back({.m_pLabel = "OK", .m_Confirm = true, .m_Cancel = true});
+		const std::optional<int> MessageResult = pClient->ShowMessageBox({.m_pTitle = "Assertion Error", .m_pMessage = aMessage, .m_vButtons = vButtons});
+#if !defined(CONF_PLATFORM_ANDROID)
+		if(pClient->Storage() != nullptr && MessageResult && *MessageResult == 0)
+		{
+			char aDumpsPath[IO_MAX_PATH_LENGTH];
+			pClient->Storage()->GetCompletePath(IStorage::TYPE_SAVE, "dumps", aDumpsPath, sizeof(aDumpsPath));
+			pClient->ViewFile(aDumpsPath);
+		}
+#else
+		(void)MessageResult;
+#endif
 		// Client will crash due to assertion, don't call PerformAllCleanup in this inconsistent state
 	});
 
@@ -4823,8 +4862,8 @@ int main(int argc, const char **argv)
 		if(!pStorage)
 		{
 			log_error("client", "Failed to initialize the storage location (see details above)");
-			std::string Message = "Failed to initialize the storage location. See details below.\n\n" + MemoryLogger.ConcatenatedLines();
-			pClient->ShowMessageBox("Storage Error", Message.c_str());
+			std::string Message = std::string("Failed to initialize the storage location. See details below.\n\n") + MemoryLogger.ConcatenatedLines();
+			pClient->ShowMessageBox({.m_pTitle = "Storage Error", .m_pMessage = Message.c_str()});
 			PerformAllCleanup();
 			return -1;
 		}
@@ -4841,15 +4880,6 @@ int main(int argc, const char **argv)
 		str_format(aBufName, sizeof(aBufName), "dumps/" GAME_NAME "_%s_crash_log_%s_%d_%s.RTP", CONF_PLATFORM_STRING, aDate, pid(), GIT_SHORTREV_HASH != nullptr ? GIT_SHORTREV_HASH : "");
 		pStorage->GetCompletePath(IStorage::TYPE_SAVE, aBufName, aBufPath, sizeof(aBufPath));
 		crashdump_init_if_available(aBufPath);
-	}
-
-	if(RandInitFailed)
-	{
-		const char *pError = "Failed to initialize the secure RNG.";
-		log_error("secure", "%s", pError);
-		pClient->ShowMessageBox("Secure RNG Error", pError);
-		PerformAllCleanup();
-		return -1;
 	}
 
 	IConsole *pConsole = CreateConsole(CFGFLAG_CLIENT).release();
@@ -4908,7 +4938,7 @@ int main(int argc, const char **argv)
 		{
 			const char *pError = "Failed to load config from '" CONFIG_FILE "'.";
 			log_error("client", "%s", pError);
-			pClient->ShowMessageBox("Config File Error", pError);
+			pClient->ShowMessageBox({.m_pTitle = "Config File Error", .m_pMessage = pError});
 			PerformAllCleanup();
 			return -1;
 		}
@@ -5006,7 +5036,7 @@ int main(int argc, const char **argv)
 		char aError[256];
 		str_format(aError, sizeof(aError), "Unable to initialize SDL base: %s", SDL_GetError());
 		log_error("client", "%s", aError);
-		pClient->ShowMessageBox("SDL Error", aError);
+		pClient->ShowMessageBox({.m_pTitle = "SDL Error", .m_pMessage = aError});
 		PerformAllCleanup();
 		return -1;
 	}
@@ -5030,7 +5060,7 @@ int main(int argc, const char **argv)
 
 	for(const SWarning &Warning : vQuittingWarnings)
 	{
-		::ShowMessageBox(Warning.m_aWarningTitle, Warning.m_aWarningMsg);
+		ShowMessageBoxWithoutGraphics({.m_pTitle = Warning.m_aWarningTitle, .m_pMessage = Warning.m_aWarningMsg});
 	}
 
 	if(Restarting)
@@ -5248,7 +5278,7 @@ int CClient::UdpConnectivity(int NetType)
 	return Connectivity;
 }
 
-bool CClient::ViewLink(const char *pLink)
+static bool ViewLinkImpl(const char *pLink)
 {
 #if defined(CONF_PLATFORM_ANDROID)
 	if(SDL_OpenURL(pLink) == 0)
@@ -5267,10 +5297,20 @@ bool CClient::ViewLink(const char *pLink)
 #endif
 }
 
+bool CClient::ViewLink(const char *pLink)
+{
+	if(!str_startswith(pLink, "https://"))
+	{
+		log_error("client", "Failed to open link '%s': only https-links are allowed", pLink);
+		return false;
+	}
+	return ViewLinkImpl(pLink);
+}
+
 bool CClient::ViewFile(const char *pFilename)
 {
 #if defined(CONF_PLATFORM_MACOS)
-	return ViewLink(pFilename);
+	return ViewLinkImpl(pFilename);
 #else
 	// Create a file link so the path can contain forward and
 	// backward slashes. But the file link must be absolute.
@@ -5289,7 +5329,7 @@ bool CClient::ViewFile(const char *pFilename)
 
 	char aFileLink[IO_MAX_PATH_LENGTH];
 	str_format(aFileLink, sizeof(aFileLink), "file://%s%s", aWorkingDir, pFilename);
-	return ViewLink(aFileLink);
+	return ViewLinkImpl(aFileLink);
 #endif
 }
 
@@ -5341,21 +5381,42 @@ void CClient::ShellUnregister()
 }
 #endif
 
-void CClient::ShowMessageBox(const char *pTitle, const char *pMessage, EMessageBoxType Type)
+std::optional<int> CClient::ShowMessageBox(const IGraphics::CMessageBox &MessageBox)
 {
-	if(m_pGraphics == nullptr || !m_pGraphics->ShowMessageBox(GetSdlMessageBoxFlags(Type), pTitle, pMessage))
-		::ShowMessageBox(pTitle, pMessage, Type);
+	std::optional<int> Result = m_pGraphics == nullptr ? std::nullopt : m_pGraphics->ShowMessageBox(MessageBox);
+	if(!Result)
+	{
+		Result = ShowMessageBoxWithoutGraphics(MessageBox);
+	}
+	return Result;
 }
 
-void CClient::GetGpuInfoString(char (&aGpuInfo)[256])
+void CClient::GetGpuInfoString(char (&aGpuInfo)[512])
 {
-	if(m_pGraphics != nullptr && m_pGraphics->IsBackendInitialized())
+	if(m_pGraphics == nullptr || !m_pGraphics->IsBackendInitialized())
 	{
-		str_format(aGpuInfo, std::size(aGpuInfo), "GPU: %s - %s - %s", m_pGraphics->GetVendorString(), m_pGraphics->GetRendererString(), m_pGraphics->GetVersionString());
+		str_format(aGpuInfo, std::size(aGpuInfo),
+			"Graphics backend: %s %d.%d.%d\n"
+			"Graphics %s not yet initialized.",
+			g_Config.m_GfxBackend, g_Config.m_GfxGLMajor, g_Config.m_GfxGLMinor, g_Config.m_GfxGLPatch,
+			m_pGraphics == nullptr ? "were" : "backend was");
 	}
 	else
 	{
-		str_copy(aGpuInfo, "Graphics backend was not yet initialized.");
+		// TODO: Even better would be if the backend could return its name and version, because the config variables can be outdated when the client was not restarted.
+		str_format(aGpuInfo, std::size(aGpuInfo),
+			"Graphics backend: %s %d.%d.%d\n"
+			"GPU: %s - %s - %s\n"
+			"Texture: %" PRIu64 " MiB, "
+			"Buffer: %" PRIu64 " MiB, "
+			"Streamed: %" PRIu64 " MiB, "
+			"Staging: %" PRIu64 " MiB",
+			g_Config.m_GfxBackend, g_Config.m_GfxGLMajor, g_Config.m_GfxGLMinor, g_Config.m_GfxGLPatch,
+			m_pGraphics->GetVendorString(), m_pGraphics->GetRendererString(), m_pGraphics->GetVersionString(),
+			m_pGraphics->TextureMemoryUsage() / 1024 / 1024,
+			m_pGraphics->BufferMemoryUsage() / 1024 / 1024,
+			m_pGraphics->StreamedMemoryUsage() / 1024 / 1024,
+			m_pGraphics->StagingMemoryUsage() / 1024 / 1024);
 	}
 }
 

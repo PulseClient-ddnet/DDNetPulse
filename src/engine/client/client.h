@@ -3,6 +3,9 @@
 #ifndef ENGINE_CLIENT_CLIENT_H
 #define ENGINE_CLIENT_CLIENT_H
 
+#include "graph.h"
+#include "smooth_time.h"
+
 #include <base/hash.h>
 #include <base/types.h>
 
@@ -21,9 +24,6 @@
 #include <engine/shared/network.h>
 #include <engine/textrender.h>
 #include <engine/warning.h>
-
-#include "graph.h"
-#include "smooth_time.h"
 
 #include <chrono>
 #include <deque>
@@ -553,8 +553,8 @@ public:
 	void ShellUnregister() override;
 #endif
 
-	void ShowMessageBox(const char *pTitle, const char *pMessage, EMessageBoxType Type = MESSAGE_BOX_TYPE_ERROR) override;
-	void GetGpuInfoString(char (&aGpuInfo)[256]) override;
+	std::optional<int> ShowMessageBox(const IGraphics::CMessageBox &MessageBox) override;
+	void GetGpuInfoString(char (&aGpuInfo)[512]) override;
 	void SetLoggers(std::shared_ptr<ILogger> &&pFileLogger, std::shared_ptr<ILogger> &&pStdoutLogger);
 };
 

@@ -10,14 +10,11 @@
 #include <GLES3/gl3.h>
 #endif
 
-#include <engine/client/backend_sdl.h>
-
+#include <engine/client/backend/glsl_shader_compiler.h>
 #include <engine/client/backend/opengl/opengl_sl.h>
 #include <engine/client/backend/opengl/opengl_sl_program.h>
-
+#include <engine/client/backend_sdl.h>
 #include <engine/gfx/image_manipulation.h>
-
-#include <engine/client/backend/glsl_shader_compiler.h>
 
 #if defined(CONF_PLATFORM_EMSCRIPTEN)
 // WebGL2 defines the type of a buffer at the first bind to a buffer target
@@ -900,14 +897,11 @@ void CCommandProcessorFragment_OpenGL3_3::AppendIndices(unsigned int NewIndicesC
 void CCommandProcessorFragment_OpenGL3_3::Cmd_CreateBufferObject(const CCommandBuffer::SCommand_CreateBufferObject *pCommand)
 {
 	void *pUploadData = pCommand->m_pUploadData;
-	int Index = pCommand->m_BufferIndex;
+	const int Index = pCommand->m_BufferIndex;
 	// create necessary space
 	if((size_t)Index >= m_vBufferObjectIndices.size())
 	{
-		for(int i = m_vBufferObjectIndices.size(); i < Index + 1; ++i)
-		{
-			m_vBufferObjectIndices.push_back(0);
-		}
+		m_vBufferObjectIndices.resize(Index + 1, 0);
 	}
 
 	GLuint VertBufferId = 0;
@@ -965,17 +959,14 @@ void CCommandProcessorFragment_OpenGL3_3::Cmd_DeleteBufferObject(const CCommandB
 
 void CCommandProcessorFragment_OpenGL3_3::Cmd_CreateBufferContainer(const CCommandBuffer::SCommand_CreateBufferContainer *pCommand)
 {
-	int Index = pCommand->m_BufferContainerIndex;
+	const int Index = pCommand->m_BufferContainerIndex;
 	// create necessary space
 	if((size_t)Index >= m_vBufferContainers.size())
 	{
-		for(int i = m_vBufferContainers.size(); i < Index + 1; ++i)
-		{
-			SBufferContainer Container;
-			Container.m_ContainerInfo.m_Stride = 0;
-			Container.m_ContainerInfo.m_VertBufferBindingIndex = -1;
-			m_vBufferContainers.push_back(Container);
-		}
+		SBufferContainer Container;
+		Container.m_ContainerInfo.m_Stride = 0;
+		Container.m_ContainerInfo.m_VertBufferBindingIndex = -1;
+		m_vBufferContainers.resize(Index + 1, Container);
 	}
 
 	SBufferContainer &BufferContainer = m_vBufferContainers[Index];
@@ -1173,7 +1164,7 @@ void CCommandProcessorFragment_OpenGL3_3::Cmd_RenderQuadLayer(const CCommandBuff
 
 	if(!Grouped)
 	{
-		vec4 aColors[ms_MaxQuadsPossible];
+		ColorRGBA aColors[ms_MaxQuadsPossible];
 		vec2 aOffsets[ms_MaxQuadsPossible];
 		float aRotations[ms_MaxQuadsPossible];
 
@@ -1199,7 +1190,7 @@ void CCommandProcessorFragment_OpenGL3_3::Cmd_RenderQuadLayer(const CCommandBuff
 	}
 	else
 	{
-		vec4 Colors = pCommand->m_pQuadInfo[0].m_Color;
+		ColorRGBA Colors = pCommand->m_pQuadInfo[0].m_Color;
 		vec2 Offsets = pCommand->m_pQuadInfo[0].m_Offsets;
 		float Rotations = pCommand->m_pQuadInfo[0].m_Rotation;
 

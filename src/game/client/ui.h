@@ -214,7 +214,9 @@ struct SLabelProperties
 	bool m_StopAtEnd = false;
 	bool m_EllipsisAtEnd = false;
 	bool m_EnableWidthCheck = true;
-	std::vector<STextColorSplit> m_vColorSplits = {};
+	std::vector<STextColorSplit> m_vColorSplits;
+
+	void SetColor(const ColorRGBA &Color);
 };
 
 enum EButtonFlags : unsigned
@@ -374,6 +376,8 @@ private:
 	};
 	CDoubleClickState m_DoubleClickState;
 	const void *m_pLastEditingItem = nullptr;
+	const void *m_pLastActiveScrollbar = nullptr;
+	int m_ScrollbarValue = 0;
 	float m_ActiveScrollbarOffset = 0.0f;
 	float m_ProgressSpinnerOffset = 0.0f;
 	class CValueSelectorState
@@ -651,6 +655,7 @@ public:
 		SCROLLBAR_OPTION_INFINITE = 1 << 0,
 		SCROLLBAR_OPTION_NOCLAMPVALUE = 1 << 1,
 		SCROLLBAR_OPTION_MULTILINE = 1 << 2,
+		SCROLLBAR_OPTION_DELAYUPDATE = 1 << 3,
 	};
 	float DoScrollbarV(const void *pId, const CUIRect *pRect, float Current);
 	float DoScrollbarH(const void *pId, const CUIRect *pRect, float Current, const ColorRGBA *pColorInner = nullptr);

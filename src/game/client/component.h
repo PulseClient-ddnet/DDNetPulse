@@ -15,6 +15,7 @@ class CComponentInterfaces
 {
 public:
 	virtual void OnInterfacesInit(CGameClient *pClient);
+	virtual ~CComponentInterfaces() = default;
 
 protected:
 	/**
@@ -71,6 +72,11 @@ protected:
 	 * Get the render tools interface.
 	 */
 	class CRenderTools *RenderTools() const;
+
+	/**
+	 * Get the render map interface.
+	 */
+	class CRenderMap *RenderMap() const;
 
 	/**
 	 * Get the config manager interface.
@@ -158,13 +164,6 @@ private:
 class CComponent : public CComponentInterfaces
 {
 public:
-	/**
-	 * The component virtual destructor.
-	 */
-	virtual ~CComponent()
-	{
-	}
-
 	/**
 	 * Gets the size of the non-abstract component.
 	 */

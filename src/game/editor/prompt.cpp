@@ -1,10 +1,11 @@
-#include <engine/keys.h>
-#include <game/client/ui_listbox.h>
-#include <game/editor/quick_action.h>
+#include "prompt.h"
 
 #include "editor.h"
 
-#include "prompt.h"
+#include <engine/keys.h>
+
+#include <game/client/ui_listbox.h>
+#include <game/editor/quick_action.h>
 
 static bool FuzzyMatch(const char *pHaystack, const char *pNeedle)
 {
@@ -27,14 +28,13 @@ static bool FuzzyMatch(const char *pHaystack, const char *pNeedle)
 
 bool CPrompt::IsActive()
 {
-	return CEditorComponent::IsActive() || Editor()->m_Dialog == DIALOG_QUICK_PROMPT;
+	return Editor()->m_Dialog == DIALOG_QUICK_PROMPT;
 }
 
 void CPrompt::SetActive()
 {
 	Editor()->m_Dialog = DIALOG_QUICK_PROMPT;
-	CEditorComponent::SetActive();
-
+	Ui()->ClosePopupMenus();
 	Ui()->SetActiveItem(&m_PromptInput);
 }
 
@@ -46,12 +46,11 @@ void CPrompt::SetInactive()
 	{
 		Editor()->OnDialogClose();
 	}
-	CEditorComponent::SetInactive();
 }
 
 bool CPrompt::OnInput(const IInput::CEvent &Event)
 {
-	if(Input()->ModifierIsPressed() && Input()->KeyIsPressed(KEY_P))
+	if(Editor()->m_Dialog == DIALOG_NONE && Input()->ModifierIsPressed() && Input()->KeyPress(KEY_P))
 	{
 		SetActive();
 	}

@@ -1,17 +1,16 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#include "broadcast.h"
+
 #include <engine/graphics.h>
 #include <engine/shared/config.h>
 #include <engine/textrender.h>
 
-#include <game/generated/protocol.h>
-
-#include <game/client/gameclient.h>
+#include <generated/protocol.h>
 
 #include <game/client/components/motd.h>
 #include <game/client/components/scoreboard.h>
-
-#include "broadcast.h"
+#include <game/client/gameclient.h>
 
 void CBroadcast::OnReset()
 {
@@ -55,7 +54,8 @@ void CBroadcast::RenderServerBroadcast()
 	if(!m_TextContainerIndex.Valid())
 	{
 		CTextCursor Cursor;
-		TextRender()->SetCursor(&Cursor, m_BroadcastRenderOffset, 40.0f, 12.0f, TEXTFLAG_RENDER);
+		Cursor.SetPosition(vec2(m_BroadcastRenderOffset, 40.0f));
+		Cursor.m_FontSize = 12.0f;
 		Cursor.m_LineWidth = Width;
 		TextRender()->CreateTextContainer(m_TextContainerIndex, &Cursor, m_aBroadcastText);
 	}

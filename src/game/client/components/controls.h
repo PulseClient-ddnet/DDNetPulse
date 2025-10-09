@@ -6,9 +6,11 @@
 #include <base/vmath.h>
 
 #include <engine/client.h>
+#include <engine/console.h>
+
+#include <generated/protocol.h>
 
 #include <game/client/component.h>
-#include <game/generated/protocol.h>
 
 class CControls : public CComponent
 {

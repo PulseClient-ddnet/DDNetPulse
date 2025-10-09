@@ -1,4 +1,5 @@
-#include <game/editor/editor.h>
+#include "image.h"
+#include "sound.h"
 
 #include <engine/client.h>
 #include <engine/console.h>
@@ -9,11 +10,9 @@
 #include <engine/sound.h>
 #include <engine/storage.h>
 
+#include <game/editor/editor.h>
 #include <game/gamecore.h>
 #include <game/mapitems_ex.h>
-
-#include "image.h"
-#include "sound.h"
 
 // compatibility with old sound layers
 class CSoundSourceDeprecated
@@ -28,6 +27,18 @@ public:
 	int m_SoundEnv;
 	int m_SoundEnvOffset;
 };
+
+void CDataFileWriterFinishJob::Run()
+{
+	m_Writer.Finish();
+}
+
+CDataFileWriterFinishJob::CDataFileWriterFinishJob(const char *pRealFileName, const char *pTempFileName, CDataFileWriter &&Writer) :
+	m_Writer(std::move(Writer))
+{
+	str_copy(m_aRealFileName, pRealFileName);
+	str_copy(m_aTempFileName, pTempFileName);
+}
 
 bool CEditorMap::Save(const char *pFileName, const std::function<void(const char *pErrorMessage)> &ErrorHandler)
 {
@@ -613,7 +624,7 @@ bool CEditorMap::Load(const char *pFileName, int StorageType, const std::functio
 				// load external
 				if(m_pEditor->Storage()->ReadFile(aBuf, IStorage::TYPE_ALL, &pSound->m_pData, &pSound->m_DataSize))
 				{
-					pSound->m_SoundId = m_pEditor->Sound()->LoadOpusFromMem(pSound->m_pData, pSound->m_DataSize, true);
+					pSound->m_SoundId = m_pEditor->Sound()->LoadOpusFromMem(pSound->m_pData, pSound->m_DataSize, true, pSound->m_aName);
 				}
 				else
 				{
@@ -627,7 +638,7 @@ bool CEditorMap::Load(const char *pFileName, int StorageType, const std::functio
 				void *pData = DataFile.GetData(pItem->m_SoundData);
 				pSound->m_pData = malloc(pSound->m_DataSize);
 				mem_copy(pSound->m_pData, pData, pSound->m_DataSize);
-				pSound->m_SoundId = m_pEditor->Sound()->LoadOpusFromMem(pSound->m_pData, pSound->m_DataSize, true);
+				pSound->m_SoundId = m_pEditor->Sound()->LoadOpusFromMem(pSound->m_pData, pSound->m_DataSize, true, pSound->m_aName);
 			}
 
 			m_vpSounds.push_back(pSound);
@@ -744,6 +755,12 @@ bool CEditorMap::Load(const char *pFileName, int StorageType, const std::functio
 					pTiles->m_Image = pTilemapItem->m_Image;
 					pTiles->m_HasGame = pTilemapItem->m_Flags & TILESLAYERFLAG_GAME;
 
+					// validate image index
+					if(pTiles->m_Image < -1 || pTiles->m_Image >= (int)m_vpImages.size())
+					{
+						pTiles->m_Image = -1;
+					}
+
 					// load layer name
 					if(pTilemapItem->m_Version >= 3)
 						IntsToStr(pTilemapItem->m_aName, std::size(pTilemapItem->m_aName), pTiles->m_aName, std::size(pTiles->m_aName));
@@ -858,8 +875,12 @@ bool CEditorMap::Load(const char *pFileName, int StorageType, const std::functio
 					std::shared_ptr<CLayerQuads> pQuads = std::make_shared<CLayerQuads>(m_pEditor);
 					pQuads->m_Flags = pLayerItem->m_Flags;
 					pQuads->m_Image = pQuadsItem->m_Image;
+
+					// validate image index
 					if(pQuads->m_Image < -1 || pQuads->m_Image >= (int)m_vpImages.size())
+					{
 						pQuads->m_Image = -1;
+					}
 
 					// load layer name
 					if(pQuadsItem->m_Version >= 2)
@@ -885,9 +906,11 @@ bool CEditorMap::Load(const char *pFileName, int StorageType, const std::functio
 					pSounds->m_Flags = pLayerItem->m_Flags;
 					pSounds->m_Sound = pSoundsItem->m_Sound;
 
-					// validate m_Sound
+					// validate sound index
 					if(pSounds->m_Sound < -1 || pSounds->m_Sound >= (int)m_vpSounds.size())
+					{
 						pSounds->m_Sound = -1;
+					}
 
 					// load layer name
 					IntsToStr(pSoundsItem->m_aName, std::size(pSoundsItem->m_aName), pSounds->m_aName, std::size(pSounds->m_aName));
@@ -914,9 +937,11 @@ bool CEditorMap::Load(const char *pFileName, int StorageType, const std::functio
 					pSounds->m_Flags = pLayerItem->m_Flags;
 					pSounds->m_Sound = pSoundsItem->m_Sound;
 
-					// validate m_Sound
+					// validate sound index
 					if(pSounds->m_Sound < -1 || pSounds->m_Sound >= (int)m_vpSounds.size())
+					{
 						pSounds->m_Sound = -1;
+					}
 
 					// load layer name
 					IntsToStr(pSoundsItem->m_aName, std::size(pSoundsItem->m_aName), pSounds->m_aName, std::size(pSounds->m_aName));
@@ -1025,10 +1050,7 @@ bool CEditorMap::Load(const char *pFileName, int StorageType, const std::functio
 
 	PerformSanityChecks(ErrorHandler);
 
-	m_Modified = false;
-	m_ModifiedAuto = false;
-	m_LastModifiedTime = -1.0f;
-	m_LastSaveTime = m_pEditor->Client()->GlobalTime();
+	ResetModifiedState();
 	return true;
 }
 

@@ -3,6 +3,7 @@
 #define GAME_SERVER_TEAMS_H
 
 #include <engine/shared/protocol.h>
+
 #include <game/race_state.h>
 #include <game/server/gamecontext.h>
 #include <game/team_state.h>
@@ -104,7 +105,7 @@ public:
 	void SwapTeamCharacters(CPlayer *pPrimaryPlayer, CPlayer *pTargetPlayer, int Team);
 	void CancelTeamSwap(CPlayer *pPlayer, int Team);
 	void ProcessSaveTeam();
-	int GetFirstEmptyTeam() const;
+	std::optional<int> GetFirstEmptyTeam() const;
 	bool TeeStarted(int ClientId) const;
 	bool TeeFinished(int ClientId) const;
 	ETeamState GetTeamState(int Team) const;

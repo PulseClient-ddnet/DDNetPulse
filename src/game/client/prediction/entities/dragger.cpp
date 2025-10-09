@@ -1,12 +1,14 @@
 /* (c) Shereef Marzouk. See "licence DDRace.txt" and the readme.txt in the root of the distribution for more information. */
 #include "dragger.h"
+
 #include "character.h"
 
 #include <engine/shared/config.h>
 
+#include <generated/protocol.h>
+
 #include <game/client/laser_data.h>
 #include <game/collision.h>
-#include <game/generated/protocol.h>
 #include <game/mapitems.h>
 
 void CDragger::Tick()

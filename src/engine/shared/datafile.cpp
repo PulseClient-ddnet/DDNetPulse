@@ -3,6 +3,8 @@
 
 #include "datafile.h"
 
+#include "uuid_manager.h"
+
 #include <base/hash_ctxt.h>
 #include <base/log.h>
 #include <base/math.h>
@@ -10,13 +12,11 @@
 
 #include <engine/storage.h>
 
-#include "uuid_manager.h"
+#include <zlib.h>
 
 #include <cstdlib>
 #include <limits>
 #include <unordered_set>
-
-#include <zlib.h>
 
 static constexpr int MAX_ITEM_TYPE = 0xFFFF;
 static constexpr int MAX_ITEM_ID = 0xFFFF;
@@ -545,7 +545,7 @@ bool CDataFileReader::Open(class IStorage *pStorage, const char *pFilename, int 
 	if((int64_t)sizeof(Header) + Size + (int64_t)Header.m_DataSize != FileSize)
 	{
 		io_close(File);
-		log_error("datafile", "invalid header data size or truncated file. data_size=%" PRId64 " file_size=%" PRId64, Header.m_DataSize, FileSize);
+		log_error("datafile", "invalid header data size or truncated file. data_size=%d file_size=%" PRId64, Header.m_DataSize, FileSize);
 		return false;
 	}
 
@@ -571,7 +571,7 @@ bool CDataFileReader::Open(class IStorage *pStorage, const char *pFilename, int 
 	{
 		if(Header.m_Swaplen % sizeof(int) == 0 && SizeFix != 0 && HeaderSwaplen + SizeFix == FileSizeSwaplen)
 		{
-			log_warn("datafile", "fixing invalid header swaplen. swaplen=%d fix=+%d", Header.m_Swaplen, SizeFix);
+			log_warn("datafile", "fixing invalid header swaplen. swaplen=%d fix=+%" PRId64, Header.m_Swaplen, SizeFix);
 			Header.m_Swaplen += SizeFix;
 		}
 		else
@@ -621,7 +621,7 @@ bool CDataFileReader::Open(class IStorage *pStorage, const char *pFilename, int 
 	{
 		io_close(pTmpDataFile->m_File);
 		free(pTmpDataFile);
-		log_error("datafile", "truncation error. could not read all item data. wanted=%" PRIzu " got=%d", Size, ReadSize);
+		log_error("datafile", "truncation error. could not read all item data. wanted=%" PRId64 " got=%d", Size, ReadSize);
 		return false;
 	}
 
