@@ -31,24 +31,11 @@ static const char *s_apSplashTexts[] = {
 	"Teleport abuse not included.",
 	"Save your hammerhits, they matter.",
 	"This map is easy... said no one ever.",
-	"Rank 1? In your dreams.",
-	"Who needs friends when you have dummy?",
-	"Did you just skip 7 minutes?",
-	"Sawblade lovers anonymous.",
-	"Rated E for Everyone’s Screams.",
+	"Who needs friends when you have dummy...? Right?...",
 	"Your dummy is judging you.",
-	"Made with more triggers than emotions.",
-	"Even n9 failed this one. Probably.",
-	"Edgehook? More like edge-nope.",
-	"You can't out-wallhammer your problems.",
 	"Speedrunners hate this one trick!",
 	"Unfreeze me, I swear I won’t troll.",
-	"KoG’s playground, DDNet’s battlefield.",
-	"Lost in CP3 again, aren’t you?",
-	"You thought that was the finish? Cute.",
-	"Still loading… like your team skills.",
 	"Map rated 2★, ego rated 5★.",
-	"Inspired by Aoe, failed like you.",
 	"This phrase was placed here by Tee gods.",
 	"Welcome to hook school – you’re late.",
 	"Lag is just a feature.",
@@ -59,14 +46,9 @@ static const char *s_apSplashTexts[] = {
 	"You can't hammer your way out of this one.",
 	"That wasn’t lag, that was skill delay.",
 	"Now featuring invisible fails!",
-	"Climb like nobody's watching.",
-	"Maps don’t break you, CP9 does.",
 	"Your dummy abandoned you.",
 	"Made by players. Cursed by players.",
 	"Finish the map, they said.",
-	"Where walljumps go to die.",
-	"Hitting lasers like it’s a feature.",
-	"Triggered? So is this map.",
 	"Rank farming intensifies.",
 	"100% skill, 0% sanity.",
 	"Spectate the pros. Copy. Fail.",
@@ -83,12 +65,8 @@ static const char *s_apSplashTexts[] = {
 	"You vs. the dummy she told you not to worry about.",
 	"This phrase is harder than the map.",
 	"Aoe finished before you even spawned.",
-	"n9’s ghost approved this run.",
 	"You're not Aoe. Accept it.",
 	"Cendren would have edgehooked that...",
-	"n9 did it backwards.",
-	"StormA paused. You're safe.",
-	"Even Brokecdx couldn't break this.",
 	"n9 finished this map blindfolded.",
 	"Cendren wrote a book on this part.",
 	"Aoe says hi. Also, get good.",
@@ -96,9 +74,8 @@ static const char *s_apSplashTexts[] = {
 	"n9 could finish this with a spoon.",
 	"This map once feared Aoe.",
 	"You just failed where Cendren flexed.",
-	"x lines of code",
-	"absolutely no bots",
-	"waiting for noob school 3",
+	"+200 lines of code",
+	"absolutely no bot",
 	"also try teeworlds",
 	"didirice notwork",
 	"soon will crash",
@@ -107,7 +84,6 @@ static const char *s_apSplashTexts[] = {
 	"Spüli is love, Spüli is life",
 	"a chatroom disguised as a game",
 	"welcome to hell",
-	"snail did nothing wrong",
 	"We love edging!",
 	"fng best mod",
 	"fng sux",
@@ -129,61 +105,76 @@ static const char *s_apSplashTexts[] = {
 
 static const char *GetRandomSplashText() { return s_apSplashTexts[secure_rand() % std::size(s_apSplashTexts)]; }
 
+
+
 void CMenusStart::RenderStartMenu(CUIRect MainView)
 {
 	GameClient()->m_MenuBackground.ChangePosition(CMenuBackground::POS_START);
 
 	// render logo
-	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_BANNER].m_Id);
-	Graphics()->QuadsBegin();
-	Graphics()->SetColor(1, 1, 1, 1);
-	IGraphics::CQuadItem QuadItem(MainView.w / 2 - 170, 60, 360, 103);
-	Graphics()->QuadsDrawTL(&QuadItem, 1);
-	Graphics()->QuadsEnd();
+	//Graphics()->TextureSet(g_pData->m_aImages[IMAGE_BANNER].m_Id);
+	//Graphics()->QuadsBegin();
+	//Graphics()->SetColor(1, 1, 1, 1);
+	//IGraphics::CQuadItem QuadItem(MainView.w / 2 + 120, MainView.h / 2 - 70, 360, 103);
+	//Graphics()->QuadsDrawTL(&QuadItem, 1);
+	//Graphics()->QuadsEnd();
+	/*
+		static const char *s_pCurrentSplashText = nullptr;
+		static float s_SplashTextTime = 0.0f;
 
-	static const char *s_pCurrentSplashText = nullptr;
-	static float s_SplashTextTime = 0.0f;
-
-	if(s_SplashTextTime == 0.0f || Client()->LocalTime() - s_SplashTextTime > 10.0f)
-	{
-		s_pCurrentSplashText = GetRandomSplashText();
-		s_SplashTextTime = Client()->LocalTime();
-	}
-
-	// Render splash text
-	if(s_pCurrentSplashText)
-	{
-		float x = MainView.w / 2 + 190.0f;
-		float y = 120.0f;
-
-		float BaseSize = 18.0f;
-		float PulseSpeed = 0.000000003f; //eeeeh, vibecoded
-		float PulseAmount = 2.0f;
-		float CurrentTime = time_get_nanoseconds().count() * PulseSpeed;
-		float PulseSize = BaseSize + sinf(CurrentTime) * PulseAmount;
-
-		CUIRect SplashButton;
-		SplashButton.x = MainView.w / 2 - 150;
-		SplashButton.y = 60.0f;
-		SplashButton.w = 350.0f;
-		SplashButton.h = 100.0f;
-		//SplashButton.Draw(ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f), IGraphics::CORNER_ALL, 10.0f);
-		static CButtonContainer s_SplashTextButton;
-
-		if(GameClient()->m_Menus.DoButton_Menu(&s_SplashTextButton, "", 0, &SplashButton, BUTTONFLAG_LEFT, nullptr, IGraphics::CORNER_NONE, 0.0f, 0.0f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.0f)))
+		if(s_SplashTextTime == 0.0f || Client()->LocalTime() - s_SplashTextTime > 10.0f)
 		{
 			s_pCurrentSplashText = GetRandomSplashText();
 			s_SplashTextTime = Client()->LocalTime();
 		}
 
-		TextRender()->TextColor(1.0f, 0.8f, 0.0f, 1.0f);
-		TextRender()->SetFontPreset(EFontPreset::MINECRAFT_FONT);
+		// Render splash text
+		if(s_pCurrentSplashText)
+		{
 
-		TextRender()->TextRotated(x, y - 30, PulseSize, pi / 7.0f, s_pCurrentSplashText);
 
-		TextRender()->SetFontPreset(EFontPreset::DEFAULT_FONT);
-		TextRender()->TextColor(TextRender()->DefaultTextColor());
-	}
+			float x = MainView.w / 2 + 190.0f;
+			float y = 120.0f;
+
+			float BaseSize = 18.0f;
+			float PulseSpeed = 0.000000003f; //eeeeh, vibecoded
+			float PulseAmount = 2.0f;
+			float CurrentTime = time_get_nanoseconds().count() * PulseSpeed;
+			float PulseSize = BaseSize + sinf(CurrentTime) * PulseAmount;
+
+			CUIRect SplashButton;
+			SplashButton.x = MainView.w / 2 - 150;
+			SplashButton.y = 60.0f;
+			SplashButton.w = 350.0f;
+			SplashButton.h = 100.0f;
+			//SplashButton.Draw(ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f), IGraphics::CORNER_ALL, 10.0f);
+			static CButtonContainer s_SplashTextButton;
+
+			if(GameClient()->m_Menus.DoButton_Menu(&s_SplashTextButton, "", 0, &SplashButton, BUTTONFLAG_LEFT, nullptr, IGraphics::CORNER_NONE, 0.0f, 0.0f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.0f)))
+			{
+				s_pCurrentSplashText = GetRandomSplashText();
+				s_SplashTextTime = Client()->LocalTime();
+			}
+
+			TextRender()->TextColor(1.0f, 0.8f, 0.0f, 1.0f);
+			TextRender()->SetFontPreset(EFontPreset::MINECRAFT_FONT);
+
+			TextRender()->TextRotated(x, y - 30, PulseSize, pi / 7.0f, s_pCurrentSplashText);
+
+			TextRender()->SetFontPreset(EFontPreset::DEFAULT_FONT);
+			TextRender()->TextColor(TextRender()->DefaultTextColor());
+		}
+	*/
+
+	// render slash quad
+	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_NULL].m_Id);
+	Graphics()->QuadsBegin();
+	Graphics()->SetColor(0, 0, 0, 0.3f);
+	IGraphics::CQuadItem QuadItem(-MainView.w + 550, 0, 1000, 1000);
+	Graphics()->QuadsSetRotation(50.0f);
+	Graphics()->QuadsDrawTL(&QuadItem, 1);
+	Graphics()->QuadsEnd();
+
 
 	const float Rounding = 10.0f;
 	const float VMargin = MainView.w / 2 - 190.0f;
@@ -191,74 +182,64 @@ void CMenusStart::RenderStartMenu(CUIRect MainView)
 	CUIRect Button;
 	int NewPage = -1;
 
-	CUIRect ExtMenu;
-	MainView.VSplitLeft(30.0f, nullptr, &ExtMenu);
-	ExtMenu.VSplitLeft(100.0f, &ExtMenu, nullptr);
 
-	ExtMenu.HSplitBottom(20.0f, &ExtMenu, &Button);
-	static CButtonContainer s_DiscordButton;
-	if(GameClient()->m_Menus.DoButton_Menu(&s_DiscordButton, Localize("Discord"), 0, &Button, BUTTONFLAG_LEFT, nullptr, IGraphics::CORNER_ALL, 5.0f, 0.0f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f))) { Client()->ViewLink(Localize("https://ddnet.org/discord")); }
-
-	ExtMenu.HSplitBottom(5.0f, &ExtMenu, nullptr); // little space
-	ExtMenu.HSplitBottom(20.0f, &ExtMenu, &Button);
-	static CButtonContainer s_LearnButton;
-	if(GameClient()->m_Menus.DoButton_Menu(&s_LearnButton, Localize("Learn"), 0, &Button, BUTTONFLAG_LEFT, nullptr, IGraphics::CORNER_ALL, 5.0f, 0.0f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f))) { Client()->ViewLink(Localize("https://wiki.ddnet.org/")); }
-
-	ExtMenu.HSplitBottom(5.0f, &ExtMenu, nullptr); // little space
-	ExtMenu.HSplitBottom(20.0f, &ExtMenu, &Button);
-	static CButtonContainer s_TutorialButton;
-	static float s_JoinTutorialTime = 0.0f;
-	if(GameClient()->m_Menus.DoButton_Menu(&s_TutorialButton, Localize("Tutorial"), 0, &Button, BUTTONFLAG_LEFT, nullptr, IGraphics::CORNER_ALL, 5.0f, 0.0f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)) ||
-	   (s_JoinTutorialTime != 0.0f && Client()->LocalTime() >= s_JoinTutorialTime))
-	{
-		// Activate internet tab before joining tutorial to make sure the server info
-		// for the tutorial servers is available.
-		GameClient()->m_Menus.SetMenuPage(CMenus::PAGE_INTERNET);
-		GameClient()->m_Menus.RefreshBrowserTab(true);
-		const char *pAddr = ServerBrowser()->GetTutorialServer();
-		if(pAddr)
-		{
-			Client()->Connect(pAddr);
-			s_JoinTutorialTime = 0.0f;
-		}
-		else if(s_JoinTutorialTime == 0.0f)
-		{
-			dbg_msg("menus", "couldn't find tutorial server, retrying in 5 seconds");
-			s_JoinTutorialTime = Client()->LocalTime() + 5.0f;
-		}
-		else
-		{
-			Client()->AddWarning(SWarning(Localize("Can't find a Tutorial server")));
-			s_JoinTutorialTime = 0.0f;
-		}
-	}
-
-	ExtMenu.HSplitBottom(5.0f, &ExtMenu, nullptr); // little space
-	ExtMenu.HSplitBottom(20.0f, &ExtMenu, &Button);
-	static CButtonContainer s_WebsiteButton;
-	if(GameClient()->m_Menus.DoButton_Menu(&s_WebsiteButton, Localize("Website"), 0, &Button, BUTTONFLAG_LEFT, nullptr, IGraphics::CORNER_ALL, 5.0f, 0.0f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f))) { Client()->ViewLink("https://ddnet.org/"); }
-
-	ExtMenu.HSplitBottom(5.0f, &ExtMenu, nullptr); // little space
-	ExtMenu.HSplitBottom(20.0f, &ExtMenu, &Button);
-	static CButtonContainer s_NewsButton;
-	if(GameClient()->m_Menus.DoButton_Menu(&s_NewsButton, Localize("News"), 0, &Button, BUTTONFLAG_LEFT, nullptr, IGraphics::CORNER_ALL, 5.0f, 0.0f, g_Config.m_UiUnreadNews ? ColorRGBA(0.0f, 1.0f, 0.0f, 0.25f) : ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)) || CheckHotKey(KEY_N))
-		NewPage = CMenus::PAGE_NEWS;
-
-	CUIRect Menu;
-	MainView.VMargin(VMargin, &Menu);
+	CUIRect Menu, Logo;
+	MainView.VSplitLeft(MainView.w / 2.8 , &Menu, &MainView);
+	Menu.VSplitLeft(15.0f, nullptr, &Menu);
+	Menu.HSplitTop(Menu.h / 3, &Logo, &Menu);
 	Menu.HSplitBottom(25.0f, &Menu, nullptr);
+	Menu.Draw(ColorRGBA (0.0f, 0.0f, 0.0f, 0.15f), IGraphics::CORNER_ALL, Rounding);
 
-	Menu.HSplitBottom(40.0f, &Menu, &Button);
-	static CButtonContainer s_QuitButton;
-	bool UsedEscape = false;
-	if(GameClient()->m_Menus.DoButton_Menu(&s_QuitButton, Localize("Quit"), 0, &Button, BUTTONFLAG_LEFT, nullptr, IGraphics::CORNER_ALL, Rounding, 0.5f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)) || (UsedEscape = Ui()->ConsumeHotkey(CUi::HOTKEY_ESCAPE)) || CheckHotKey(KEY_Q))
+
+	Menu.HSplitTop(80.0f, nullptr, &Menu);
+	Menu.VSplitLeft(7.5f, nullptr, &Menu);
+	Menu.HSplitTop(50.0f, &Button, &Menu);
+	//Button.VMargin(5.0f, &Button);
+	static CButtonContainer s_PlayButton;
+	if(GameClient()->m_Menus.DoButton_Menu(&s_PlayButton, Localize("Play", "Start menu"), 0, &Button, BUTTONFLAG_LEFT, g_Config.m_ClShowStartMenuImages ? "play_game" : nullptr, IGraphics::CORNER_ALL, Rounding, 0.5f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)) || Ui()->ConsumeHotkey(CUi::HOTKEY_ENTER) || CheckHotKey(KEY_P)) { NewPage = g_Config.m_UiPage >= CMenus::PAGE_INTERNET && g_Config.m_UiPage <= CMenus::PAGE_FAVORITE_COMMUNITY_5 ? g_Config.m_UiPage : CMenus::PAGE_INTERNET; }
+
+
+	Menu.HSplitTop(7.50f, nullptr, &Menu);
+	Menu.HSplitTop(50.0f, &Button, &Menu);
+	//Button.VMargin(5.0f, &Button);
+
+	static CButtonContainer s_MapEditorButton;
+	if(GameClient()->m_Menus.DoButton_Menu(&s_MapEditorButton, Localize("Editor"), 0, &Button, BUTTONFLAG_LEFT, g_Config.m_ClShowStartMenuImages ? "editor" : nullptr, IGraphics::CORNER_ALL, Rounding, 0.5f, GameClient()->Editor()->HasUnsavedData() ? ColorRGBA(0.0f, 1.0f, 0.0f, 0.25f) : ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)) || CheckHotKey(KEY_E))
 	{
-		if(UsedEscape || GameClient()->Editor()->HasUnsavedData() || (GameClient()->CurrentRaceTime() / 60 >= g_Config.m_ClConfirmQuitTime && g_Config.m_ClConfirmQuitTime >= 0)) { GameClient()->m_Menus.ShowQuitPopup(); }
-		else { Client()->Quit(); }
+		g_Config.m_ClEditor = 1;
+		Input()->MouseModeRelative();
 	}
 
-	Menu.HSplitBottom(100.0f, &Menu, nullptr);
-	Menu.HSplitBottom(40.0f, &Menu, &Button);
+	Menu.HSplitTop(7.5f, nullptr, &Menu);
+	Menu.HSplitTop(50.0f, &Button, &Menu);
+	static CButtonContainer s_SettingsButton;
+	if(GameClient()->m_Menus.DoButton_Menu(&s_SettingsButton, Localize("Settings"), 0, &Button, BUTTONFLAG_LEFT, g_Config.m_ClShowStartMenuImages ? "settings" : nullptr, IGraphics::CORNER_ALL, Rounding, 0.5f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)) || CheckHotKey(KEY_S))
+		NewPage = CMenus::PAGE_SETTINGS;
+
+
+	TextRender()->SetFontPreset(EFontPreset::ICON_FONT);
+	TextRender()->SetRenderFlags(ETextRenderFlags::TEXT_RENDER_FLAG_ONLY_ADVANCE_WIDTH | ETextRenderFlags::TEXT_RENDER_FLAG_NO_X_BEARING | ETextRenderFlags::TEXT_RENDER_FLAG_NO_Y_BEARING | ETextRenderFlags::TEXT_RENDER_FLAG_NO_PIXEL_ALIGNMENT | ETextRenderFlags::TEXT_RENDER_FLAG_NO_OVERSIZE);
+	CUIRect RightView, Line;
+	MainView.VSplitRight(MainView.w / 2.0f, &MainView, &RightView);
+	RightView.Draw(ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f), IGraphics::CORNER_ALL, Rounding);
+
+	RightView.HSplitTop(33.0f, &Line, &RightView);
+	Line.VSplitRight(33.0f, nullptr, &Button);
+	static CButtonContainer s_QuitButton;
+	ColorRGBA QuitColor(1, 0, 0, 0.5f);
+	if(GameClient()->m_Menus.DoButton_MenuTab(&s_QuitButton, FONT_ICON_LAYER_GROUP, 0, &Button, IGraphics::CORNER_ALL, nullptr, nullptr, nullptr, &QuitColor, 5.0f))
+	{
+		Client()->Quit();
+	}
+	GameClient()->m_Tooltips.DoToolTip(&s_QuitButton, &Button, Localize("Quit"));
+
+
+
+
+	TextRender()->SetRenderFlags(0);
+	TextRender()->SetFontPreset(EFontPreset::DEFAULT_FONT);
+
+	/*
 	static CButtonContainer s_SettingsButton;
 	if(GameClient()->m_Menus.DoButton_Menu(&s_SettingsButton, Localize("Settings"), 0, &Button, BUTTONFLAG_LEFT, g_Config.m_ClShowStartMenuImages ? "settings" : nullptr, IGraphics::CORNER_ALL, Rounding, 0.5f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)) || CheckHotKey(KEY_S))
 		NewPage = CMenus::PAGE_SETTINGS;
@@ -282,12 +263,6 @@ void CMenusStart::RenderStartMenu(CUIRect MainView)
 		g_Config.m_ClEditor = 1;
 		Input()->MouseModeRelative();
 	}
-
-	Menu.HSplitBottom(5.0f, &Menu, nullptr); // little space
-	Menu.HSplitBottom(40.0f, &Menu, &Button);
-	static CButtonContainer s_DemoButton;
-	if(GameClient()->m_Menus.DoButton_Menu(&s_DemoButton, Localize("Demos"), 0, &Button, BUTTONFLAG_LEFT, g_Config.m_ClShowStartMenuImages ? "demos" : nullptr, IGraphics::CORNER_ALL, Rounding, 0.5f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)) || CheckHotKey(KEY_D)) { NewPage = CMenus::PAGE_DEMOS; }
-
 	Menu.HSplitBottom(5.0f, &Menu, nullptr); // little space
 	Menu.HSplitBottom(40.0f, &Menu, &Button);
 	static CButtonContainer s_PlayButton;
@@ -308,7 +283,7 @@ void CMenusStart::RenderStartMenu(CUIRect MainView)
 	if(GameClient()->m_Menus.DoButton_Menu(&s_ConsoleButton, FONT_ICON_TERMINAL, 0, &ConsoleButton, BUTTONFLAG_LEFT, nullptr, IGraphics::CORNER_ALL, 5.0f, 0.0f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.1f))) { GameClient()->m_GameConsole.Toggle(CGameConsole::CONSOLETYPE_LOCAL); }
 	TextRender()->SetRenderFlags(0);
 	TextRender()->SetFontPreset(EFontPreset::DEFAULT_FONT);
-
+*/
 	CUIRect VersionUpdate;
 	MainView.HSplitBottom(20.0f, nullptr, &VersionUpdate);
 	VersionUpdate.VMargin(VMargin, &VersionUpdate);

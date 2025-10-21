@@ -142,7 +142,7 @@ int CMenus::DoButton_Menu(CButtonContainer *pButtonContainer, const char *pText,
 			Graphics()->WrapClamp();
 			Graphics()->QuadsBegin();
 			Graphics()->SetColor(1.0f, 1.0f, 1.0f, 1.0f);
-			IGraphics::CQuadItem QuadItem(Image.x, Image.y, Image.w, Image.h);
+			IGraphics::CQuadItem QuadItem(Image.x + 4, Image.y + 4, Image.w - 8, Image.h - 8);
 			Graphics()->QuadsDrawTL(&QuadItem, 1);
 			Graphics()->QuadsEnd();
 			Graphics()->WrapNormal();

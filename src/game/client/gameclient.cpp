@@ -201,7 +201,8 @@ void CGameClient::OnConsoleInit()
 	Console()->Register("mapbug", "s[mapbug]", CFGFLAG_GAME, ConMapbug, this, "Enable map compatibility mode using the specified bug (example: grenade-doubleexplosion@ddnet.tw)");
 
 	//Pulse
-	Console()->Register("p_copy", "?r[player ID]", CFGFLAG_CLIENT, PulseCopy, this, "Copy player profile by ID");
+	Console()->Register("p_copy", "?r[player ID]", CFGFLAG_CLIENT, PulseCopy, this, "Copy player profile by ID");\
+	Console()->Register("send_proximity_message", "?r[MSG]", CFGFLAG_CLIENT, SendProxyMessage, this, "Send message in special chat");\
 
 	for(auto &pComponent : m_vpAll)
 		pComponent->OnInterfacesInit(this);
@@ -4612,6 +4613,13 @@ void CGameClient::PulseCopy(IConsole::IResult *pResult, void *pUserData)
 	pSelf->m_SkinProfiles.SaveProfiles();
 }
 
+void CGameClient::SendProxyMessage(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameClient *pSelf = (CGameClient *)pUserData;
+
+	pSelf->m_SocketIO.socket()->emit("chat_message", sio::string_message::create(pResult->GetString(0)));
+}
+
 void CGameClient::ConMapbug(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameClient *pSelf = (CGameClient *)pUserData;
@@ -5116,7 +5124,6 @@ void CGameClient::LoadCustomConsole(const char *pPath)
 		Graphics()->UnloadTexture(&TextureHandle);
 		return;
 	}
-
 	// -> cache
 	SConsoleImageCache NewCache;
 	str_copy(NewCache.m_aName, pPath, sizeof(NewCache.m_aName));
