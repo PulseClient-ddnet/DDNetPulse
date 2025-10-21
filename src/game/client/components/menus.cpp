@@ -615,6 +615,21 @@ void CMenus::RenderMenubar(CUIRect Box, IClient::EClientState ClientState)
 
 		bool GotNewsOrUpdate = false;
 
+
+
+		Box.VSplitRight(10.0f, &Box, nullptr);
+		Box.VSplitRight(33.0f, &Box, &Button);
+		static CButtonContainer s_CrossChatButton;
+		if(DoButton_MenuTab(&s_CrossChatButton, FONT_ICON_PAPER_PLANE, ActivePage == PAGE_CROSSCHAT, &Button, IGraphics::CORNER_T, &m_aAnimatorsSmallPage[SMALL_TAB_CROSSCHATBUTTON]))
+		{
+			NewPage = PAGE_CROSSCHAT;
+		}
+		GameClient()->m_Tooltips.DoToolTip(&s_CrossChatButton, &Button, Localize("CrossChat"));
+		Box.VSplitRight(10.0f, &Box, nullptr);
+
+		Box.VSplitLeft(33.0f, &Button, &Box);
+
+
 #if defined(CONF_AUTOUPDATE)
 		int State = Updater()->GetCurrentState();
 		bool NeedUpdate = str_comp(Client()->LatestVersion(), "0");
@@ -1176,6 +1191,10 @@ void CMenus::Render()
 			else if(m_MenuPage == PAGE_SETTINGS)
 			{
 				RenderSettings(MainView);
+			}
+			else if(m_MenuPage == PAGE_CROSSCHAT)
+			{
+				RenderCrossChat(MainView);
 			}
 			else
 			{

@@ -6,7 +6,8 @@
 void CWebSocket::OnInit()
 {
 	//SocketConnect();
-	ChatConnect(Client()->PlayerName());
+	if(g_Config.m_ClCrossChatAutoConnect)
+		ChatConnect(Client()->PlayerName());
 }
 
 void CWebSocket::SocketConnect()
@@ -65,14 +66,30 @@ void CWebSocket::ChatConnect(const std::string &Name)
 		});
 
 		pClient->m_SocketIO.socket()->on("chat_message", [&](sio::event &ev) {
-		    auto data = ev.get_message();
-		    if (data && data->get_flag() == sio::message::flag_string)
-		    	dbg_msg("Pulse-Chat:", "%s", data->get_string().c_str());
-			char aBuf[256];
-			str_format(aBuf, sizeof(aBuf), "echo Pulse-chat: %s", data->get_string().c_str());
-
-			Console()->ExecuteLine(aBuf);
-		    });
+		    auto Data = ev.get_message();
+		    if (Data && Data->get_flag() == sio::message::flag_string)
+		    {
+			    dbg_msg("socket.io", "%s", Data->get_string().c_str());
+			if(g_Config.m_ClCrossChatInGameChat)
+			{
+				char aBuf[256];
+				str_format(aBuf, sizeof(aBuf), "echo ->: %s", Data->get_string().c_str());
+				Console()->ExecuteLine(aBuf);
+			}
+		    }
+		    else if (Data->get_flag() == sio::message::flag_object)
+		    {
+			auto Nickname = Data->get_map()["nickname"]->get_string();
+			auto Message = Data->get_map()["message"]->get_string();
+			dbg_msg("socket.io", "[%s]: %s", Nickname.c_str(), Message.c_str());
+		    	if(g_Config.m_ClCrossChatInGameChat)
+		    	{
+			    char aBuf[256];
+			    str_format(aBuf, sizeof(aBuf), "echo -> [%s]: %s", Nickname.c_str(), Message.c_str());
+			    Console()->ExecuteLine(aBuf);
+			}
+		    }
+		});
 
 		pClient->m_SocketIO.connect("http://0.0.0.0:3000");
 		pClient->m_SocketIO.socket()->emit("nickname", sio::string_message::create(player));

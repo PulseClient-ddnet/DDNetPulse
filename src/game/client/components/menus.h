@@ -600,6 +600,7 @@ protected:
 	void RenderSettingsSound(CUIRect MainView);
 	void RenderSettings(CUIRect MainView);
 	void RenderSettingsCustom(CUIRect MainView);
+	void RenderCrossChat(CUIRect MainView);
 
 	std::vector<CButtonContainer> m_vButtonContainersJoystickAbsolute = {{}, {}};
 	std::vector<CButtonContainer> m_vButtonContainersNamePlateShow = {{}, {}, {}, {}};
@@ -692,6 +693,8 @@ public:
 		PAGE_NETWORK,
 		PAGE_GHOST,
 
+		PAGE_CROSSCHAT,
+
 		PAGE_LENGTH,
 	};
 
@@ -736,6 +739,7 @@ public:
 		SMALL_TAB_SETTINGS,
 		SMALL_TAB_EDITOR,
 		SMALL_TAB_DEMOBUTTON,
+		SMALL_TAB_CROSSCHATBUTTON,
 		SMALL_TAB_SERVER,
 		SMALL_TAB_BROWSER_FILTER,
 		SMALL_TAB_BROWSER_INFO,
