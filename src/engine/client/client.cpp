@@ -48,7 +48,7 @@
 #include <engine/storage.h>
 #include <engine/textrender.h>
 
-#include <game/generated/client_data.h>
+#include <generated/client_data.h>
 
 #include <game/localization.h>
 #include <game/version.h>

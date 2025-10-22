@@ -109,6 +109,13 @@ private:
 	int m_DirectionQuadContainerIndex;
 
 	// menus_settings_assets.cpp
+
+
+	//pulse
+	std::vector<std::string> m_CrossChatMessages;
+	CLineInput m_CrossChatInput;
+	bool m_CrossChatInitialized = false;
+	
 public:
 	struct SCustomItem
 	{
