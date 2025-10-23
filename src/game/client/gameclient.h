@@ -285,8 +285,10 @@ private:
 	static void ConchainMenuMap(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
 
 	static void PulseCopy(IConsole::IResult *pResult, void *pUserData);
-	static void SendProxyMessage(IConsole::IResult *pResult, void *pUserData);
 
+public:
+	static void SendProxyMessage(IConsole::IResult *pResult, void *pUserData);
+private:
 	// only used in OnPredict
 	vec2 m_aLastPos[MAX_CLIENTS];
 	bool m_aLastActive[MAX_CLIENTS];

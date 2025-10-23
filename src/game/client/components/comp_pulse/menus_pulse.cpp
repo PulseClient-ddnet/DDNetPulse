@@ -925,13 +925,32 @@ void CMenus::RenderCrossChat(CUIRect MainView)
 	LeftBar.Draw(ColorRGBA(0, 0, 0, 0.3f), IGraphics::CORNER_ALL, 5.0f);
 
 
+	InputBar.VSplitLeft(InputBar.w / 5, nullptr, &InputBar); // TODO(SOMETHIGN TO THE LEFT BAR LATER)
+	InputBar.VMargin(10.0f, &InputBar);
+	InputBar.HMargin(10.0f, &InputBar);
+
+	static CLineInputBuffered<64> s_ChatInput;
+	s_ChatInput.SetEmptyText("Send Message");
+
+	Ui()->SetActiveItem(&s_ChatInput);
+	Ui()->DoEditBox(&s_ChatInput, &InputBar, FontSize + 2.0f);
+	if((Input()->KeyPress(KEY_RETURN) || Input()->KeyPress(KEY_KP_ENTER)))
+	{
+		const char *pText = s_ChatInput.GetString();
+		if(pText && pText[0])
+		{
+//			dbg_msg("chat", "sending message: %s", pText);
+			GameClient()->m_SocketIO.socket()->emit("chat_message", sio::string_message::create(pText));
+			s_ChatInput.Clear();
+		}
+	}
+
+
 	std::lock_guard<std::mutex> Lock(GameClient()->m_WebSocket.m_OnlinePlayersMutex);
 	float yu = LeftBar.y + 10.0f;
 	for(const auto &player : GameClient()->m_WebSocket.m_OnlinePlayers) {
 		TextRender()->Text(LeftBar.x + 5.0f, yu, 12.0f, player.c_str(), -1);
 		yu += 15.0f;
-
-		dbg_msg("test", "player: %s", player.c_str());
 	}
 
 	for(auto it = Messages.rbegin(); it != Messages.rend(); ++it)
