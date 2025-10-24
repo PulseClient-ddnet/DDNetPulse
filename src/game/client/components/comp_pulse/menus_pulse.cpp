@@ -895,6 +895,9 @@ void CMenus::RenderSettingsProfs(CUIRect MainView)
 
 void CMenus::RenderCrossChat(CUIRect MainView)
 {
+
+	static std::vector<std::string> s_ChatHistory;
+	static int s_HistoryIndex = -1;
 	if(!m_CrossChatInitialized)
 	{
 		m_CrossChatInitialized = true;
@@ -928,6 +931,11 @@ void CMenus::RenderCrossChat(CUIRect MainView)
 	static CLineInputBuffered<64> s_ChatInput;
 	s_ChatInput.SetEmptyText("Send Message");
 
+	if(Ui()->ActiveItem() == nullptr)
+	{
+		Ui()->SetActiveItem(&s_ChatInput);
+	}
+
 	if(Ui()->DoEditBox(&s_ChatInput, &InputBar, FontSize + 2.0f))
 		Ui()->SetActiveItem(&s_ChatInput);
 
@@ -937,9 +945,42 @@ void CMenus::RenderCrossChat(CUIRect MainView)
 		if(pText && pText[0])
 		{
 			GameClient()->m_WebSocket.SendChatMessage(pText);
+
+			s_ChatHistory.push_back(pText);
+			s_HistoryIndex = -1;
 			s_ChatInput.Clear();
 		}
 	}
+
+	if(Input()->KeyPress(KEY_UP))
+	{
+		if(!s_ChatHistory.empty())
+		{
+			if(s_HistoryIndex == -1)
+				s_HistoryIndex = (int)s_ChatHistory.size() - 1;
+			else if(s_HistoryIndex > 0)
+				s_HistoryIndex--;
+
+			s_ChatInput.Set(s_ChatHistory[s_HistoryIndex].c_str());
+		}
+	}
+	else if(Input()->KeyPress(KEY_DOWN))
+	{
+		if(!s_ChatHistory.empty() && s_HistoryIndex != -1)
+		{
+			s_HistoryIndex++;
+			if(s_HistoryIndex >= (int)s_ChatHistory.size())
+			{
+				s_HistoryIndex = -1;
+				s_ChatInput.Clear();
+			}
+			else
+			{
+				s_ChatInput.Set(s_ChatHistory[s_HistoryIndex].c_str());
+			}
+		}
+	}
+
 
 	std::lock_guard<std::mutex> lock(GameClient()->m_WebSocket.m_OnlinePlayersMutex);
 	float yOnline = LeftBar.y + 10.0f;
