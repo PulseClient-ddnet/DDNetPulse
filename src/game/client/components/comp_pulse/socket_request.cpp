@@ -3,8 +3,10 @@
 
 void CWebSocket::OnInit()
 {
-    if(g_Config.m_ClCrossChatAutoConnect)
-        SocketListen(Client()->PlayerName());
+	if(g_Config.m_ClCrossChatAutoConnect){
+		SocketConnect();
+		SocketListen(Client()->PlayerName());
+	}
 }
 
 void CWebSocket::SocketConnect()
@@ -117,8 +119,7 @@ void CWebSocket::HandleOnlineUpdate(sio::event &ev)
 void CWebSocket::SendChatMessage(const std::string &Msg)
 {
     CGameClient *pClient = (CGameClient *)GameClient();
-    if(pClient->m_SocketIOConnected)
-        pClient->m_SocketIO.socket()->emit("chat_message", sio::string_message::create(Msg));
+	pClient->m_SocketIO.socket()->emit("chat_message", sio::string_message::create(Msg));
 }
 
 void CWebSocket::AddMessage(const std::string &Msg)
@@ -133,10 +134,4 @@ std::vector<std::string> CWebSocket::GetMessages()
 {
     std::lock_guard<std::mutex> lock(m_MessageMutex);
     return m_ChatMessages;
-}
-
-void CWebSocket::SocketMessage(const char *pEvent, const sio::message::list pData)
-{
-    CGameClient *pClient = (CGameClient *)GameClient();
-    pClient->SendSocketMessage(pEvent, pData);
 }

@@ -23,7 +23,6 @@ public:
 
 	void SocketDisconnect();
 	void SocketListen(const std::string &name);
-	void SocketMessage(const char *pEvent, const sio::message::list pData);
 	void SendChatMessage(const std::string &Msg);
 
 	void AddMessage(const std::string &Msg);
