@@ -916,17 +916,62 @@ void CMenus::RenderCrossChat(CUIRect MainView)
 
 	MainView.Draw(ColorRGBA(0, 0, 0, 0.5f), IGraphics::CORNER_ALL, 5.0f);
 
-	CUIRect ChatView, InputBar;
+	CUIRect ChatView, InputBar, ReconectRect;
 	MainView.HSplitBottom(40.0f, &ChatView, &InputBar);
 	ChatView.VMargin(10.0f, &ChatView);
 	ChatView.HMargin(10.0f, &ChatView);
-	InputBar.VSplitLeft(InputBar.w / 5, nullptr, &InputBar); // TODO: Add a button or something here later
+	InputBar.VSplitLeft(InputBar.w / 5, &ReconectRect, &InputBar); // TODO: Add a button or something here later
 	InputBar.VMargin(10.0f, &InputBar);
 	InputBar.HMargin(10.0f, &InputBar);
 
 	CUIRect LeftBar;
 	ChatView.VSplitLeft(ChatView.w / 5, &LeftBar, &ChatView);
 	LeftBar.Draw(ColorRGBA(0, 0, 0, 0.3f), IGraphics::CORNER_ALL, 5.0f);
+
+	CUIRect ChatSettings;
+	ReconectRect.VSplitMid(&ChatSettings, &ReconectRect);
+	ReconectRect.VMargin(7.0f, &ReconectRect);
+	ReconectRect.HMargin(7.0f, &ReconectRect);
+	ChatSettings.VMargin(7.0f, &ChatSettings);
+	ChatSettings.HMargin(7.0f, &ChatSettings);
+
+	TextRender()->SetFontPreset(EFontPreset::ICON_FONT);
+
+	CButtonContainer SReconnectButton;
+	bool Connected = GameClient()->m_WebSocket.IsConnected();
+
+	// Задаем цвет в зависимости от состояния
+	ColorRGBA ButtonColor = Connected ? ColorRGBA(1.0f, 0.0f, 0.0f, 0.25f)  // красная при подключении
+					  : ColorRGBA(0.0f, 1.0f, 0.0f, 0.25f); // зеленая при отключении
+
+	if(DoButton_Menu(
+		&SReconnectButton,
+		Connected ? FONT_ICON_POWER_OFF : FONT_ICON_EXITGAME,
+		0,
+		&ReconectRect,
+		BUTTONFLAG_LEFT,
+		nullptr,
+		IGraphics::CORNER_ALL,
+		3.0f,
+		0.01f,
+		ButtonColor))
+	{
+		GameClient()->m_WebSocket.SocketConnect();
+		if(Connected)
+		{
+			GameClient()->m_WebSocket.OnInit();
+		}
+	}
+	CButtonContainer SettingsButton;
+	if(DoButton_Menu(&SettingsButton, FONT_ICON_GEAR, 0, &ChatSettings, BUTTONFLAG_RIGHT, nullptr, IGraphics::CORNER_ALL, 3.0f, 0.01f, ColorRGBA(0.0f, 0.5f, 1.0f, 0.25f)))
+	{
+		//TODO: setting window
+	}
+
+	TextRender()->SetFontPreset(EFontPreset::DEFAULT_FONT);
+
+
+
 
 	static CLineInputBuffered<64> s_ChatInput;
 	s_ChatInput.SetEmptyText("Send Message");
@@ -1000,9 +1045,9 @@ void CMenus::RenderCrossChat(CUIRect MainView)
 		std::string line;
 		while(std::getline(ss, line, '\n'))
 		{
-			TextRender()->TextColor(it->m_Color); // цвет из сервера
+			TextRender()->TextColor(it->m_Color);
 			TextRender()->Text(ChatView.x + 10, y, 12.0f, line.c_str(), -1);
-			TextRender()->TextColor(TextRender()->DefaultTextColor()); // сброс
+			TextRender()->TextColor(TextRender()->DefaultTextColor());
 			y -= 14.0f;
 			if(y < ChatView.y) break;
 		}

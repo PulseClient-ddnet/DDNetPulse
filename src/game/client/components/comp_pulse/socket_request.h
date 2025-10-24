@@ -13,7 +13,6 @@
 
 class CWebSocket : public CComponent
 {
-	void SocketConnect();
 	void SetupSocketListeners();
 	void HandleChatMessage(sio::event &ev);
 	void HandleOnlineUpdate(sio::event &ev);
@@ -35,10 +34,14 @@ public:
 	std::vector<std::string> m_OnlinePlayers;
 	std::mutex m_OnlinePlayersMutex;
 
+	void SocketConnect();
 	void SocketDisconnect();
 	void SocketListen(const std::string &name);
 	void SendChatMessage(const std::string &Msg);
 	bool IsConnected() const;
+
+	void OnOpen();
+	void OnClose(int code, const char* reason);
 
 	void AddMessage(const std::string &Msg, ColorRGBA Color = ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f));
 	std::vector<SChatMessage> GetMessages();

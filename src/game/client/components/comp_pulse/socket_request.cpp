@@ -3,10 +3,8 @@
 
 void CWebSocket::OnInit()
 {
-	if(g_Config.m_ClCrossChatAutoConnect){
-		SocketConnect();
-		SocketListen(Client()->PlayerName());
-	}
+	SocketConnect();
+	SocketListen(Client()->PlayerName());
 }
 
 void CWebSocket::SocketConnect()
@@ -134,4 +132,15 @@ std::vector<CWebSocket::SChatMessage> CWebSocket::GetMessages()
 bool CWebSocket::IsConnected() const
 {
 	return m_IsConnected;
+}
+
+
+void CWebSocket::OnOpen()
+{
+	AddMessage("Connected successfully.");
+}
+
+void CWebSocket::OnClose(int code, const char* reason)
+{
+	AddMessage("Disconnected from chat.");
 }
