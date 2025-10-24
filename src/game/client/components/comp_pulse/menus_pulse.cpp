@@ -895,83 +895,78 @@ void CMenus::RenderSettingsProfs(CUIRect MainView)
 
 void CMenus::RenderCrossChat(CUIRect MainView)
 {
-	if(!m_CrossChatInitialized)
-	{
-		m_CrossChatInitialized = true;
-		m_CrossChatInput.Clear();
-		m_CrossChatMessages.clear();
-		//m_CrossChatMessages.emplace_back("[Server]: Добро пожаловать в CrossChat!");
-	}
+    if(!m_CrossChatInitialized)
+    {
+        m_CrossChatInitialized = true;
+        m_CrossChatInput.Clear();
+        m_CrossChatMessages.clear();
+        // m_CrossChatMessages.emplace_back("[Server]: Добро пожаловать в CrossChat!");
 
+    	char aBuf[64];
+    	str_format(aBuf, sizeof(aBuf), "[Server]: Welcome to chat, %s", g_Config.m_PlayerName);
+    	GameClient()->m_WebSocket.AddMessage(aBuf);
+    }
 
-	MainView.Draw(ColorRGBA(0, 0, 0, 0.5f), IGraphics::CORNER_ALL, 5.0f);
+    MainView.Draw(ColorRGBA(0, 0, 0, 0.5f), IGraphics::CORNER_ALL, 5.0f);
 
-	CUIRect ChatView, InputBar;
-	MainView.HSplitBottom(40.0f, &ChatView, &InputBar);
+    CUIRect ChatView, InputBar;
+    MainView.HSplitBottom(40.0f, &ChatView, &InputBar);
+    ChatView.VMargin(10.0f, &ChatView);
+    ChatView.HMargin(10.0f, &ChatView);
+    InputBar.VSplitLeft(InputBar.w / 5, nullptr, &InputBar); // TODO: Add a button or something here later
+    InputBar.VMargin(10.0f, &InputBar);
+    InputBar.HMargin(10.0f, &InputBar);
 
-	ChatView.VMargin(10.0f, &ChatView);
-	ChatView.HMargin(10.0f, &ChatView);
+    CUIRect LeftBar;
+    ChatView.VSplitLeft(ChatView.w / 5, &LeftBar, &ChatView);
+    LeftBar.Draw(ColorRGBA(0, 0, 0, 0.3f), IGraphics::CORNER_ALL, 5.0f);
 
-	std::vector<std::string> Messages = GameClient()->m_WebSocket.GetMessages();
+    static CLineInputBuffered<64> s_ChatInput;
+    s_ChatInput.SetEmptyText("Send Message");
 
-	const float LineHeight = 12.0f;
-	float y = ChatView.y + ChatView.h - LineHeight;
+    if(Ui()->DoEditBox(&s_ChatInput, &InputBar, FontSize + 2.0f))
+        Ui()->SetActiveItem(&s_ChatInput);
 
-	CUIRect LeftBar;
-	ChatView.VSplitLeft(ChatView.w / 5, &LeftBar, &ChatView);
-	LeftBar.Draw(ColorRGBA(0, 0, 0, 0.3f), IGraphics::CORNER_ALL, 5.0f);
+    if(Input()->KeyPress(KEY_RETURN) || Input()->KeyPress(KEY_KP_ENTER))
+    {
+        const char *pText = s_ChatInput.GetString();
+        if(pText && pText[0])
+        {
+            GameClient()->m_WebSocket.SendChatMessage(pText);
+            s_ChatInput.Clear();
+        }
+    }
 
+    std::lock_guard<std::mutex> lock(GameClient()->m_WebSocket.m_OnlinePlayersMutex);
+    float yOnline = LeftBar.y + 10.0f;
+    for(const auto &player : GameClient()->m_WebSocket.m_OnlinePlayers)
+    {
+        TextRender()->Text(LeftBar.x + 5.0f, yOnline, 12.0f, player.c_str(), -1);
+        yOnline += 15.0f;
+    }
 
-	InputBar.VSplitLeft(InputBar.w / 5, nullptr, &InputBar); // TODO(SOMETHIGN TO THE LEFT BAR LATER)
-	InputBar.VMargin(10.0f, &InputBar);
-	InputBar.HMargin(10.0f, &InputBar);
+    std::vector<std::string> Messages = GameClient()->m_WebSocket.GetMessages();
+    const float LineHeight = 12.0f;
+    float y = ChatView.y + ChatView.h - LineHeight;
 
-	static CLineInputBuffered<64> s_ChatInput;
-	s_ChatInput.SetEmptyText("Send Message");
+    for(auto it = Messages.rbegin(); it != Messages.rend(); ++it)
+    {
+        std::stringstream ss(*it);
+        std::string line;
+        while(std::getline(ss, line, '\n'))
+        {
+            TextRender()->TextColor(1, 1, 1, 1);
+            TextRender()->Text(ChatView.x + 10, y, 12.0f, line.c_str(), -1);
+            y -= LineHeight + 2;
 
-	if(Ui()->DoEditBox(&s_ChatInput, &InputBar, FontSize + 2.0f))
-	{	Ui()->SetActiveItem(&s_ChatInput);}
-	if((Input()->KeyPress(KEY_RETURN) || Input()->KeyPress(KEY_KP_ENTER)))
-	{
-		const char *pText = s_ChatInput.GetString();
-		if(pText && pText[0])
-		{
-			//			dbg_msg("chat", "sending message: %s", pText);
-			GameClient()->m_SocketIO.socket()->emit("chat_message", sio::string_message::create(pText));
-			s_ChatInput.Clear();
-		}
-	}
+            if(y < ChatView.y)
+                break;
+        }
 
-
-	std::lock_guard<std::mutex> Lock(GameClient()->m_WebSocket.m_OnlinePlayersMutex);
-	float yu = LeftBar.y + 10.0f;
-	for(const auto &player : GameClient()->m_WebSocket.m_OnlinePlayers) {
-		TextRender()->Text(LeftBar.x + 5.0f, yu, 12.0f, player.c_str(), -1);
-		yu += 15.0f;
-	}
-
-	for(auto it = Messages.rbegin(); it != Messages.rend(); ++it)
-	{
-		{
-			const std::string &Msg = *it;
-			std::stringstream bullshit1(Msg);
-			std::string Line;
-
-			while(std::getline(bullshit1, Line, '\n'))
-			{
-				TextRender()->TextColor(1, 1, 1, 1);
-				TextRender()->Text(ChatView.x + 10, y, 12.0f, Line.c_str(), -1);
-				y -= LineHeight + 2;
-
-				if(y < ChatView.y)
-					break;
-			}
-
-			if(y < ChatView.y)
-				break;
-		}
-
-	}
+        if(y < ChatView.y)
+            break; 
+    }
 }
+
 
 //TODO: Add everything to here
