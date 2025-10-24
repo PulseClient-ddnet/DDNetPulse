@@ -12,33 +12,31 @@ void CWebSocket::OnInit()
 void CWebSocket::SocketConnect()
 {
     CGameClient *pClient = (CGameClient *)GameClient();
-    pClient->m_SocketIOConnected = false;
 
     pClient->m_SocketIO.set_open_listener([this, pClient]() {
-        pClient->m_SocketIOConnected = true;
+    	m_IsConnected = true;
         dbg_msg("socket.io", "Connected to server");
     });
 
     pClient->m_SocketIO.set_close_listener([this, pClient](sio::client::close_reason const &) {
-        pClient->m_SocketIOConnected = false;
+    	m_IsConnected = false;
         dbg_msg("socket.io", "Disconnected from server");
     });
 
     pClient->m_SocketIO.set_fail_listener([this, pClient]() {
-        pClient->m_SocketIOConnected = false;
+    	m_IsConnected = false;
         dbg_msg("socket.io", "Connection failed");
     });
 
     pClient->m_SocketIO.connect(g_Config.m_ClSocketNameserver);
+
 }
 
 void CWebSocket::SocketDisconnect()
 {
     CGameClient *pClient = (CGameClient *)GameClient();
-    if(pClient->m_SocketIOConnected)
     {
         pClient->m_SocketIO.close();
-        pClient->m_SocketIOConnected = false;
     }
 }
 
@@ -49,16 +47,12 @@ void CWebSocket::SocketListen(const std::string &Name)
 
     SetupSocketListeners();
 
-    pClient->m_SocketIO.connect(g_Config.m_ClSocketNameserver);
     pClient->m_SocketIO.socket()->emit("nickname", sio::string_message::create(player));
 }
 
 void CWebSocket::SetupSocketListeners()
 {
     CGameClient *pClient = (CGameClient *)GameClient();
-
-    pClient->m_SocketIO.set_open_listener([&]() { dbg_msg("socket.io", "Connecting to server"); });
-    pClient->m_SocketIO.set_close_listener([&](sio::client::close_reason const &) { dbg_msg("socket.io", "Disconnected from server"); });
 
     pClient->m_SocketIO.socket()->on("chat_message", [&](sio::event &ev) { HandleChatMessage(ev); });
     pClient->m_SocketIO.socket()->on("online_update", [&](sio::event &ev) { HandleOnlineUpdate(ev); });
@@ -134,4 +128,9 @@ std::vector<std::string> CWebSocket::GetMessages()
 {
     std::lock_guard<std::mutex> lock(m_MessageMutex);
     return m_ChatMessages;
+}
+
+bool CWebSocket::IsConnected() const
+{
+	return m_IsConnected;
 }

@@ -17,13 +17,17 @@ class CWebSocket : public CComponent
 	std::vector<std::string> m_ChatMessages;
 	std::mutex m_MessageMutex;
 
+
 public:
+	bool m_IsConnected;
+
 	std::vector<std::string> m_OnlinePlayers;
 	std::mutex m_OnlinePlayersMutex;
 
 	void SocketDisconnect();
 	void SocketListen(const std::string &name);
 	void SendChatMessage(const std::string &Msg);
+	bool IsConnected() const;
 
 	void AddMessage(const std::string &Msg);
 	std::vector<std::string> GetMessages();

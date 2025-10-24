@@ -981,10 +981,8 @@ private:
 
 public:
 	sio::client m_SocketIO;
-	bool m_SocketIOConnected;
 
 	void SendSocketMessage(const char *pEvent, sio::message::list pData);
-	bool IsSocketConnected() const { return m_SocketIOConnected; }
 	void SendSocketEvent(const char *pEvent, const char *pData) { SendSocketMessage(pEvent, sio::message::list(pData)); }
 };
 

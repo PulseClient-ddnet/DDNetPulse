@@ -903,7 +903,11 @@ void CMenus::RenderCrossChat(CUIRect MainView)
         // m_CrossChatMessages.emplace_back("[Server]: Добро пожаловать в CrossChat!");
 
     	char aBuf[64];
-    	str_format(aBuf, sizeof(aBuf), "[Server]: Welcome to chat, %s", g_Config.m_PlayerName);
+    	if(GameClient()->m_WebSocket.IsConnected())
+    		str_format(aBuf, sizeof(aBuf), "[Server]: Welcome to chat, %s", g_Config.m_PlayerName);
+    	else
+    		str_format(aBuf, sizeof(aBuf), "[Offline]: Try again later");
+
     	GameClient()->m_WebSocket.AddMessage(aBuf);
     }
 

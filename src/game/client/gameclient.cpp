@@ -1261,10 +1261,10 @@ void CGameClient::OnShutdown()
 	m_vConsoleImageCache.clear();
 
 	// kill socketio
-	if(m_SocketIOConnected)
+	if(m_WebSocket.IsConnected() == true)
 	{
 		m_SocketIO.close();
-		m_SocketIOConnected = false;
+		dbg_msg("Socket.IO", "Client shutdown, socket closed");
 	}
 
 	for(auto &pComponent : m_vpAll)
@@ -5066,7 +5066,7 @@ bool CGameClient::CheckNewInput()
 
 void CGameClient::SendSocketMessage(const char *pEvent, const sio::message::list pData)
 {
-	if(!m_SocketIOConnected || !m_SocketIO.socket())
+	if(!m_WebSocket.IsConnected() || !m_SocketIO.socket())
 		return;
 
 	m_SocketIO.socket()->emit(pEvent, pData);
