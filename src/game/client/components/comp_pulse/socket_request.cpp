@@ -60,40 +60,38 @@ void CWebSocket::SetupSocketListeners()
 
 void CWebSocket::HandleChatMessage(sio::event &ev)
 {
-    auto Data = ev.get_message();
-    if(!Data) return;
+	auto Data = ev.get_message();
+	if(!Data || Data->get_flag() != sio::message::flag_object)
+		return;
 
-    if(Data->get_flag() == sio::message::flag_string)
-    {
-        std::string Msg = Data->get_string();
-        dbg_msg("socket.io", "%s", Msg.c_str());
+	auto Map = Data->get_map();
+	std::string Nickname = Map["nickname"]->get_string();
+	std::string Message = Map["message"]->get_string();
 
-        if(g_Config.m_ClCrossChatInGameChat || IClient::STATE_ONLINE)
-        {
-            char aBuf[256];
-            str_format(aBuf, sizeof(aBuf), "echo ->: %s", Msg.c_str());
-            Console()->ExecuteLine(aBuf);
-        }
+	ColorRGBA color(1.0f, 1.0f, 1.0f, 1.0f);
 
-        AddMessage(Msg);
-    }
-    else if(Data->get_flag() == sio::message::flag_object)
-    {
-        auto Nickname = Data->get_map()["nickname"]->get_string();
-        auto Message = Data->get_map()["message"]->get_string();
+	if(Map.find("color") != Map.end())
+	{
+		auto c = Map["color"]->get_map();
+		color.r = c["r"] ? (float)c["r"]->get_double() : 1.0f;
+		color.g = c["g"] ? (float)c["g"]->get_double() : 1.0f;
+		color.b = c["b"] ? (float)c["b"]->get_double() : 1.0f;
+		color.a = c["a"] ? (float)c["a"]->get_double() : 1.0f;
+		//dbg_msg("chat_color", "Received color: r=%.2f g=%.2f b=%.2f a=%.2f", color.r, color.g, color.b, color.a);
+	}
 
-        dbg_msg("socket.io", "[%s]: %s", Nickname.c_str(), Message.c_str());
 
-        if(g_Config.m_ClCrossChatInGameChat || IClient::STATE_ONLINE)
-        {
-            char aBuf[256];
-            str_format(aBuf, sizeof(aBuf), "echo -> [%s]: %s", Nickname.c_str(), Message.c_str());
-            Console()->ExecuteLine(aBuf);
-        }
+	std::string display = "[" + Nickname + "]: " + Message;
+	AddMessage(display, color);
 
-        AddMessage("[" + Nickname + "]: " + Message);
-    }
+	if(g_Config.m_ClCrossChatInGameChat || IClient::STATE_ONLINE)
+	{
+		char aBuf[256];
+		str_format(aBuf, sizeof(aBuf), "%s", display.c_str());
+		Console()->ExecuteLine(aBuf);
+	}
 }
+
 
 void CWebSocket::HandleOnlineUpdate(sio::event &ev)
 {
@@ -116,15 +114,18 @@ void CWebSocket::SendChatMessage(const std::string &Msg)
 	pClient->m_SocketIO.socket()->emit("chat_message", sio::string_message::create(Msg));
 }
 
-void CWebSocket::AddMessage(const std::string &Msg)
+void CWebSocket::AddMessage(const std::string &Msg, ColorRGBA Color)
 {
-    std::lock_guard<std::mutex> lock(m_MessageMutex);
-    m_ChatMessages.push_back(Msg);
-    if(m_ChatMessages.size() > 100)
-        m_ChatMessages.erase(m_ChatMessages.begin());
+	std::lock_guard<std::mutex> lock(m_MessageMutex);
+	SChatMessage MsgStruct;
+	MsgStruct.m_Text = Msg;
+	MsgStruct.m_Color = Color;
+	m_ChatMessages.push_back(MsgStruct);
+	if(m_ChatMessages.size() > 100)
+		m_ChatMessages.erase(m_ChatMessages.begin());
 }
 
-std::vector<std::string> CWebSocket::GetMessages()
+std::vector<CWebSocket::SChatMessage> CWebSocket::GetMessages()
 {
     std::lock_guard<std::mutex> lock(m_MessageMutex);
     return m_ChatMessages;
