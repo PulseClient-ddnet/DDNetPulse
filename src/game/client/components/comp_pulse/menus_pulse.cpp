@@ -895,33 +895,30 @@ void CMenus::RenderSettingsProfs(CUIRect MainView)
 
 void CMenus::RenderCrossChat(CUIRect MainView)
 {
-	// Первичная инициализация
 	if(!m_CrossChatInitialized)
 	{
 		m_CrossChatInitialized = true;
 		m_CrossChatInput.Clear();
 		m_CrossChatMessages.clear();
-		m_CrossChatMessages.emplace_back("[Server]: Добро пожаловать в CrossChat!");
+		//m_CrossChatMessages.emplace_back("[Server]: Добро пожаловать в CrossChat!");
 	}
 
 
-	MainView.Draw(ColorRGBA(0, 0, 0, 0.3f), IGraphics::CORNER_ALL, 5.0f);
+	MainView.Draw(ColorRGBA(0, 0, 0, 0.5f), IGraphics::CORNER_ALL, 5.0f);
 
 	CUIRect ChatView, InputBar;
 	MainView.HSplitBottom(40.0f, &ChatView, &InputBar);
 
-	// Рендер области сообщений
 	ChatView.VMargin(10.0f, &ChatView);
 	ChatView.HMargin(10.0f, &ChatView);
 
-	// Получаем список сообщений
 	std::vector<std::string> Messages = GameClient()->m_WebSocket.GetMessages();
 
 	const float LineHeight = 12.0f;
 	float y = ChatView.y + ChatView.h - LineHeight;
 
 	CUIRect LeftBar;
-	ChatView.VSplitLeft(ChatView.w / 5, &LeftBar, &ChatView); // Оставляем место справа
+	ChatView.VSplitLeft(ChatView.w / 5, &LeftBar, &ChatView);
 	LeftBar.Draw(ColorRGBA(0, 0, 0, 0.3f), IGraphics::CORNER_ALL, 5.0f);
 
 
@@ -932,14 +929,14 @@ void CMenus::RenderCrossChat(CUIRect MainView)
 	static CLineInputBuffered<64> s_ChatInput;
 	s_ChatInput.SetEmptyText("Send Message");
 
-	Ui()->SetActiveItem(&s_ChatInput);
-	Ui()->DoEditBox(&s_ChatInput, &InputBar, FontSize + 2.0f);
+	if(Ui()->DoEditBox(&s_ChatInput, &InputBar, FontSize + 2.0f))
+	{	Ui()->SetActiveItem(&s_ChatInput);}
 	if((Input()->KeyPress(KEY_RETURN) || Input()->KeyPress(KEY_KP_ENTER)))
 	{
 		const char *pText = s_ChatInput.GetString();
 		if(pText && pText[0])
 		{
-//			dbg_msg("chat", "sending message: %s", pText);
+			//			dbg_msg("chat", "sending message: %s", pText);
 			GameClient()->m_SocketIO.socket()->emit("chat_message", sio::string_message::create(pText));
 			s_ChatInput.Clear();
 		}
@@ -955,15 +952,26 @@ void CMenus::RenderCrossChat(CUIRect MainView)
 
 	for(auto it = Messages.rbegin(); it != Messages.rend(); ++it)
 	{
-		TextRender()->TextColor(1, 1, 1, 1);
-		TextRender()->Text(ChatView.x + 10, y, 12.0f, it->c_str(), -1);
-		y -= LineHeight + 2;
-		if(y < ChatView.y)
-			break;
+		{
+			const std::string &Msg = *it;
+			std::stringstream bullshit1(Msg);
+			std::string Line;
+
+			while(std::getline(bullshit1, Line, '\n'))
+			{
+				TextRender()->TextColor(1, 1, 1, 1);
+				TextRender()->Text(ChatView.x + 10, y, 12.0f, Line.c_str(), -1);
+				y -= LineHeight + 2;
+
+				if(y < ChatView.y)
+					break;
+			}
+
+			if(y < ChatView.y)
+				break;
+		}
+
 	}
-
 }
-
-
 
 //TODO: Add everything to here

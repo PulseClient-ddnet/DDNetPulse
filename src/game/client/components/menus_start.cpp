@@ -111,13 +111,25 @@ void CMenusStart::RenderStartMenu(CUIRect MainView)
 {
 	GameClient()->m_MenuBackground.ChangePosition(CMenuBackground::POS_START);
 
-	// render logo
-	//Graphics()->TextureSet(g_pData->m_aImages[IMAGE_BANNER].m_Id);
-	//Graphics()->QuadsBegin();
-	//Graphics()->SetColor(1, 1, 1, 1);
-	//IGraphics::CQuadItem QuadItem(MainView.w / 2 + 120, MainView.h / 2 - 70, 360, 103);
-	//Graphics()->QuadsDrawTL(&QuadItem, 1);
-	//Graphics()->QuadsEnd();
+// render logo
+
+	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_NULL].m_Id);
+	Graphics()->QuadsBegin();
+	Graphics()->SetColor(0, 0, 0, 0.3f);
+	IGraphics::CQuadItem QuadItem2(-MainView.w + 550, 0, 1000, 1000);
+	Graphics()->QuadsSetRotation(50.0f);
+	Graphics()->QuadsDrawTL(&QuadItem2, 1);
+	Graphics()->QuadsEnd();
+
+
+
+
+		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_BANNER].m_Id);
+		Graphics()->QuadsBegin();
+		Graphics()->SetColor(1, 1, 1, 1);
+		IGraphics::CQuadItem QuadItem(MainView.x, MainView.h / 5, 360, 103);
+		Graphics()->QuadsDrawTL(&QuadItem, 1);
+		Graphics()->QuadsEnd();
 	/*
 		static const char *s_pCurrentSplashText = nullptr;
 		static float s_SplashTextTime = 0.0f;
@@ -167,13 +179,6 @@ void CMenusStart::RenderStartMenu(CUIRect MainView)
 	*/
 
 	// render slash quad
-	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_NULL].m_Id);
-	Graphics()->QuadsBegin();
-	Graphics()->SetColor(0, 0, 0, 0.3f);
-	IGraphics::CQuadItem QuadItem(-MainView.w + 550, 0, 1000, 1000);
-	Graphics()->QuadsSetRotation(50.0f);
-	Graphics()->QuadsDrawTL(&QuadItem, 1);
-	Graphics()->QuadsEnd();
 
 
 	const float Rounding = 10.0f;
@@ -188,19 +193,19 @@ void CMenusStart::RenderStartMenu(CUIRect MainView)
 	Menu.VSplitLeft(15.0f, nullptr, &Menu);
 	Menu.HSplitTop(Menu.h / 3, &Logo, &Menu);
 	Menu.HSplitBottom(25.0f, &Menu, nullptr);
-	Menu.Draw(ColorRGBA (0.0f, 0.0f, 0.0f, 0.15f), IGraphics::CORNER_ALL, Rounding);
+	//Menu.Draw(ColorRGBA (0.0f, 0.0f, 0.0f, 0.15f), IGraphics::CORNER_ALL, Rounding);
 
 
 	Menu.HSplitTop(80.0f, nullptr, &Menu);
 	Menu.VSplitLeft(7.5f, nullptr, &Menu);
-	Menu.HSplitTop(50.0f, &Button, &Menu);
+	Menu.HSplitTop(45.0f, &Button, &Menu);
 	//Button.VMargin(5.0f, &Button);
 	static CButtonContainer s_PlayButton;
 	if(GameClient()->m_Menus.DoButton_Menu(&s_PlayButton, Localize("Play", "Start menu"), 0, &Button, BUTTONFLAG_LEFT, g_Config.m_ClShowStartMenuImages ? "play_game" : nullptr, IGraphics::CORNER_ALL, Rounding, 0.5f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)) || Ui()->ConsumeHotkey(CUi::HOTKEY_ENTER) || CheckHotKey(KEY_P)) { NewPage = g_Config.m_UiPage >= CMenus::PAGE_INTERNET && g_Config.m_UiPage <= CMenus::PAGE_FAVORITE_COMMUNITY_5 ? g_Config.m_UiPage : CMenus::PAGE_INTERNET; }
 
 
 	Menu.HSplitTop(7.50f, nullptr, &Menu);
-	Menu.HSplitTop(50.0f, &Button, &Menu);
+	Menu.HSplitTop(45.0f, &Button, &Menu);
 	//Button.VMargin(5.0f, &Button);
 
 	static CButtonContainer s_MapEditorButton;
@@ -211,23 +216,47 @@ void CMenusStart::RenderStartMenu(CUIRect MainView)
 	}
 
 	Menu.HSplitTop(7.5f, nullptr, &Menu);
-	Menu.HSplitTop(50.0f, &Button, &Menu);
+	Menu.HSplitTop(45.0f, &Button, &Menu);
 	static CButtonContainer s_SettingsButton;
 	if(GameClient()->m_Menus.DoButton_Menu(&s_SettingsButton, Localize("Settings"), 0, &Button, BUTTONFLAG_LEFT, g_Config.m_ClShowStartMenuImages ? "settings" : nullptr, IGraphics::CORNER_ALL, Rounding, 0.5f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)) || CheckHotKey(KEY_S))
 		NewPage = CMenus::PAGE_SETTINGS;
 
+	CUIRect QuickBar;
+	Menu.HSplitTop(7.5f, nullptr, &Menu);
+	Menu.HSplitTop(30.0f, &QuickBar, &Menu);
+	QuickBar.VSplitLeft(QuickBar.w / 5, &Button, &QuickBar);
+	static CButtonContainer s_ChatButton;
+
+
+
+	ColorRGBA DefaultColor = TextRender()->DefaultTextColor();
+	char aBuf[64];
+	str_format(aBuf, sizeof(aBuf), "Welcome back,");
+	TextRender()->TextColor(ColorRGBA(0.8f, 0.8f, 0.8f, 1.0f));
+	TextRender()->Text(QuickBar.x + 5.f, QuickBar.y, 11.0f, aBuf, -1);
+	TextRender()->TextColor(DefaultColor);
+	str_format(aBuf, sizeof(aBuf), "%s", Client()->PlayerName());
+	TextRender()->TextColor(ColorRGBA(g_Config.m_ClMessageSystemColor));
+	TextRender()->Text(QuickBar.x + 5.f, QuickBar.y + 13, 15.0f, aBuf, -1);
+	TextRender()->TextColor(DefaultColor);
+
 
 	TextRender()->SetFontPreset(EFontPreset::ICON_FONT);
 	TextRender()->SetRenderFlags(ETextRenderFlags::TEXT_RENDER_FLAG_ONLY_ADVANCE_WIDTH | ETextRenderFlags::TEXT_RENDER_FLAG_NO_X_BEARING | ETextRenderFlags::TEXT_RENDER_FLAG_NO_Y_BEARING | ETextRenderFlags::TEXT_RENDER_FLAG_NO_PIXEL_ALIGNMENT | ETextRenderFlags::TEXT_RENDER_FLAG_NO_OVERSIZE);
+	if(GameClient()->m_Menus.DoButton_MenuTab(&s_ChatButton, FONT_ICON_PAPER_PLANE, 0, &Button, IGraphics::CORNER_ALL, nullptr, nullptr, nullptr, nullptr, 5.0f))
+	{
+		NewPage = CMenus::PAGE_CROSSCHAT;
+	}
+
 	CUIRect RightView, Line;
 	MainView.VSplitRight(MainView.w / 2.0f, &MainView, &RightView);
-	RightView.Draw(ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f), IGraphics::CORNER_ALL, Rounding);
+	//RightView.Draw(ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f), IGraphics::CORNER_ALL, Rounding);
 
 	RightView.HSplitTop(33.0f, &Line, &RightView);
 	Line.VSplitRight(33.0f, nullptr, &Button);
 	static CButtonContainer s_QuitButton;
 	ColorRGBA QuitColor(1, 0, 0, 0.5f);
-	if(GameClient()->m_Menus.DoButton_MenuTab(&s_QuitButton, FONT_ICON_LAYER_GROUP, 0, &Button, IGraphics::CORNER_ALL, nullptr, nullptr, nullptr, &QuitColor, 5.0f))
+	if(GameClient()->m_Menus.DoButton_MenuTab(&s_QuitButton, FONT_ICON_EXITGAME, 0, &Button, IGraphics::CORNER_ALL, nullptr, nullptr, nullptr, &QuitColor, 5.0f))
 	{
 		Client()->Quit();
 	}

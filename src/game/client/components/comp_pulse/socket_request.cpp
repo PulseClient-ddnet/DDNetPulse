@@ -1,6 +1,7 @@
 #include "socket_request.h"
 
 #include "game/client/gameclient.h"
+#include "game/editor/editor_ui.h"
 
 #include <sio_client.h>
 
@@ -15,7 +16,6 @@ void CWebSocket::SocketConnect()
 {
 	CGameClient *pClient = (CGameClient *)GameClient();
 
-	// websocket init here
 	pClient->m_SocketIOConnected = false;
 	pClient->m_SocketIO.set_open_listener([this, pClient]() {
 		pClient->m_SocketIOConnected = true;
@@ -32,7 +32,6 @@ void CWebSocket::SocketConnect()
 		dbg_msg("socket.io", "Connection failed");
 	});
 
-	// Connect
 	pClient->m_SocketIO.connect("http://0.0.0.0:3000"); // TODO: change to actual API server
 }
 
@@ -70,7 +69,7 @@ void CWebSocket::ChatConnect(const std::string &Name)
 		if(Data && Data->get_flag() == sio::message::flag_string)
 		{
 			dbg_msg("socket.io", "%s", Data->get_string().c_str());
-			if(g_Config.m_ClCrossChatInGameChat)
+			if(g_Config.m_ClCrossChatInGameChat || IClient::STATE_ONLINE)
 			{
 				char aBuf[256];
 				str_format(aBuf, sizeof(aBuf), "echo ->: %s", Data->get_string().c_str());
@@ -84,7 +83,7 @@ void CWebSocket::ChatConnect(const std::string &Name)
 			auto Nickname = Data->get_map()["nickname"]->get_string();
 			auto Message = Data->get_map()["message"]->get_string();
 			dbg_msg("socket.io", "[%s]: %s", Nickname.c_str(), Message.c_str());
-			if(g_Config.m_ClCrossChatInGameChat)
+			if(g_Config.m_ClCrossChatInGameChat || IClient::STATE_ONLINE)
 			{
 				char aBuf[256];
 				str_format(aBuf, sizeof(aBuf), "echo -> [%s]: %s", Nickname.c_str(), Message.c_str());
