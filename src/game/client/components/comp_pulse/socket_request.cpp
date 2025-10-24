@@ -54,6 +54,27 @@ void CWebSocket::SetupSocketListeners()
 
     pClient->m_SocketIO.socket()->on("chat_message", [&](sio::event &ev) { HandleChatMessage(ev); });
     pClient->m_SocketIO.socket()->on("online_update", [&](sio::event &ev) { HandleOnlineUpdate(ev); });
+
+
+	pClient->m_SocketIO.socket()->on("typing_start", [&](sio::event &ev) {
+	auto Data = ev.get_message();
+	if(!Data || Data->get_flag() != sio::message::flag_object)
+		return;
+	std::string Nickname = Data->get_map()["nickname"]->get_string();
+
+	std::lock_guard<std::mutex> lock(m_TypingMutex);
+	m_TypingUsers.insert(Nickname);
+});
+
+	pClient->m_SocketIO.socket()->on("typing_stop", [&](sio::event &ev) {
+		auto Data = ev.get_message();
+		if(!Data || Data->get_flag() != sio::message::flag_object)
+			return;
+		std::string Nickname = Data->get_map()["nickname"]->get_string();
+
+		std::lock_guard<std::mutex> lock(m_TypingMutex);
+		m_TypingUsers.erase(Nickname);
+	});
 }
 
 void CWebSocket::HandleChatMessage(sio::event &ev)

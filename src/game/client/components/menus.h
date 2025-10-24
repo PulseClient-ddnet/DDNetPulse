@@ -28,6 +28,7 @@
 #include <optional>
 #include <vector>
 
+class CTextRender;
 // component to fetch keypresses, override all other input
 class CMenusKeyBinder : public CComponent
 {
@@ -849,7 +850,6 @@ public:
 	void ForceRefreshLanPage();
 	void SetShowStart(bool ShowStart);
 	void ShowQuitPopup();
-
 private:
 	CCommunityIcons m_CommunityIcons;
 	CMenusStart m_MenusStart;

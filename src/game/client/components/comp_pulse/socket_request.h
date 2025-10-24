@@ -9,6 +9,7 @@
 
 #include <mutex>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 class CWebSocket : public CComponent
@@ -26,13 +27,17 @@ public:
 		ColorRGBA m_Color;
 	};
 	std::mutex m_MessageMutex;
-protected:
 	std::vector<SChatMessage> m_ChatMessages;
-public:
+
 	bool m_IsConnected;
 
 	std::vector<std::string> m_OnlinePlayers;
 	std::mutex m_OnlinePlayersMutex;
+
+	std::unordered_set<std::string> m_TypingUsers; //skebobing
+	std::mutex m_TypingMutex;
+	bool m_IsTyping = false;
+	int64_t m_LastTypeTime = 0;
 
 	void SocketConnect();
 	void SocketDisconnect();

@@ -946,7 +946,7 @@ void CMenus::RenderCrossChat(CUIRect MainView)
 
 	if(DoButton_Menu(
 		&SReconnectButton,
-		Connected ? FONT_ICON_POWER_OFF : FONT_ICON_EXITGAME,
+		Connected ? FONT_ICON_ARROW_ROTATE_LEFT : FONT_ICON_EXITGAME,
 		0,
 		&ReconectRect,
 		BUTTONFLAG_LEFT,
@@ -962,11 +962,35 @@ void CMenus::RenderCrossChat(CUIRect MainView)
 			GameClient()->m_WebSocket.OnInit();
 		}
 	}
+	static bool settings_open = false;
+
 	CButtonContainer SettingsButton;
-	if(DoButton_Menu(&SettingsButton, FONT_ICON_GEAR, 0, &ChatSettings, BUTTONFLAG_RIGHT, nullptr, IGraphics::CORNER_ALL, 3.0f, 0.01f, ColorRGBA(0.0f, 0.5f, 1.0f, 0.25f)))
+	if(DoButton_Menu(
+	       &SettingsButton,
+	       FONT_ICON_GEAR,
+	       0,
+	       &ChatSettings,
+	       BUTTONFLAG_ALL,
+	       nullptr,
+	       IGraphics::CORNER_ALL,
+	       3.0f,
+	       0.01f,
+	       ColorRGBA(0.0f, 0.5f, 1.0f, 0.25f)))
 	{
-		//TODO: setting window
+		settings_open = !settings_open;
 	}
+
+	CUIRect SettingsRect;
+	if(settings_open)
+	{
+		LeftBar.HSplitBottom(LeftBar.h / 3, &LeftBar, &SettingsRect);
+		SettingsRect.Draw(ColorRGBA(0.0f, 0.5f, 1.0f, 0.25f), IGraphics::CORNER_ALL, 3.0f);
+		TextRender()->Text(SettingsRect.x + 5.0f, SettingsRect.y + 5.0f, 12.0f, FONT_ICON_GEAR, -1);
+
+
+
+	}
+
 
 	TextRender()->SetFontPreset(EFontPreset::DEFAULT_FONT);
 
@@ -982,7 +1006,35 @@ void CMenus::RenderCrossChat(CUIRect MainView)
 	}
 
 	if(Ui()->DoEditBox(&s_ChatInput, &InputBar, FontSize + 2.0f))
+	{
 		Ui()->SetActiveItem(&s_ChatInput);
+
+		const char *pText = s_ChatInput.GetString();
+		int64_t Now = time_get();
+
+		if(GameClient()->m_WebSocket.IsConnected())
+		{
+			if(!GameClient()->m_WebSocket.m_IsTyping)
+			{
+				GameClient()->m_WebSocket.m_IsTyping = true;
+				GameClient()->m_SocketIO.socket()->emit("typing_start", sio::string_message::create(Client()->PlayerName()));
+			}
+
+			GameClient()->m_WebSocket.m_LastTypeTime = Now;
+		}
+	}
+
+	if(GameClient()->m_WebSocket.m_IsTyping && time_get() - GameClient()->m_WebSocket.m_LastTypeTime > time_freq() * 2)
+	{
+		GameClient()->m_WebSocket.m_IsTyping = false;
+		if(GameClient()->m_WebSocket.IsConnected())
+			GameClient()->m_SocketIO.socket()->emit("typing_stop", sio::string_message::create(Client()->PlayerName()));
+	}
+
+
+
+
+
 
 	if(Input()->KeyPress(KEY_RETURN) || Input()->KeyPress(KEY_KP_ENTER))
 	{
@@ -994,8 +1046,15 @@ void CMenus::RenderCrossChat(CUIRect MainView)
 			s_ChatHistory.push_back(pText);
 			s_HistoryIndex = -1;
 			s_ChatInput.Clear();
+
+			if(GameClient()->m_WebSocket.m_IsTyping)
+			{
+				GameClient()->m_WebSocket.m_IsTyping = false;
+				GameClient()->m_SocketIO.socket()->emit("typing_stop", sio::string_message::create(Client()->PlayerName()));
+			}
 		}
 	}
+
 
 	if(Input()->KeyPress(KEY_UP))
 	{
@@ -1052,6 +1111,35 @@ void CMenus::RenderCrossChat(CUIRect MainView)
 			if(y < ChatView.y) break;
 		}
 		if(y < ChatView.y) break;
+	}
+
+	{
+		std::lock_guard<std::mutex> lock(GameClient()->m_WebSocket.m_TypingMutex);
+		if(!GameClient()->m_WebSocket.m_TypingUsers.empty())
+		{
+			std::string TypingText;
+			size_t Count = GameClient()->m_WebSocket.m_TypingUsers.size();
+
+			if(Count == 1)
+			{
+				TypingText = *GameClient()->m_WebSocket.m_TypingUsers.begin() + " is typing...";
+			}
+			else if(Count == 2)
+			{
+				auto it = GameClient()->m_WebSocket.m_TypingUsers.begin();
+				std::string first = *it++;
+				std::string second = *it;
+				TypingText = first + " and " + second + " are typing...";
+			}
+			else
+			{
+				TypingText = "A lot of people are typing...";
+			}
+
+			TextRender()->TextColor(ColorRGBA(0.8f, 0.8f, 0.8f, 1.0f));
+			TextRender()->Text(ChatView.x + 10, InputBar.y - 15.0f, 11.0f, TypingText.c_str(), -1);
+			TextRender()->TextColor(TextRender()->DefaultTextColor());
+		}
 	}
 
 }
