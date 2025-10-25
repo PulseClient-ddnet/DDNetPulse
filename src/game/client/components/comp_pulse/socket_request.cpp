@@ -5,6 +5,7 @@ void CWebSocket::OnInit()
 {
 	SocketConnect();
 	SocketListen(Client()->PlayerName());
+	SetPlayerSkin(g_Config.m_ClPlayerSkin, std::to_string(g_Config.m_ClPlayerColorBody), std::to_string(g_Config.m_ClPlayerColorFeet), g_Config.m_ClPlayerUseCustomColor);
 }
 
 void CWebSocket::SocketConnect()
@@ -88,7 +89,6 @@ void CWebSocket::HandleChatMessage(sio::event &ev)
 	std::string Message = Map["message"]->get_string();
 
 	ColorRGBA color(1.0f, 1.0f, 1.0f, 1.0f);
-
 	if(Map.find("color") != Map.end())
 	{
 		auto c = Map["color"]->get_map();
@@ -96,17 +96,19 @@ void CWebSocket::HandleChatMessage(sio::event &ev)
 		color.g = c["g"] ? (float)c["g"]->get_double() : 1.0f;
 		color.b = c["b"] ? (float)c["b"]->get_double() : 1.0f;
 		color.a = c["a"] ? (float)c["a"]->get_double() : 1.0f;
-		//dbg_msg("chat_color", "Received color: r=%.2f g=%.2f b=%.2f a=%.2f", color.r, color.g, color.b, color.a);
 	}
 
+	std::string skin_name;
+	if(Map.find("skin_name") != Map.end() && Map["skin_name"]->get_flag() == sio::message::flag_string)
+		skin_name = Map["skin_name"]->get_string();
 
 	std::string display = "[" + Nickname + "]: " + Message;
 	AddMessage(display, color);
 
 	if(g_Config.m_ClCrossChatInGameChat || IClient::STATE_ONLINE)
 	{
-		char aBuf[256];
-		str_format(aBuf, sizeof(aBuf), "%s", display.c_str());
+		char aBuf[512];
+		str_format(aBuf, sizeof(aBuf), "[%s]: %s", Nickname.c_str(), Message.c_str());
 		Console()->ExecuteLine(aBuf);
 	}
 }
@@ -133,16 +135,41 @@ void CWebSocket::SendChatMessage(const std::string &Msg)
 	pClient->m_SocketIO.socket()->emit("chat_message", sio::string_message::create(Msg));
 }
 
-void CWebSocket::AddMessage(const std::string &Msg, ColorRGBA Color)
+void CWebSocket::AddMessage(const std::string &Msg, ColorRGBA MsgColor)
 {
 	std::lock_guard<std::mutex> lock(m_MessageMutex);
 	SChatMessage MsgStruct;
 	MsgStruct.m_Text = Msg;
-	MsgStruct.m_Color = Color;
+	MsgStruct.m_Color = MsgColor;
 	m_ChatMessages.push_back(MsgStruct);
 	if(m_ChatMessages.size() > 100)
 		m_ChatMessages.erase(m_ChatMessages.begin());
 }
+
+void CWebSocket::SetPlayerSkin(const std::string &skin_name, const std::string &body_color, const std::string &feet_color, bool IsCustomColor)
+{
+	CGameClient *pClient = (CGameClient *)GameClient();
+	if(!pClient || !pClient->m_SocketIO.socket())
+		return;
+
+	sio::object_message::ptr msg = sio::object_message::create();
+
+	msg->get_map()["skin_name"] = sio::string_message::create(skin_name);
+	msg->get_map()["body_color"] = sio::string_message::create(body_color);
+	msg->get_map()["feet_color"] = sio::string_message::create(feet_color);
+	msg->get_map()["use_custom_color"] = sio::bool_message::create(IsCustomColor);
+
+
+	pClient->m_SocketIO.socket()->emit("set_skin", msg);
+
+	char aBuf[256];
+	str_format(aBuf, sizeof(aBuf), "Set skin: %s (Body: %s, Feet: %s)",
+		   skin_name.c_str(), body_color.c_str(), feet_color.c_str());
+	AddMessage(aBuf, ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f));
+}
+
+
+
 
 std::vector<CWebSocket::SChatMessage> CWebSocket::GetMessages()
 {
@@ -154,7 +181,6 @@ bool CWebSocket::IsConnected() const
 {
 	return m_IsConnected;
 }
-
 
 void CWebSocket::OnOpen()
 {

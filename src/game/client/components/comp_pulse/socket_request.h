@@ -19,7 +19,7 @@ class CWebSocket : public CComponent
 	void HandleOnlineUpdate(sio::event &ev);
 
 
-
+	std::mutex m_SkinMutex;
 public:
 	struct SChatMessage
 	{
@@ -48,8 +48,10 @@ public:
 	void OnOpen();
 	void OnClose(int code, const char* reason);
 
-	void AddMessage(const std::string &Msg, ColorRGBA Color = ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f));
+	void AddMessage(const std::string &Msg, ColorRGBA MsgColor = ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f));
 	std::vector<SChatMessage> GetMessages();
+	void SetPlayerSkin(const std::string &skin_name, const std::string &body_color, const std::string &feet_color, bool IsCustomColor);
+
 
 	virtual void OnInit() override;
 	virtual int Sizeof() const override { return sizeof(*this); }
