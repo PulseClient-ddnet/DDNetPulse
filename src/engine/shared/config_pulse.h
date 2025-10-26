@@ -88,6 +88,8 @@ MACRO_CONFIG_INT(ClAntiRQ, cl_anti_rq_mode, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SA
 //Chat
 MACRO_CONFIG_INT(ClCrossChatAutoConnect, cl_cross_chat_autoconnect, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Automatically connect to CrossChat on startup")
 MACRO_CONFIG_INT(ClCrossChatInGameChat, cl_cross_chat_ingame_chat , 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Enable CrossChat integration with in-game chat")
+MACRO_CONFIG_INT(ClUseignSkin, cl_use_ign_skin ,1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Use skin  in-game CrossChat messages")
+
 
 //pulse server
 MACRO_CONFIG_STR(ClSocketNameserver, ntwr_nameserver, 256, "localhost:3000", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Nameserver for websockets")//TODO: actaual nameserver
