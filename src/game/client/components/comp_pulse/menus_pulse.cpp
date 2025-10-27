@@ -919,7 +919,7 @@ void CMenus::RenderCrossChat(CUIRect MainView)
 	MainView.HSplitBottom(40.0f, &ChatView, &InputBar);
 	ChatView.VMargin(10.0f, &ChatView);
 	ChatView.HMargin(10.0f, &ChatView);
-	InputBar.VSplitLeft(InputBar.w / 5, &ReconectRect, &InputBar); // TODO: Add a button or something here later
+	InputBar.VSplitLeft(InputBar.w / 5, &ReconectRect, &InputBar);
 	InputBar.VMargin(10.0f, &InputBar);
 	InputBar.HMargin(10.0f, &InputBar);
 
@@ -939,7 +939,6 @@ void CMenus::RenderCrossChat(CUIRect MainView)
 	CButtonContainer SReconnectButton;
 	bool Connected = GameClient()->m_WebSocket.IsConnected();
 
-	// Задаем цвет в зависимости от состояния
 	ColorRGBA ButtonColor = Connected ? ColorRGBA(1.0f, 0.0f, 0.0f, 0.25f)  // красная при подключении
 					  : ColorRGBA(0.0f, 1.0f, 0.0f, 0.25f); // зеленая при отключении
 
@@ -961,7 +960,7 @@ void CMenus::RenderCrossChat(CUIRect MainView)
 			GameClient()->m_WebSocket.OnInit();
 		}
 	}
-	static bool settings_open = false;
+	static bool s_settings_open = false;
 
 	CButtonContainer SettingsButton;
 	if(DoButton_Menu(
@@ -976,17 +975,20 @@ void CMenus::RenderCrossChat(CUIRect MainView)
 	       0.01f,
 	       ColorRGBA(0.0f, 0.5f, 1.0f, 0.25f)))
 	{
-		settings_open = !settings_open;
+		s_settings_open = !s_settings_open;
 	}
 
 	CUIRect SettingsRect;
-	if(settings_open)
+	if(s_settings_open)
 	{
+		CUIRect Button;
 		LeftBar.HSplitBottom(LeftBar.h / 3, &LeftBar, &SettingsRect);
 		SettingsRect.Draw(ColorRGBA(0.0f, 0.5f, 1.0f, 0.25f), IGraphics::CORNER_ALL, 3.0f);
 		TextRender()->Text(SettingsRect.x + 5.0f, SettingsRect.y + 5.0f, 12.0f, FONT_ICON_GEAR, -1);
 
-
+		SettingsRect.HSplitTop(10.0f, &Button, &SettingsRect);
+		Ui()->DoLabel(&Button, Localize("Settings"), FontSize, TEXTALIGN_ML);
+		Button.HSplitTop(5.0f, nullptr, &Button);
 
 	}
 

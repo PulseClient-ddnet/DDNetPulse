@@ -15,8 +15,8 @@
 class CWebSocket : public CComponent
 {
 	void SetupSocketListeners();
-	void HandleChatMessage(sio::event &ev);
-	void HandleOnlineUpdate(sio::event &ev);
+	void HandleChatMessage(sio::event &Ev);
+	void HandleOnlineUpdate(sio::event &Ev);
 
 
 	std::mutex m_SkinMutex;
@@ -34,27 +34,28 @@ public:
 	std::vector<std::string> m_OnlinePlayers;
 	std::mutex m_OnlinePlayersMutex;
 
-	std::unordered_set<std::string> m_TypingUsers; //skebobing
+	std::unordered_set<std::string> m_TypingUsers;
 	std::mutex m_TypingMutex;
 	bool m_IsTyping = false;
 	int64_t m_LastTypeTime = 0;
 
 	void SocketConnect();
 	void SocketDisconnect();
-	void SocketListen(const std::string &name);
+	void ConnectAndSetup();
+	void SocketListen(const std::string &Name);
 	void SendChatMessage(const std::string &Msg);
 	bool IsConnected() const;
 
 	void OnOpen();
-	void OnClose(int code, const char* reason);
+	void OnClose();
 
 	void AddMessage(const std::string &Msg, ColorRGBA MsgColor = ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f));
 	std::vector<SChatMessage> GetMessages();
-	void SetPlayerSkin(const std::string &skin_name, const std::string &body_color, const std::string &feet_color, bool IsCustomColor);
+	void SetPlayerSkin(const std::string &SkinName, const std::string &BodyColor, const std::string &FeetColor, bool IsCustomColor);
 
 
-	virtual void OnInit() override;
-	virtual int Sizeof() const override { return sizeof(*this); }
+	void OnInit() override;
+	int Sizeof() const override { return sizeof(*this); }
 };
 
 #endif

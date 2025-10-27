@@ -3,10 +3,17 @@
 
 void CWebSocket::OnInit()
 {
+	if(g_Config.m_ClCrossChatAutoConnect)
+		ConnectAndSetup();
+}
+
+void CWebSocket::ConnectAndSetup()
+{
 	SocketConnect();
 	SocketListen(Client()->PlayerName());
 	SetPlayerSkin(g_Config.m_ClPlayerSkin, std::to_string(g_Config.m_ClPlayerColorBody), std::to_string(g_Config.m_ClPlayerColorFeet), g_Config.m_ClPlayerUseCustomColor);
 }
+
 
 void CWebSocket::SocketConnect()
 {
@@ -63,7 +70,7 @@ void CWebSocket::SetupSocketListeners()
 		return;
 	std::string Nickname = Data->get_map()["nickname"]->get_string();
 
-	std::lock_guard<std::mutex> lock(m_TypingMutex);
+	std::lock_guard<std::mutex> Lock(m_TypingMutex);
 	m_TypingUsers.insert(Nickname);
 });
 
@@ -89,7 +96,7 @@ void CWebSocket::HandleChatMessage(sio::event &ev)
 	std::string Message = Map["message"]->get_string();
 
 	ColorRGBA color(1.0f, 1.0f, 1.0f, 1.0f);
-	if(Map.find("color") != Map.end())
+	if(Map.contains("color"))
 	{
 		auto c = Map["color"]->get_map();
 		color.r = c["r"] ? (float)c["r"]->get_double() : 1.0f;
@@ -98,9 +105,8 @@ void CWebSocket::HandleChatMessage(sio::event &ev)
 		color.a = c["a"] ? (float)c["a"]->get_double() : 1.0f;
 	}
 
-	std::string skin_name;
 	if(Map.find("skin_name") != Map.end() && Map["skin_name"]->get_flag() == sio::message::flag_string)
-		skin_name = Map["skin_name"]->get_string();
+		std::string skin_name = Map["skin_name"]->get_string();
 
 	std::string display = "[" + Nickname + "]: " + Message;
 	AddMessage(display, color);
@@ -146,7 +152,7 @@ void CWebSocket::AddMessage(const std::string &Msg, ColorRGBA MsgColor)
 		m_ChatMessages.erase(m_ChatMessages.begin());
 }
 
-void CWebSocket::SetPlayerSkin(const std::string &skin_name, const std::string &body_color, const std::string &feet_color, bool IsCustomColor)
+void CWebSocket::SetPlayerSkin(const std::string &SkinName, const std::string &BodyColor, const std::string &FeetColor, bool IsCustomColor)
 {
 	CGameClient *pClient = (CGameClient *)GameClient();
 	if(!pClient || !pClient->m_SocketIO.socket())
@@ -154,9 +160,9 @@ void CWebSocket::SetPlayerSkin(const std::string &skin_name, const std::string &
 
 	sio::object_message::ptr msg = sio::object_message::create();
 
-	msg->get_map()["skin_name"] = sio::string_message::create(skin_name);
-	msg->get_map()["body_color"] = sio::string_message::create(body_color);
-	msg->get_map()["feet_color"] = sio::string_message::create(feet_color);
+	msg->get_map()["skin_name"] = sio::string_message::create(SkinName);
+	msg->get_map()["body_color"] = sio::string_message::create(BodyColor);
+	msg->get_map()["feet_color"] = sio::string_message::create(FeetColor);
 	msg->get_map()["use_custom_color"] = sio::bool_message::create(IsCustomColor);
 
 
@@ -164,7 +170,7 @@ void CWebSocket::SetPlayerSkin(const std::string &skin_name, const std::string &
 
 	char aBuf[256];
 	str_format(aBuf, sizeof(aBuf), "Set skin: %s (Body: %s, Feet: %s)",
-		   skin_name.c_str(), body_color.c_str(), feet_color.c_str());
+		   SkinName.c_str(), BodyColor.c_str(), FeetColor.c_str());
 	AddMessage(aBuf, ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f));
 }
 
@@ -173,7 +179,7 @@ void CWebSocket::SetPlayerSkin(const std::string &skin_name, const std::string &
 
 std::vector<CWebSocket::SChatMessage> CWebSocket::GetMessages()
 {
-    std::lock_guard<std::mutex> lock(m_MessageMutex);
+    std::lock_guard<std::mutex> Lock(m_MessageMutex);
     return m_ChatMessages;
 }
 
@@ -187,7 +193,7 @@ void CWebSocket::OnOpen()
 	AddMessage("Connected successfully.");
 }
 
-void CWebSocket::OnClose(int code, const char* reason)
+void CWebSocket::OnClose()
 {
 	AddMessage("Disconnected from chat.");
 }
