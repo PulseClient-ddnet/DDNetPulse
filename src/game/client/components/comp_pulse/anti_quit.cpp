@@ -3,17 +3,18 @@
 #include "anti_quit.h"
 
 #include <engine/client.h>
+
 #include <game/client/gameclient.h>
 
 void CAntiQuit::OnInterfacesInit(CGameClient *pClient)
 {
-    CComponent::OnInterfacesInit(pClient);
+	CComponent::OnInterfacesInit(pClient);
 }
 
 void CAntiQuit::Request()
 {
-	if(g_Config.m_ClAntiRQ){
-
+	if(g_Config.m_ClAntiRQ)
+	{
 		if(m_PopupRequested)
 			return;
 
@@ -36,14 +37,11 @@ void CAntiQuit::Request()
 
 void CAntiQuit::OnUpdate()
 {
-    if(!m_PopupRequested)
-        return;
+	if(!m_PopupRequested)
+		return;
 
-    if(GameClient()->m_Menus.m_Popup != CMenus::POPUP_QUIT)
-    {
-        m_PopupRequested = false;
-    }
+	if(GameClient()->m_Menus.m_Popup != CMenus::POPUP_QUIT)
+	{
+		m_PopupRequested = false;
+	}
 }
-
-
-

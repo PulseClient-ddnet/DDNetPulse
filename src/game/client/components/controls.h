@@ -48,6 +48,7 @@ public:
 	void ResetInput(int Dummy);
 
 	bool CheckNewInput();
+
 private:
 	static void ConKeyInputState(IConsole::IResult *pResult, void *pUserData);
 	static void ConKeyInputCounter(IConsole::IResult *pResult, void *pUserData);

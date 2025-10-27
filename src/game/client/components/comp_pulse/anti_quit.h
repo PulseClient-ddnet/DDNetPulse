@@ -7,17 +7,15 @@
 class CAntiQuit final : public CComponent
 {
 public:
-    int Sizeof() const override { return sizeof(*this); }
+	int Sizeof() const override { return sizeof(*this); }
 
-    void OnInterfacesInit(class CGameClient *pClient) override;
-    void OnUpdate() override;
+	void OnInterfacesInit(class CGameClient *pClient) override;
+	void OnUpdate() override;
 
-    void Request();
+	void Request();
 
 private:
-    bool m_PopupRequested = false;
+	bool m_PopupRequested = false;
 };
 
 #endif // GAME_CLIENT_COMPONENTS_COMP_PULSE_ANTI_QUIT_H
-
-

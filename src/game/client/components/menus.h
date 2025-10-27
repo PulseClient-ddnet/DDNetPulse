@@ -111,12 +111,11 @@ private:
 
 	// menus_settings_assets.cpp
 
-
 	//pulse
 	std::vector<std::string> m_CrossChatMessages;
 	CLineInput m_CrossChatInput;
 	bool m_CrossChatInitialized = false;
-	
+
 public:
 	struct SCustomItem
 	{
@@ -616,7 +615,6 @@ protected:
 	//PULSE
 	std::vector<CButtonContainer> MVButtonContainersIdleAura = {{}, {}, {}, {}, {}};
 
-
 	class CMapListItem
 	{
 	public:
@@ -850,6 +848,7 @@ public:
 	void ForceRefreshLanPage();
 	void SetShowStart(bool ShowStart);
 	void ShowQuitPopup();
+
 private:
 	CCommunityIcons m_CommunityIcons;
 	CMenusStart m_MenusStart;

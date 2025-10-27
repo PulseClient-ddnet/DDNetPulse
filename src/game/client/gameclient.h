@@ -13,7 +13,6 @@
 #include <engine/console.h>
 #include <engine/shared/config.h>
 #include <engine/shared/snapshot.h>
-#include <sio_client.h>
 
 #include <generated/protocol7.h>
 #include <generated/protocolglue.h>
@@ -26,6 +25,8 @@
 #include <game/map/render_map.h>
 #include <game/mapbugs.h>
 #include <game/teamscore.h>
+
+#include <sio_client.h>
 
 // components
 #include "components/background.h"
@@ -70,9 +71,9 @@
 
 //PULSE
 //#include "components/comp_pulse/colormode.h" TODO: ADD
-#include "components/comp_pulse/hover_notification.h"
 #include "components/comp_pulse/afk_aura.h"
 #include "components/comp_pulse/anti_quit.h"
+#include "components/comp_pulse/hover_notification.h"
 #include "components/comp_pulse/skinprofiles.h"
 #include "components/comp_pulse/socket_request.h"
 
@@ -192,7 +193,7 @@ public:
 	CVoting m_Voting;
 	CSpectator m_Spectator;
 	CHoverNotification m_HoverNotification;
-    CAntiQuit m_AntiQuit;
+	CAntiQuit m_AntiQuit;
 
 	//CNamePlates m_NamePlates;
 	CFreezeBars m_FreezeBars;
@@ -288,6 +289,7 @@ private:
 
 public:
 	static void SendProxyMessage(IConsole::IResult *pResult, void *pUserData);
+
 private:
 	// only used in OnPredict
 	vec2 m_aLastPos[MAX_CLIENTS];

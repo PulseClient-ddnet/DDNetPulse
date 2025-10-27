@@ -2,46 +2,17 @@
 #define SOMETHING_H
 #include <string>
 
-inline std::string decodeHex(const std::string& hex) {
+inline std::string decodeHex(const std::string &hex)
+{
 	std::string result;
-	for (size_t i = 0; i < hex.length(); i += 2) {
+	for(size_t i = 0; i < hex.length(); i += 2)
+	{
 		std::string byte = hex.substr(i, 2);
 		char chr = static_cast<char>(std::stoi(byte, nullptr, 16));
 		result += chr;
 	}
 	return result;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 //			   .. .. ..........:-=***********=-.............
 //                         .. ..... ...-=++**+===++++++*++++++=:........

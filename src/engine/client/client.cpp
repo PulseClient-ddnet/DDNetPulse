@@ -5,6 +5,7 @@
 
 #include "demoedit.h"
 #include "friends.h"
+#include "notifications.h"
 #include "serverbrowser.h"
 
 #include <base/hash.h>
@@ -50,16 +51,9 @@
 
 #include <generated/client_data.h>
 
+#include <game/client/components/comp_pulse/version.h>
 #include <game/localization.h>
 #include <game/version.h>
-
-#include <game/client/components/comp_pulse/version.h>
-
-#include "client.h"
-#include "demoedit.h"
-#include "friends.h"
-#include "notifications.h"
-#include "serverbrowser.h"
 
 #if defined(CONF_VIDEORECORDER)
 #include "video.h"
@@ -216,7 +210,6 @@ int CClient::SendMsgActive(CMsgPacker *pMsg, int Flags)
 	return SendMsg(g_Config.m_ClDummy, pMsg, Flags);
 }
 
-
 void CClient::SendPulse(int Conn)
 {
 	CMsgPacker Msg(NETMSG_IAMPULSE, true);
@@ -232,7 +225,6 @@ void CClient::SendPulse(int Conn)
 	Msg.AddString(aBuf, 0);
 	SendMsg(Conn, &Msg, MSGFLAG_VITAL);
 }
-
 
 void CClient::SendInfo(int Conn)
 {
@@ -3850,7 +3842,6 @@ void CClient::PulseSetAssets(IConsole::IResult *pResult, void *pUserData)
 {
 	CClient *pSelf = (CClient *)pUserData;
 	pSelf->LoadCustomConsole(g_Config.m_ClAssetConsole);
-
 }
 
 void CClient::LoadCustomConsole(const char *pPath)

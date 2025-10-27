@@ -247,13 +247,25 @@ void CEffects::PlayerDeath(vec2 Pos, int ClientId, float Alpha)
 		// And will use the team body color to create player death effect instead of tee color
 		if(GameClient()->Client()->IsSixup())
 		{
-			if(GameClient()->m_aClients[ClientId].m_RenderInfo.m_aSixup[g_Config.m_ClDummy].m_aUseCustomColors[protocol7::SKINPART_BODY]) { BloodColor = GameClient()->m_aClients[ClientId].m_RenderInfo.m_aSixup[g_Config.m_ClDummy].m_aColors[protocol7::SKINPART_BODY]; }
-			else { BloodColor = GameClient()->m_aClients[ClientId].m_RenderInfo.m_aSixup[g_Config.m_ClDummy].m_BloodColor; }
+			if(GameClient()->m_aClients[ClientId].m_RenderInfo.m_aSixup[g_Config.m_ClDummy].m_aUseCustomColors[protocol7::SKINPART_BODY])
+			{
+				BloodColor = GameClient()->m_aClients[ClientId].m_RenderInfo.m_aSixup[g_Config.m_ClDummy].m_aColors[protocol7::SKINPART_BODY];
+			}
+			else
+			{
+				BloodColor = GameClient()->m_aClients[ClientId].m_RenderInfo.m_aSixup[g_Config.m_ClDummy].m_BloodColor;
+			}
 		}
 		else
 		{
-			if(GameClient()->m_aClients[ClientId].m_RenderInfo.m_CustomColoredSkin) { BloodColor = GameClient()->m_aClients[ClientId].m_RenderInfo.m_ColorBody; }
-			else { BloodColor = GameClient()->m_aClients[ClientId].m_RenderInfo.m_BloodColor; }
+			if(GameClient()->m_aClients[ClientId].m_RenderInfo.m_CustomColoredSkin)
+			{
+				BloodColor = GameClient()->m_aClients[ClientId].m_RenderInfo.m_ColorBody;
+			}
+			else
+			{
+				BloodColor = GameClient()->m_aClients[ClientId].m_RenderInfo.m_BloodColor;
+			}
 		}
 	}
 
@@ -438,9 +450,8 @@ void CEffects::AfkAura(vec2 Position, float Alpha, vec4 BodyColor)
 			float RadiusPulse = AURA_RADIUS * (0.9f + 0.1f * std::sin(Time * 2.0f + i));
 
 			vec2 SparklePos = BasePosition + vec2(
-				                  std::cos(Angle) * RadiusPulse,
-				                  std::sin(Angle) * RadiusPulse
-				                  );
+								 std::cos(Angle) * RadiusPulse,
+								 std::sin(Angle) * RadiusPulse);
 
 			float SparkleAlpha = 0.4f + 0.3f * std::sin(Time * 3.0f + i);
 
@@ -470,8 +481,7 @@ void CEffects::AfkAura(vec2 Position, float Alpha, vec4 BodyColor)
 				std::clamp(R, 0.0f, 1.0f),
 				std::clamp(G, 0.0f, 1.0f),
 				std::clamp(B, 0.0f, 1.0f),
-				1.0f
-				);
+				1.0f);
 
 			GameClient()->m_Particles.Add(CParticles::GROUP_EXTRA, &p);
 		}
@@ -491,9 +501,8 @@ void CEffects::AfkAura(vec2 Position, float Alpha, vec4 BodyColor)
 			float OffsetY = std::cos(Time * 0.5f + i) * random_float(1.0f, 3.0f);
 
 			vec2 SparklePos = BasePosition + vec2(
-				                  std::cos(Angle) * RadiusPulse + OffsetX,
-				                  std::sin(Angle) * RadiusPulse + OffsetY
-				                  );
+								 std::cos(Angle) * RadiusPulse + OffsetX,
+								 std::sin(Angle) * RadiusPulse + OffsetY);
 
 			float SparkleAlpha = 0.3f + 0.3f * std::sin(Time * 0.8f + i);
 
@@ -523,8 +532,7 @@ void CEffects::AfkAura(vec2 Position, float Alpha, vec4 BodyColor)
 				std::clamp(R, 0.0f, 1.0f),
 				std::clamp(G, 0.0f, 1.0f),
 				std::clamp(B, 0.0f, 1.0f),
-				1.0f
-				);
+				1.0f);
 
 			GameClient()->m_Particles.Add(CParticles::GROUP_EXTRA, &p);
 		}
@@ -537,27 +545,26 @@ void CEffects::AfkAura(vec2 Position, float Alpha, vec4 BodyColor)
 			float RotationSpeed = 0.1f + (float)(i % 4) * 0.15f;
 
 			float AngleNoise = std::sin(Time * 0.3f + i * 0.7f) * 0.5f +
-			                   std::cos(Time * 0.9f + i * 1.1f) * 0.2f;
+					   std::cos(Time * 0.9f + i * 1.1f) * 0.2f;
 			float Angle = BaseAngle + Time * RotationSpeed + AngleNoise;
 
 			float VerticalWave = std::sin(Time * 0.8f + i * 0.5f) * 8.0f +
-			                     std::cos(Time * 0.4f + i * 0.3f) * 4.0f +
-			                     std::sin(Time * 1.2f + i * 0.2f) * 2.0f +
-			                     random_float(-2.0f, 2.0f);
+					     std::cos(Time * 0.4f + i * 0.3f) * 4.0f +
+					     std::sin(Time * 1.2f + i * 0.2f) * 2.0f +
+					     random_float(-2.0f, 2.0f);
 
 			float RadiusVariation = 1.0f +
-			                        std::sin(Time * 0.6f + i * 0.4f) * 0.2f +
-			                        std::cos(Time * 0.3f + i * 0.6f) * 0.1f +
-			                        random_float(-0.1f, 0.1f);
+						std::sin(Time * 0.6f + i * 0.4f) * 0.2f +
+						std::cos(Time * 0.3f + i * 0.6f) * 0.1f +
+						random_float(-0.1f, 0.1f);
 			float CurrentRadius = AURA_RADIUS * RadiusVariation;
 
 			vec2 SparklePos = BasePosition + vec2(
-				                  std::cos(Angle) * CurrentRadius + random_float(-1.5f, 1.5f),
-				                  std::sin(Angle) * CurrentRadius + VerticalWave + random_float(-1.5f, 1.5f)
-				                  );
+								 std::cos(Angle) * CurrentRadius + random_float(-1.5f, 1.5f),
+								 std::sin(Angle) * CurrentRadius + VerticalWave + random_float(-1.5f, 1.5f));
 
 			float SparkleAlpha = 0.4f + 0.3f * std::sin(Time * 1.2f + i * 0.4f) +
-			                     0.2f * std::cos(Time * 0.8f + i * 0.6f);
+					     0.2f * std::cos(Time * 0.8f + i * 0.6f);
 
 			float ColorPhase = Time * 0.3f + i * 0.2f;
 			float ColorVariation = 0.15f * std::sin(ColorPhase);
@@ -590,7 +597,7 @@ void CEffects::AfkAura(vec2 Position, float Alpha, vec4 BodyColor)
 			p.m_EndAlpha = 0.0f;
 
 			p.m_Rot = Time * 2.0f + i * 0.5f +
-			          std::sin(Time * 0.7f + i * 0.4f) * 0.5f;
+				  std::sin(Time * 0.7f + i * 0.4f) * 0.5f;
 			p.m_Rotspeed = random_float(-1.0f, 1.0f);
 			p.m_Gravity = 0.0f;
 			p.m_Friction = 1.0f;
@@ -600,8 +607,7 @@ void CEffects::AfkAura(vec2 Position, float Alpha, vec4 BodyColor)
 				std::clamp(R, 0.0f, 1.0f),
 				std::clamp(G, 0.0f, 1.0f),
 				std::clamp(B, 0.0f, 1.0f),
-				1.0f
-				);
+				1.0f);
 
 			GameClient()->m_Particles.Add(CParticles::GROUP_EXTRA, &p);
 		}
@@ -621,9 +627,8 @@ void CEffects::AfkAura(vec2 Position, float Alpha, vec4 BodyColor)
 				float OffsetY = std::sin(Time * 0.3f + i) * random_float(0.5f, 1.5f);
 
 				vec2 SparklePos = BasePosition + vec2(
-					                  std::cos(Angle) * RadiusPulse + OffsetX,
-					                  std::sin(Angle) * RadiusPulse + VerticalWave + OffsetY
-					                  );
+									 std::cos(Angle) * RadiusPulse + OffsetX,
+									 std::sin(Angle) * RadiusPulse + VerticalWave + OffsetY);
 
 				float SparkleAlpha = 0.3f + 0.4f * std::sin(Time * 0.7f + i);
 
@@ -653,8 +658,7 @@ void CEffects::AfkAura(vec2 Position, float Alpha, vec4 BodyColor)
 					std::clamp(R, 0.0f, 1.0f),
 					std::clamp(G, 0.0f, 1.0f),
 					std::clamp(B, 0.0f, 1.0f),
-					1.0f
-					);
+					1.0f);
 
 				GameClient()->m_Particles.Add(CParticles::GROUP_EXTRA, &p);
 			}
@@ -675,9 +679,8 @@ void CEffects::AfkAura(vec2 Position, float Alpha, vec4 BodyColor)
 			float OffsetY = std::sin(Time * 0.2f + i) * random_float(0.2f, 0.8f);
 
 			vec2 SparklePos = BasePosition + vec2(
-				                  std::cos(Angle) * RadiusPulse + OffsetX,
-				                  std::sin(Angle) * RadiusPulse + VerticalWave + OffsetY
-				                  );
+								 std::cos(Angle) * RadiusPulse + OffsetX,
+								 std::sin(Angle) * RadiusPulse + VerticalWave + OffsetY);
 
 			float MinRadius = 5.0f;
 			float DistFactor = std::max(RadiusPulse, MinRadius) / AURA_RADIUS;
@@ -711,8 +714,7 @@ void CEffects::AfkAura(vec2 Position, float Alpha, vec4 BodyColor)
 				std::clamp(R, 0.0f, 1.0f),
 				std::clamp(G, 0.0f, 1.0f),
 				std::clamp(B, 0.0f, 1.0f),
-				1.0f
-				);
+				1.0f);
 
 			GameClient()->m_Particles.Add(CParticles::GROUP_EXTRA, &p);
 		}
@@ -739,9 +741,8 @@ void CEffects::AfkAura(vec2 Position, float Alpha, vec4 BodyColor)
 			float radius = SPIRAL_RADIUS * (0.8f + 0.2f * std::sin(Time + t * 5.0f));
 
 			vec2 SparklePos = BasePosition + vec2(
-				                  std::cos(finalAngle) * radius,
-				                  std::sin(finalAngle) * radius + y
-				                  );
+								 std::cos(finalAngle) * radius,
+								 std::sin(finalAngle) * radius + y);
 
 			float SparkleAlpha = (0.3f + 0.3f * std::sin(Time * 2.0f + i)) * (radius / SPIRAL_RADIUS);
 
@@ -771,8 +772,7 @@ void CEffects::AfkAura(vec2 Position, float Alpha, vec4 BodyColor)
 				std::clamp(R, 0.0f, 1.0f),
 				std::clamp(G, 0.0f, 1.0f),
 				std::clamp(B, 0.0f, 1.0f),
-				1.0f
-				);
+				1.0f);
 
 			GameClient()->m_Particles.Add(CParticles::GROUP_EXTRA, &p);
 		}

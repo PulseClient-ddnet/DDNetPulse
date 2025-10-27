@@ -5,6 +5,7 @@
 #include "binds.h"
 #include "camera.h"
 #include "controls.h"
+#include "hud.h"
 #include "voting.h"
 
 #include <base/color.h>
@@ -24,12 +25,6 @@
 #include <game/localization.h>
 
 #include <cmath>
-
-#include "binds.h"
-#include "camera.h"
-#include "controls.h"
-#include "hud.h"
-#include "voting.h"
 
 CHud::CHud()
 {

@@ -1,4 +1,5 @@
 #include "socket_request.h"
+
 #include "game/client/gameclient.h"
 
 void CWebSocket::OnInit()
@@ -14,65 +15,62 @@ void CWebSocket::ConnectAndSetup()
 	SetPlayerSkin(g_Config.m_ClPlayerSkin, std::to_string(g_Config.m_ClPlayerColorBody), std::to_string(g_Config.m_ClPlayerColorFeet), g_Config.m_ClPlayerUseCustomColor);
 }
 
-
 void CWebSocket::SocketConnect()
 {
-    CGameClient *pClient = (CGameClient *)GameClient();
+	CGameClient *pClient = (CGameClient *)GameClient();
 
-    pClient->m_SocketIO.set_open_listener([this, pClient]() {
-    	m_IsConnected = true;
-        dbg_msg("socket.io", "Connected to server");
-    });
+	pClient->m_SocketIO.set_open_listener([this, pClient]() {
+		m_IsConnected = true;
+		dbg_msg("socket.io", "Connected to server");
+	});
 
-    pClient->m_SocketIO.set_close_listener([this, pClient](sio::client::close_reason const &) {
-    	m_IsConnected = false;
-        dbg_msg("socket.io", "Disconnected from server");
-    });
+	pClient->m_SocketIO.set_close_listener([this, pClient](sio::client::close_reason const &) {
+		m_IsConnected = false;
+		dbg_msg("socket.io", "Disconnected from server");
+	});
 
-    pClient->m_SocketIO.set_fail_listener([this, pClient]() {
-    	m_IsConnected = false;
-        dbg_msg("socket.io", "Connection failed");
-    });
+	pClient->m_SocketIO.set_fail_listener([this, pClient]() {
+		m_IsConnected = false;
+		dbg_msg("socket.io", "Connection failed");
+	});
 
-    pClient->m_SocketIO.connect(g_Config.m_ClSocketNameserver);
-
+	pClient->m_SocketIO.connect(g_Config.m_ClSocketNameserver);
 }
 
 void CWebSocket::SocketDisconnect()
 {
-    CGameClient *pClient = (CGameClient *)GameClient();
-    {
-        pClient->m_SocketIO.close();
-    }
+	CGameClient *pClient = (CGameClient *)GameClient();
+	{
+		pClient->m_SocketIO.close();
+	}
 }
 
 void CWebSocket::SocketListen(const std::string &Name)
 {
-    CGameClient *pClient = (CGameClient *)GameClient();
-    std::string player = Name;
+	CGameClient *pClient = (CGameClient *)GameClient();
+	std::string player = Name;
 
-    SetupSocketListeners();
+	SetupSocketListeners();
 
-    pClient->m_SocketIO.socket()->emit("nickname", sio::string_message::create(player));
+	pClient->m_SocketIO.socket()->emit("nickname", sio::string_message::create(player));
 }
 
 void CWebSocket::SetupSocketListeners()
 {
-    CGameClient *pClient = (CGameClient *)GameClient();
+	CGameClient *pClient = (CGameClient *)GameClient();
 
-    pClient->m_SocketIO.socket()->on("chat_message", [&](sio::event &ev) { HandleChatMessage(ev); });
-    pClient->m_SocketIO.socket()->on("online_update", [&](sio::event &ev) { HandleOnlineUpdate(ev); });
-
+	pClient->m_SocketIO.socket()->on("chat_message", [&](sio::event &ev) { HandleChatMessage(ev); });
+	pClient->m_SocketIO.socket()->on("online_update", [&](sio::event &ev) { HandleOnlineUpdate(ev); });
 
 	pClient->m_SocketIO.socket()->on("typing_start", [&](sio::event &ev) {
-	auto Data = ev.get_message();
-	if(!Data || Data->get_flag() != sio::message::flag_object)
-		return;
-	std::string Nickname = Data->get_map()["nickname"]->get_string();
+		auto Data = ev.get_message();
+		if(!Data || Data->get_flag() != sio::message::flag_object)
+			return;
+		std::string Nickname = Data->get_map()["nickname"]->get_string();
 
-	std::lock_guard<std::mutex> Lock(m_TypingMutex);
-	m_TypingUsers.insert(Nickname);
-});
+		std::lock_guard<std::mutex> Lock(m_TypingMutex);
+		m_TypingUsers.insert(Nickname);
+	});
 
 	pClient->m_SocketIO.socket()->on("typing_stop", [&](sio::event &ev) {
 		auto Data = ev.get_message();
@@ -119,25 +117,25 @@ void CWebSocket::HandleChatMessage(sio::event &ev)
 	}
 }
 
-
 void CWebSocket::HandleOnlineUpdate(sio::event &ev)
 {
-    auto Data = ev.get_message();
-    if(!Data || Data->get_flag() != sio::message::flag_object) return;
+	auto Data = ev.get_message();
+	if(!Data || Data->get_flag() != sio::message::flag_object)
+		return;
 
-    auto UsersArray = Data->get_map()["users"]->get_vector();
-    std::vector<std::string> OnlinePlayers;
-    for(auto &userMsg : UsersArray)
-        if(userMsg->get_flag() == sio::message::flag_string)
-            OnlinePlayers.push_back(userMsg->get_string());
+	auto UsersArray = Data->get_map()["users"]->get_vector();
+	std::vector<std::string> OnlinePlayers;
+	for(auto &userMsg : UsersArray)
+		if(userMsg->get_flag() == sio::message::flag_string)
+			OnlinePlayers.push_back(userMsg->get_string());
 
-    std::lock_guard<std::mutex> lock(m_OnlinePlayersMutex);
-    m_OnlinePlayers = OnlinePlayers;
+	std::lock_guard<std::mutex> lock(m_OnlinePlayersMutex);
+	m_OnlinePlayers = OnlinePlayers;
 }
 
 void CWebSocket::SendChatMessage(const std::string &Msg)
 {
-    CGameClient *pClient = (CGameClient *)GameClient();
+	CGameClient *pClient = (CGameClient *)GameClient();
 	pClient->m_SocketIO.socket()->emit("chat_message", sio::string_message::create(Msg));
 }
 
@@ -165,22 +163,18 @@ void CWebSocket::SetPlayerSkin(const std::string &SkinName, const std::string &B
 	msg->get_map()["feet_color"] = sio::string_message::create(FeetColor);
 	msg->get_map()["use_custom_color"] = sio::bool_message::create(IsCustomColor);
 
-
 	pClient->m_SocketIO.socket()->emit("set_skin", msg);
 
 	char aBuf[256];
 	str_format(aBuf, sizeof(aBuf), "Set skin: %s (Body: %s, Feet: %s)",
-		   SkinName.c_str(), BodyColor.c_str(), FeetColor.c_str());
+		SkinName.c_str(), BodyColor.c_str(), FeetColor.c_str());
 	AddMessage(aBuf, ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f));
 }
 
-
-
-
 std::vector<CWebSocket::SChatMessage> CWebSocket::GetMessages()
 {
-    std::lock_guard<std::mutex> Lock(m_MessageMutex);
-    return m_ChatMessages;
+	std::lock_guard<std::mutex> Lock(m_MessageMutex);
+	return m_ChatMessages;
 }
 
 bool CWebSocket::IsConnected() const

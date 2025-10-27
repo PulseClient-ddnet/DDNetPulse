@@ -615,8 +615,6 @@ void CMenus::RenderMenubar(CUIRect Box, IClient::EClientState ClientState)
 
 		bool GotNewsOrUpdate = false;
 
-
-
 		Box.VSplitRight(10.0f, &Box, nullptr);
 		Box.VSplitRight(33.0f, &Box, &Button);
 		static CButtonContainer s_CrossChatButton;
@@ -628,7 +626,6 @@ void CMenus::RenderMenubar(CUIRect Box, IClient::EClientState ClientState)
 		Box.VSplitRight(10.0f, &Box, nullptr);
 
 		Box.VSplitLeft(33.0f, &Button, &Box);
-
 
 #if defined(CONF_AUTOUPDATE)
 		int State = Updater()->GetCurrentState();

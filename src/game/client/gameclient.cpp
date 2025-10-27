@@ -8,6 +8,8 @@
 #include "components/broadcast.h"
 #include "components/camera.h"
 #include "components/chat.h"
+#include "components/comp_pulse/afk_aura.h"
+#include "components/comp_pulse/anti_quit.h"
 #include "components/console.h"
 #include "components/controls.h"
 #include "components/countryflags.h"
@@ -37,8 +39,7 @@
 #include "components/spectator.h"
 #include "components/statboard.h"
 #include "components/voting.h"
-#include "components/comp_pulse/afk_aura.h"
-#include "components/comp_pulse/anti_quit.h"
+#include "game/client/components/comp_pulse/unknown/something.h"
 #include "lineinput.h"
 #include "prediction/entities/character.h"
 #include "prediction/entities/projectile.h"
@@ -80,8 +81,6 @@
 
 #include <chrono>
 #include <limits>
-
-#include "game/client/components/comp_pulse/unknown/something.h"
 using namespace std::chrono_literals;
 
 const char *CGameClient::Version() const { return GAME_VERSION; }
@@ -201,8 +200,8 @@ void CGameClient::OnConsoleInit()
 	Console()->Register("mapbug", "s[mapbug]", CFGFLAG_GAME, ConMapbug, this, "Enable map compatibility mode using the specified bug (example: grenade-doubleexplosion@ddnet.tw)");
 
 	//Pulse
-	Console()->Register("p_copy", "?r[player ID]", CFGFLAG_CLIENT, PulseCopy, this, "Copy player profile by ID");\
-	Console()->Register("send_proximity_message", "?r[MSG]", CFGFLAG_CLIENT, SendProxyMessage, this, "Send message in special chat");\
+	Console()->Register("p_copy", "?r[player ID]", CFGFLAG_CLIENT, PulseCopy, this, "Copy player profile by ID");
+	Console()->Register("send_proximity_message", "?r[MSG]", CFGFLAG_CLIENT, SendProxyMessage, this, "Send message in special chat");
 
 	for(auto &pComponent : m_vpAll)
 		pComponent->OnInterfacesInit(this);
@@ -1157,8 +1156,7 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker, int Conn, bool Dumm
 				"Oops! That wasn't supposed to happen.",
 				"Achievement unlocked: Sudden Demise!",
 				"You died. But at least you looked cool!",
-				"Back to the tee drawing board!"
-			};
+				"Back to the tee drawing board!"};
 			constexpr int NumPhrases = sizeof(s_aFunnyPhrases) / sizeof(s_aFunnyPhrases[0]);
 			int PhraseId = rand() % NumPhrases;
 			m_Chat.Echo(s_aFunnyPhrases[PhraseId]);
@@ -1390,18 +1388,18 @@ void CGameClient::ProcessDemoSnapshot(CSnapshot *pSnap)
 
 bool CGameClient::OnQuitRequested()
 {
-    // Check if anti-quit protection is enabled
-    if(g_Config.m_ClAntiRQ)
-    {
-        // Defer immediate quitting and show confirmation via our component.
-        m_AntiQuit.Request();
-        return false; // do not quit now
-    }
-    else
-    {
-        // Anti-quit protection is disabled, allow immediate quit
-        return true;
-    }
+	// Check if anti-quit protection is enabled
+	if(g_Config.m_ClAntiRQ)
+	{
+		// Defer immediate quitting and show confirmation via our component.
+		m_AntiQuit.Request();
+		return false; // do not quit now
+	}
+	else
+	{
+		// Anti-quit protection is disabled, allow immediate quit
+		return true;
+	}
 }
 
 void CGameClient::OnRconType(bool UsernameReq)
@@ -2660,7 +2658,6 @@ void CGameClient::OnPredict()
 
 	if(g_Config.m_ClFastInp)
 		m_PredictedWorld.CopyWorld(&m_PrevPredictedWorld);
-
 
 	// detect mispredictions of other players and make corrections smoother when possible
 	if(g_Config.m_ClAntiPingSmooth &&

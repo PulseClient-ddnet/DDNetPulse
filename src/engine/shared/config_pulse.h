@@ -19,7 +19,6 @@ MACRO_CONFIG_INT(ClApplyProfileFlag, p_profile_flag, 0, 0, 1, CFGFLAG_CLIENT | C
 MACRO_CONFIG_INT(ClApplyProfileColors, p_profile_colors, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Apply colors in profiles")
 MACRO_CONFIG_INT(ClApplyProfileEmote, p_profile_emote, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Apply emote in profiles")
 
-
 MACRO_CONFIG_INT(ClCustomConsole, p_custom_console, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "")
 MACRO_CONFIG_STR(ClAssetConsole, p_console_asset, 50, "default", CFGFLAG_SAVE | CFGFLAG_CLIENT, "")
 MACRO_CONFIG_INT(ClCustomConsoleFading, p_custom_console_fading, 75, 0, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "")
@@ -40,7 +39,6 @@ MACRO_CONFIG_INT(ClPlayerIdleAura, p_idle_aura, 1, 0, 1, CFGFLAG_CLIENT | CFGFLA
 
 MACRO_CONFIG_INT(ClPlayerSquashStretch, p_squash_stretch, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Enable squash and stretch animation for player sprites based on velocity")
 
-
 MACRO_CONFIG_INT(ClPlayerIdleAuraTimer, p_idle_aura_timer, 2, 2, 30, CFGFLAG_CLIENT | CFGFLAG_SAVE, "")
 MACRO_CONFIG_INT(ClIdleAuraType, p_idle_aura_type, 1, 1, 5, CFGFLAG_CLIENT | CFGFLAG_SAVE, "")
 MACRO_CONFIG_INT(ClToggleAuraParticlesNum, p_toggle_aura_parsicle_num, 12, 0, 300, CFGFLAG_CLIENT | CFGFLAG_SAVE, "")
@@ -57,7 +55,6 @@ MACRO_CONFIG_INT(ClShowDJ, cl_show_jumps, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE
 MACRO_CONFIG_INT(ClShowJumpsSize, cl_show_jumps_size, 30, -50, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Size of double jump indicators")
 //MACRO_CONFIG_INT(ClFreeMouse, dc_free_mouse, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Free mouse mode (WIP)")
 //MACRO_CONFIG_INT(ClUnlockZoom, dc_unlock_zoom, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Disable camera zoom lock")
-
 
 //Effects controls
 MACRO_CONFIG_INT(ClFreezeSnowFlakes, p_effect_freeze_snowflakes, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "toggles snowflakes effect")
@@ -87,8 +84,8 @@ MACRO_CONFIG_INT(ClAntiRQ, cl_anti_rq_mode, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SA
 
 //Chat
 MACRO_CONFIG_INT(ClCrossChatAutoConnect, cl_cross_chat_autoconnect, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Automatically connect to CrossChat on startup")
-MACRO_CONFIG_INT(ClCrossChatInGameChat, cl_cross_chat_ingame_chat , 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Enable CrossChat integration with in-game chat")
-
+MACRO_CONFIG_INT(ClCrossChatInGameChat, cl_cross_chat_ingame_chat, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Enable CrossChat integration with in-game chat")
+//MACRO_CONFIG_INT(ClCrossChatInGameChat, cl_cross_chat_ingame_chat, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Enable CrossChat integration with in-game chat")
 
 //pulse server
-MACRO_CONFIG_STR(ClSocketNameserver, ntwr_nameserver, 256, "localhost:3000", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Nameserver for websockets")//TODO: actaual nameserver
+MACRO_CONFIG_STR(ClSocketNameserver, ntwr_nameserver, 256, "localhost:3000", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Nameserver for websockets") //TODO: actaual nameserver

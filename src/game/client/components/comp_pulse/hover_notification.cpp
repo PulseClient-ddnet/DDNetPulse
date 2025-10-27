@@ -1,4 +1,5 @@
 #include "hover_notification.h"
+
 #include <game/client/gameclient.h>
 
 CHoverNotification::CHoverNotification()

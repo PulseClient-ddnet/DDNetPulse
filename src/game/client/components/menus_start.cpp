@@ -100,18 +100,15 @@ static const char *s_apSplashTexts[] = {
 	"pipotam",
 	"try volleyball!",
 	"no u",
-	"connect dummy? more like skill issue"
-};
+	"connect dummy? more like skill issue"};
 
 static const char *GetRandomSplashText() { return s_apSplashTexts[secure_rand() % std::size(s_apSplashTexts)]; }
-
-
 
 void CMenusStart::RenderStartMenu(CUIRect MainView)
 {
 	GameClient()->m_MenuBackground.ChangePosition(CMenuBackground::POS_START);
 
-// render logo
+	// render logo
 
 	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_NULL].m_Id);
 	Graphics()->QuadsBegin();
@@ -121,15 +118,12 @@ void CMenusStart::RenderStartMenu(CUIRect MainView)
 	Graphics()->QuadsDrawTL(&QuadItem2, 1);
 	Graphics()->QuadsEnd();
 
-
-
-
-		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_BANNER].m_Id);
-		Graphics()->QuadsBegin();
-		Graphics()->SetColor(1, 1, 1, 1);
-		IGraphics::CQuadItem QuadItem(MainView.x, MainView.h / 5, 360, 103);
-		Graphics()->QuadsDrawTL(&QuadItem, 1);
-		Graphics()->QuadsEnd();
+	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_BANNER].m_Id);
+	Graphics()->QuadsBegin();
+	Graphics()->SetColor(1, 1, 1, 1);
+	IGraphics::CQuadItem QuadItem(MainView.x, MainView.h / 5, 360, 103);
+	Graphics()->QuadsDrawTL(&QuadItem, 1);
+	Graphics()->QuadsEnd();
 	/*
 		static const char *s_pCurrentSplashText = nullptr;
 		static float s_SplashTextTime = 0.0f;
@@ -180,29 +174,28 @@ void CMenusStart::RenderStartMenu(CUIRect MainView)
 
 	// render slash quad
 
-
 	const float Rounding = 10.0f;
 	const float VMargin = MainView.w / 2 - 190.0f;
 
 	CUIRect Button;
 	int NewPage = -1;
 
-
 	CUIRect Menu, Logo;
-	MainView.VSplitLeft(MainView.w / 2.8 , &Menu, &MainView);
+	MainView.VSplitLeft(MainView.w / 2.8, &Menu, &MainView);
 	Menu.VSplitLeft(15.0f, nullptr, &Menu);
 	Menu.HSplitTop(Menu.h / 3, &Logo, &Menu);
 	Menu.HSplitBottom(25.0f, &Menu, nullptr);
 	//Menu.Draw(ColorRGBA (0.0f, 0.0f, 0.0f, 0.15f), IGraphics::CORNER_ALL, Rounding);
-
 
 	Menu.HSplitTop(80.0f, nullptr, &Menu);
 	Menu.VSplitLeft(7.5f, nullptr, &Menu);
 	Menu.HSplitTop(45.0f, &Button, &Menu);
 	//Button.VMargin(5.0f, &Button);
 	static CButtonContainer s_PlayButton;
-	if(GameClient()->m_Menus.DoButton_Menu(&s_PlayButton, Localize("Play", "Start menu"), 0, &Button, BUTTONFLAG_LEFT, g_Config.m_ClShowStartMenuImages ? "play_game" : nullptr, IGraphics::CORNER_ALL, Rounding, 0.5f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)) || Ui()->ConsumeHotkey(CUi::HOTKEY_ENTER) || CheckHotKey(KEY_P)) { NewPage = g_Config.m_UiPage >= CMenus::PAGE_INTERNET && g_Config.m_UiPage <= CMenus::PAGE_FAVORITE_COMMUNITY_5 ? g_Config.m_UiPage : CMenus::PAGE_INTERNET; }
-
+	if(GameClient()->m_Menus.DoButton_Menu(&s_PlayButton, Localize("Play", "Start menu"), 0, &Button, BUTTONFLAG_LEFT, g_Config.m_ClShowStartMenuImages ? "play_game" : nullptr, IGraphics::CORNER_ALL, Rounding, 0.5f, ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f)) || Ui()->ConsumeHotkey(CUi::HOTKEY_ENTER) || CheckHotKey(KEY_P))
+	{
+		NewPage = g_Config.m_UiPage >= CMenus::PAGE_INTERNET && g_Config.m_UiPage <= CMenus::PAGE_FAVORITE_COMMUNITY_5 ? g_Config.m_UiPage : CMenus::PAGE_INTERNET;
+	}
 
 	Menu.HSplitTop(7.50f, nullptr, &Menu);
 	Menu.HSplitTop(45.0f, &Button, &Menu);
@@ -227,8 +220,6 @@ void CMenusStart::RenderStartMenu(CUIRect MainView)
 	QuickBar.VSplitLeft(QuickBar.w / 5, &Button, &QuickBar);
 	static CButtonContainer s_ChatButton;
 
-
-
 	ColorRGBA DefaultColor = TextRender()->DefaultTextColor();
 	char aBuf[64];
 	str_format(aBuf, sizeof(aBuf), "Welcome back,");
@@ -239,7 +230,6 @@ void CMenusStart::RenderStartMenu(CUIRect MainView)
 	TextRender()->TextColor(ColorRGBA(g_Config.m_ClMessageSystemColor));
 	TextRender()->Text(QuickBar.x + 5.f, QuickBar.y + 13, 15.0f, aBuf, -1);
 	TextRender()->TextColor(DefaultColor);
-
 
 	TextRender()->SetFontPreset(EFontPreset::ICON_FONT);
 	TextRender()->SetRenderFlags(ETextRenderFlags::TEXT_RENDER_FLAG_ONLY_ADVANCE_WIDTH | ETextRenderFlags::TEXT_RENDER_FLAG_NO_X_BEARING | ETextRenderFlags::TEXT_RENDER_FLAG_NO_Y_BEARING | ETextRenderFlags::TEXT_RENDER_FLAG_NO_PIXEL_ALIGNMENT | ETextRenderFlags::TEXT_RENDER_FLAG_NO_OVERSIZE);
@@ -261,9 +251,6 @@ void CMenusStart::RenderStartMenu(CUIRect MainView)
 		Client()->Quit();
 	}
 	GameClient()->m_Tooltips.DoToolTip(&s_QuitButton, &Button, Localize("Quit"));
-
-
-
 
 	TextRender()->SetRenderFlags(0);
 	TextRender()->SetFontPreset(EFontPreset::DEFAULT_FONT);

@@ -1,3 +1,9 @@
+#include "../binds.h"
+#include "../countryflags.h"
+#include "../menus.h"
+#include "../skins.h"
+#include "skinprofiles.h"
+
 #include <base/log.h>
 #include <base/math.h>
 #include <base/system.h>
@@ -13,9 +19,9 @@
 
 #include <game/client/animstate.h>
 #include <game/client/components/chat.h>
+#include <game/client/components/comp_pulse/menus_macro.h>
 #include <game/client/components/menu_background.h>
 #include <game/client/components/sounds.h>
-#include <game/client/components/comp_pulse/menus_macro.h>
 #include <game/client/gameclient.h>
 #include <game/client/render.h>
 #include <game/client/skin.h>
@@ -24,11 +30,7 @@
 #include <game/client/ui_scrollregion.h>
 #include <game/localization.h>
 
-#include "../binds.h"
-#include "../countryflags.h"
-#include "../menus.h"
-#include "../skins.h"
-#include "skinprofiles.h"
+#include <sio_client.h>
 
 #include <array>
 #include <chrono>
@@ -36,8 +38,6 @@
 #include <numeric>
 #include <string>
 #include <vector>
-
-#include <sio_client.h>
 using namespace FontIcons;
 using namespace std::chrono_literals;
 
@@ -69,7 +69,6 @@ typedef struct
 	int m_KeyId;
 	int m_ModifierCombination;
 } CKeyInfo;
-
 
 static int ListConsoleImagesCallback(const char *pName, int IsDir, int StorageType, void *pUser)
 {
@@ -136,7 +135,10 @@ void CMenus::RenderConsoleImages(CUIRect MainView)
 						s_vConsoleImages.push_back(Image);
 						dbg_msg("console_images", "Successfully loaded image: %s", Image.m_aName);
 					}
-					else { dbg_msg("console_images", "Failed to load image: %s", aFullPath); }
+					else
+					{
+						dbg_msg("console_images", "Failed to load image: %s", aFullPath);
+					}
 				}
 			}
 		}
@@ -234,7 +236,10 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 	{
 		TabBar.VSplitLeft(TabWidth, &Button, &TabBar);
 		const int Corners = Tab == PULSE_TAB_GLOBAL ? IGraphics::CORNER_L : Tab == NUMBER_OF_PULSE_TABS - 1 ? IGraphics::CORNER_R : IGraphics::CORNER_NONE;
-		if(DoButton_MenuTab(&s_aPageTabs[Tab], apTabNames[Tab], s_CurTab == Tab, &Button, Corners, nullptr, nullptr, nullptr, nullptr, 4.0f)) { s_CurTab = Tab; }
+		if(DoButton_MenuTab(&s_aPageTabs[Tab], apTabNames[Tab], s_CurTab == Tab, &Button, Corners, nullptr, nullptr, nullptr, nullptr, 4.0f))
+		{
+			s_CurTab = Tab;
+		}
 	}
 
 	if(s_CurTab == PULSE_TAB_GLOBAL)
@@ -325,7 +330,7 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 				   MVButtonContainersIdleAura,
 				   {Localize("Starfall"), Localize("Spiral"), Localize("Clock"), Localize("Peace"), Localize("Circles")},
 				   {1, 2, 3, 4, 5},
-				   g_Config.m_ClIdleAuraType)){}
+				   g_Config.m_ClIdleAuraType)) {}
 
 			END_LABEL(LeftSection);
 			CUIRect FunRect;
@@ -340,7 +345,6 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 		{
 			CUIRect Section, Label;
 			CUIRect PreferencesRect;
-
 
 			// Preferences
 			DRAW_BOX(RightSection, PreferencesRect, 80.0f, defaultCol, 10.0f);
@@ -378,9 +382,15 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 			s_ScrollRegion.AddRect(DuckRect);
 			BOX_LABEL(DuckRect, Section, "Duck Settings", 40.0f, 10.0f);
 			BUTTON(DuckRect, Button, 20.0f, &g_Config.m_ClShowFlags, "Show Nameplates Flags (Deep/Jetpack/etc)", g_Config.m_ClShowFlags);
-			if(g_Config.m_ClShowFlags) { SCROLLBAR(DuckRect, Button, 20.0f, &g_Config.m_ClShowFlagsSize, -50, 100, "Nameplates Flags Size"); }
+			if(g_Config.m_ClShowFlags)
+			{
+				SCROLLBAR(DuckRect, Button, 20.0f, &g_Config.m_ClShowFlagsSize, -50, 100, "Nameplates Flags Size");
+			}
 			BUTTON(DuckRect, Button, 20.0f, &g_Config.m_ClShowDJ, "Show Double Jumps", g_Config.m_ClShowDJ);
-			if(g_Config.m_ClShowDJ) { SCROLLBAR(DuckRect, Button, 20.0f, &g_Config.m_ClShowJumpsSize, -50, 100, "Double Jumps Size"); }
+			if(g_Config.m_ClShowDJ)
+			{
+				SCROLLBAR(DuckRect, Button, 20.0f, &g_Config.m_ClShowJumpsSize, -50, 100, "Double Jumps Size");
+			}
 			END_LABEL(RightSection);
 
 			CUIRect ScoreboardRect;
@@ -419,8 +429,14 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 			// Focus Mode Settings Box
 			CUIRect FocusModeRect;
 
-			if(g_Config.m_ClFocusMode) { DRAW_BOX(RightSection, FocusModeRect, 180.0f, defaultCol, 10.0f); }
-			else { DRAW_BOX(RightSection, FocusModeRect, 80.0f, defaultCol, 10.0f); }
+			if(g_Config.m_ClFocusMode)
+			{
+				DRAW_BOX(RightSection, FocusModeRect, 180.0f, defaultCol, 10.0f);
+			}
+			else
+			{
+				DRAW_BOX(RightSection, FocusModeRect, 80.0f, defaultCol, 10.0f);
+			}
 
 			s_ScrollRegion.AddRect(FocusModeRect);
 			BOX_LABEL(FocusModeRect, Section, "Focus Mode Settings", 40.0f, 10.0f);
@@ -636,7 +652,10 @@ void CMenus::RenderSettingsProfs(CUIRect MainView)
 		str_format(aName, sizeof(aName), "%s", m_Dummy ? g_Config.m_ClDummyName : g_Config.m_PlayerName);
 		str_format(aClan, sizeof(aClan), "%s", m_Dummy ? g_Config.m_ClDummyClan : g_Config.m_PlayerClan);
 	}
-	else { MainView.HSplitTop(80.0f, nullptr, &MainView); }
+	else
+	{
+		MainView.HSplitTop(80.0f, nullptr, &MainView);
+	}
 
 	//===BUTTONS AND CHECK BOX===
 	CUIRect DummyCheck, CustomCheck;
@@ -880,7 +899,10 @@ void CMenus::RenderSettingsProfs(CUIRect MainView)
 	}
 
 	const int NewSelected = s_ListBox.DoEnd();
-	if(s_SelectedProfile != NewSelected) { s_SelectedProfile = NewSelected; }
+	if(s_SelectedProfile != NewSelected)
+	{
+		s_SelectedProfile = NewSelected;
+	}
 	static CButtonContainer s_ProfilesFile;
 	FileButton.VSplitLeft(130.0f, &FileButton, nullptr);
 	if(DoButton_Menu(&s_ProfilesFile, Localize("Profiles file"), 0, &FileButton))
@@ -890,12 +912,8 @@ void CMenus::RenderSettingsProfs(CUIRect MainView)
 	}
 }
 
-
-
-
 void CMenus::RenderCrossChat(CUIRect MainView)
 {
-
 	static std::vector<std::string> s_ChatHistory;
 	static int s_HistoryIndex = -1;
 	if(!m_CrossChatInitialized)
@@ -939,20 +957,21 @@ void CMenus::RenderCrossChat(CUIRect MainView)
 	CButtonContainer SReconnectButton;
 	bool Connected = GameClient()->m_WebSocket.IsConnected();
 
-	ColorRGBA ButtonColor = Connected ? ColorRGBA(1.0f, 0.0f, 0.0f, 0.25f)  // красная при подключении
-					  : ColorRGBA(0.0f, 1.0f, 0.0f, 0.25f); // зеленая при отключении
+	ColorRGBA ButtonColor = Connected ? ColorRGBA(1.0f, 0.0f, 0.0f, 0.25f) // красная при подключении
+					    :
+					    ColorRGBA(0.0f, 1.0f, 0.0f, 0.25f); // зеленая при отключении
 
 	if(DoButton_Menu(
-		&SReconnectButton,
-		Connected ? FONT_ICON_ARROW_ROTATE_LEFT : FONT_ICON_EXITGAME,
-		0,
-		&ReconectRect,
-		BUTTONFLAG_LEFT,
-		nullptr,
-		IGraphics::CORNER_ALL,
-		3.0f,
-		0.01f,
-		ButtonColor))
+		   &SReconnectButton,
+		   Connected ? FONT_ICON_ARROW_ROTATE_LEFT : FONT_ICON_EXITGAME,
+		   0,
+		   &ReconectRect,
+		   BUTTONFLAG_LEFT,
+		   nullptr,
+		   IGraphics::CORNER_ALL,
+		   3.0f,
+		   0.01f,
+		   ButtonColor))
 	{
 		GameClient()->m_WebSocket.SocketConnect();
 		if(Connected)
@@ -964,16 +983,16 @@ void CMenus::RenderCrossChat(CUIRect MainView)
 
 	CButtonContainer SettingsButton;
 	if(DoButton_Menu(
-	       &SettingsButton,
-	       FONT_ICON_GEAR,
-	       0,
-	       &ChatSettings,
-	       BUTTONFLAG_ALL,
-	       nullptr,
-	       IGraphics::CORNER_ALL,
-	       3.0f,
-	       0.01f,
-	       ColorRGBA(0.0f, 0.5f, 1.0f, 0.25f)))
+		   &SettingsButton,
+		   FONT_ICON_GEAR,
+		   0,
+		   &ChatSettings,
+		   BUTTONFLAG_ALL,
+		   nullptr,
+		   IGraphics::CORNER_ALL,
+		   3.0f,
+		   0.01f,
+		   ColorRGBA(0.0f, 0.5f, 1.0f, 0.25f)))
 	{
 		s_settings_open = !s_settings_open;
 	}
@@ -989,14 +1008,9 @@ void CMenus::RenderCrossChat(CUIRect MainView)
 		SettingsRect.HSplitTop(10.0f, &Button, &SettingsRect);
 		Ui()->DoLabel(&Button, Localize("Settings"), FontSize, TEXTALIGN_ML);
 		Button.HSplitTop(5.0f, nullptr, &Button);
-
 	}
 
-
 	TextRender()->SetFontPreset(EFontPreset::DEFAULT_FONT);
-
-
-
 
 	static CLineInputBuffered<64> s_ChatInput;
 	s_ChatInput.SetEmptyText("Send Message");
@@ -1032,11 +1046,6 @@ void CMenus::RenderCrossChat(CUIRect MainView)
 			GameClient()->m_SocketIO.socket()->emit("typing_stop", sio::string_message::create(Client()->PlayerName()));
 	}
 
-
-
-
-
-
 	if(Input()->KeyPress(KEY_RETURN) || Input()->KeyPress(KEY_KP_ENTER))
 	{
 		const char *pText = s_ChatInput.GetString();
@@ -1055,7 +1064,6 @@ void CMenus::RenderCrossChat(CUIRect MainView)
 			}
 		}
 	}
-
 
 	if(Input()->KeyPress(KEY_UP))
 	{
@@ -1086,7 +1094,6 @@ void CMenus::RenderCrossChat(CUIRect MainView)
 		}
 	}
 
-
 	std::lock_guard<std::mutex> lock(GameClient()->m_WebSocket.m_OnlinePlayersMutex);
 	float yOnline = LeftBar.y + 10.0f;
 	for(const auto &player : GameClient()->m_WebSocket.m_OnlinePlayers)
@@ -1109,9 +1116,11 @@ void CMenus::RenderCrossChat(CUIRect MainView)
 			TextRender()->Text(ChatView.x + 10, y, 12.0f, line.c_str(), -1);
 			TextRender()->TextColor(TextRender()->DefaultTextColor());
 			y -= 14.0f;
-			if(y < ChatView.y) break;
+			if(y < ChatView.y)
+				break;
 		}
-		if(y < ChatView.y) break;
+		if(y < ChatView.y)
+			break;
 	}
 
 	{
@@ -1142,8 +1151,6 @@ void CMenus::RenderCrossChat(CUIRect MainView)
 			TextRender()->TextColor(TextRender()->DefaultTextColor());
 		}
 	}
-
 }
-
 
 //TODO: Add everything to here

@@ -684,7 +684,7 @@ public:
 		switch(Preset)
 		{
 		case EFontPreset::DEFAULT_FONT:
-			m_SelectedFace = nullptr;  // nullptr means use default font
+			m_SelectedFace = nullptr; // nullptr means use default font
 			break;
 		case EFontPreset::ICON_FONT:
 			m_SelectedFace = m_IconFace;
@@ -1354,8 +1354,6 @@ public:
 		return Success;
 	}
 
-
-
 	void SetFontLanguageVariant(const char *pLanguageFile) override
 	{
 		for(const auto &Variant : m_vVariants)
@@ -1383,8 +1381,8 @@ public:
 		float TextWidthValue = TextWidth(Size, pText, -1, LineWidth);
 		float TextHeight = Size;
 
-		x -= TextWidthValue/2;
-		y -= TextHeight/2;
+		x -= TextWidthValue / 2;
+		y -= TextHeight / 2;
 
 		CTextCursor Cursor;
 		//SSetCursor(&Cursor, x, y, Size, TEXTFLAG_RENDER);
@@ -1401,8 +1399,8 @@ public:
 				STextContainer &Container = GetTextContainer(TextCont);
 				for(auto &Quad : Container.m_StringInfo.m_vCharacterQuads)
 				{
-					float CenterX = x + TextWidthValue/2;
-					float CenterY = y + TextHeight/2;
+					float CenterX = x + TextWidthValue / 2;
+					float CenterY = y + TextHeight / 2;
 
 					for(int i = 0; i < 4; i++)
 					{

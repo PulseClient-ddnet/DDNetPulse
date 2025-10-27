@@ -370,12 +370,10 @@ void CItems::RenderLaser(vec2 From, vec2 Pos, ColorRGBA OuterColor, ColorRGBA In
 
 			const float Alphas[NumLayers] = {
 				0.02f, 0.03f, 0.04f, 0.05f, 0.06f, 0.08f, 0.10f,
-				0.15f, 0.25f, 0.45f, 0.65f, 0.85f, 1.0f
-			    };
+				0.15f, 0.25f, 0.45f, 0.65f, 0.85f, 1.0f};
 			const float Widths[NumLayers] = {
 				24.0f, 22.0f, 20.0f, 18.0f, 16.0f, 14.0f, 12.0f,
-				10.0f, 8.0f, 6.0f, 4.0f, 3.0f, 2.0f
-			    };
+				10.0f, 8.0f, 6.0f, 4.0f, 3.0f, 2.0f};
 
 			for(int i = 0; i < NumLayers; ++i)
 			{
@@ -383,18 +381,14 @@ void CItems::RenderLaser(vec2 From, vec2 Pos, ColorRGBA OuterColor, ColorRGBA In
 				float Offset = Widths[i] * Ia * (GlowIntensity / 100.0f);
 				vec2 Out = vec2(Dir.y, -Dir.x) * Offset;
 
-				ColorRGBA Color = (i == NumLayers - 1)
-				    ? ColorRGBA(1.0f, 1.0f, 1.0f, Alpha)
-				    : (i >= NumLayers - 2
-					? InnerColor.WithMultipliedAlpha(Alpha)
-					: OuterColor.WithMultipliedAlpha(Alpha));
+				ColorRGBA Color = (i == NumLayers - 1) ? ColorRGBA(1.0f, 1.0f, 1.0f, Alpha) : (i >= NumLayers - 2 ? InnerColor.WithMultipliedAlpha(Alpha) : OuterColor.WithMultipliedAlpha(Alpha));
 
 				Graphics()->SetColor(Color);
 				IGraphics::CFreeformItem Freeform(
-				    From.x - Out.x, From.y - Out.y,
-				    From.x + Out.x, From.y + Out.y,
-				    Pos.x - Out.x, Pos.y - Out.y,
-				    Pos.x + Out.x, Pos.y + Out.y);
+					From.x - Out.x, From.y - Out.y,
+					From.x + Out.x, From.y + Out.y,
+					Pos.x - Out.x, Pos.y - Out.y,
+					Pos.x + Out.x, Pos.y + Out.y);
 				Graphics()->QuadsDrawFreeform(&Freeform, 1);
 			}
 

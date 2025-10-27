@@ -3,6 +3,8 @@
 
 #include "console.h"
 
+#include "engine/client/graphics_threaded.h"
+
 #include <base/lock.h>
 #include <base/logger.h>
 #include <base/math.h>
@@ -25,8 +27,6 @@
 #include <game/version.h>
 
 #include <iterator>
-
-#include "engine/client/graphics_threaded.h"
 
 static constexpr float FONT_SIZE = 10.0f;
 static constexpr float LINE_SPACING = 1.0f;

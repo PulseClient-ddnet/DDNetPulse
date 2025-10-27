@@ -172,7 +172,6 @@ void CRenderTools::CalculateSquashStretchScaling(vec2 Velocity, float &ScaleX, f
 	float VelY = absolute(Velocity.y);
 	float ImpactEffect = 0.0f;
 
-
 	const float LowSpeed = 20.0f;
 	const float HighSpeed = 50.0f;
 
@@ -211,7 +210,6 @@ void CRenderTools::CalculateSquashStretchScaling(vec2 Velocity, float &ScaleX, f
 		ScaleX = std::clamp(Inverse, 0.85f, 1.2f);
 	}
 }
-
 
 void CRenderTools::GetRenderTeeBodyScale(float BaseSize, float &BodyScale)
 {

@@ -1608,8 +1608,6 @@ void CMenus::RenderServerbrowserFriends(CUIRect View)
 					FormatServerbrowserPing(aLatency, Friend.ServerInfo());
 					str_format(aBuf, sizeof(aBuf), "%s | %s | %s", Friend.ServerInfo()->m_aMap, Friend.ServerInfo()->m_aCommunityCountry, aLatency); //Pulse -> Country code istead of ping
 					Ui()->DoLabel(&InfoLabel, aBuf, FontSize - 2.0f, TEXTALIGN_ML);
-
-
 				}
 
 				// remove button

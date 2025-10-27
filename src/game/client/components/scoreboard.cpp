@@ -6,7 +6,6 @@
 #include <engine/graphics.h>
 #include <engine/shared/config.h>
 #include <engine/textrender.h>
-#include <sstream>
 
 #include <generated/client_data7.h>
 #include <generated/protocol.h>
@@ -18,6 +17,8 @@
 #include <game/client/gameclient.h>
 #include <game/client/ui.h>
 #include <game/localization.h>
+
+#include <sstream>
 
 struct SPopupProperties
 {
@@ -712,7 +713,6 @@ bool CScoreboard::RenderScoreboard(CUIRect Scoreboard, int Team, int CountStart,
 					TextRender()->TextColor(Color);
 				}
 
-
 				if(g_Config.m_ClShowIds)
 				{
 					char aClientId[16];
@@ -744,11 +744,11 @@ bool CScoreboard::RenderScoreboard(CUIRect Scoreboard, int Team, int CountStart,
 						float Time = LocalTime();
 						float PulseSpeed = 0.2f;
 						float PulseIntensity = 0.5f;
-						
+
 						float Hue = fmod(Time * PulseSpeed, 1.0f);
 						float Saturation = 0.8f + 0.2f * sinf(Time * PulseSpeed * 2.0f);
 						float Value = 0.8f + 0.2f * sinf(Time * PulseSpeed * 1.5f);
-						
+
 						ColorRGBA Special = color_cast<ColorRGBA>(ColorHSVA(Hue, Saturation, Value));
 						TextRender()->TextColor(Special);
 					}

@@ -739,7 +739,7 @@ void CPlayers::RenderPlayer(
 
 	if(Local && GameClient()->m_Snap.m_LocalClientId == ClientId)
 	{
-		RenderTools()->RenderTee(&State, &RenderInfo, Player.m_Emote, Direction, Position, Alpha, *(vec2*)&Vel);
+		RenderTools()->RenderTee(&State, &RenderInfo, Player.m_Emote, Direction, Position, Alpha, *(vec2 *)&Vel);
 	}
 	else
 	{

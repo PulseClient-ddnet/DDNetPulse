@@ -1,8 +1,9 @@
 #ifndef GAME_CLIENT_COMPONENTS_AFK_AURA_H
 #define GAME_CLIENT_COMPONENTS_AFK_AURA_H
 
-#include <game/client/component.h>
 #include <base/vmath.h>
+
+#include <game/client/component.h>
 
 class CAfkAura : public CComponent
 {

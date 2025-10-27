@@ -387,7 +387,7 @@ bool CServerBrowser::SortCompareNumPlayers(int Index1, int Index2) const
 	return pIndex1->m_Info.m_NumFilteredPlayers > pIndex2->m_Info.m_NumFilteredPlayers;
 }
 
- bool CServerBrowser::SortCompareNumClients(int Index1, int Index2) const
+bool CServerBrowser::SortCompareNumClients(int Index1, int Index2) const
 {
 	CServerEntry *pIndex1 = m_ppServerlist[Index1];
 	CServerEntry *pIndex2 = m_ppServerlist[Index2];
