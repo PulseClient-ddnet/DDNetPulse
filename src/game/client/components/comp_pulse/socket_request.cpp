@@ -103,7 +103,7 @@ void CWebSocket::HandleChatMessage(sio::event &ev)
 		color.a = c["a"] ? (float)c["a"]->get_double() : 1.0f;
 	}
 
-	if(Map.find("skin_name") != Map.end() && Map["skin_name"]->get_flag() == sio::message::flag_string)
+	if(Map.contains("skin_name") && Map["skin_name"]->get_flag() == sio::message::flag_string)
 		std::string skin_name = Map["skin_name"]->get_string();
 
 	std::string display = "[" + Nickname + "]: " + Message;
