@@ -1,6 +1,6 @@
 # *DDNET PULSE*
 
-[![DDNetPulse](readme_data/banner.png)](https://pulse-client.xyz) [![Build Status](https://github.com/ddnet/ddnet/workflows/Build/badge.svg)](https://github.com/ddnet/ddnet/actions?query=workflow%3ABuild+event%3Apush+branch%3Amaster) [![Coverage](https://codecov.io/gh/ddnet/ddnet/branch/master/graph/badge.svg)](https://codecov.io/gh/ddnet/ddnet/branch/master)
+[![DDNetPulse)](https://pulse-client.xyz) [![Build Status](https://github.com/ddnet/ddnet/workflows/Build/badge.svg)](https://github.com/ddnet/ddnet/actions?query=workflow%3ABuild+event%3Apush+branch%3Amaster) [![Coverage](https://codecov.io/gh/ddnet/ddnet/branch/master/graph/badge.svg)](https://codecov.io/gh/ddnet/ddnet/branch/master)
 
 A customized DDraceNetwork client focusing on enhanced gameplay information visualization and quality-of-life features. Based on the DDNet codebase with additional features.
 
