@@ -921,7 +921,6 @@ void CMenus::RenderCrossChat(CUIRect MainView)
 		m_CrossChatInitialized = true;
 		m_CrossChatInput.Clear();
 		m_CrossChatMessages.clear();
-		// m_CrossChatMessages.emplace_back("[Server]: Добро пожаловать в CrossChat!");
 
 		char aBuf[64];
 		if(GameClient()->m_WebSocket.m_IsConnected)
@@ -935,11 +934,10 @@ void CMenus::RenderCrossChat(CUIRect MainView)
 
 	CUIRect ChatView, InputBar, ReconectRect;
 	MainView.HSplitBottom(40.0f, &ChatView, &InputBar);
-	ChatView.VMargin(10.0f, &ChatView);
-	ChatView.HMargin(10.0f, &ChatView);
+	ChatView.Margin(10.0f, &ChatView);
 	InputBar.VSplitLeft(InputBar.w / 5, &ReconectRect, &InputBar);
-	InputBar.VMargin(10.0f, &InputBar);
-	InputBar.HMargin(10.0f, &InputBar);
+	InputBar.Margin(10.0f, &InputBar);
+
 
 	CUIRect LeftBar;
 	ChatView.VSplitLeft(ChatView.w / 5, &LeftBar, &ChatView);
@@ -947,19 +945,18 @@ void CMenus::RenderCrossChat(CUIRect MainView)
 
 	CUIRect ChatSettings;
 	ReconectRect.VSplitMid(&ChatSettings, &ReconectRect);
-	ReconectRect.VMargin(7.0f, &ReconectRect);
-	ReconectRect.HMargin(7.0f, &ReconectRect);
-	ChatSettings.VMargin(7.0f, &ChatSettings);
-	ChatSettings.HMargin(7.0f, &ChatSettings);
+	ReconectRect.Margin(7.0f, &ReconectRect);
+	ChatSettings.Margin(7.0f, &ChatSettings);
+
 
 	TextRender()->SetFontPreset(EFontPreset::ICON_FONT);
 
 	CButtonContainer SReconnectButton;
 	bool Connected = GameClient()->m_WebSocket.m_IsConnected;
 
-	ColorRGBA ButtonColor = Connected ? ColorRGBA(1.0f, 0.0f, 0.0f, 0.25f) // красная при подключении
+	ColorRGBA ButtonColor = Connected ? ColorRGBA(1.0f, 0.0f, 0.0f, 0.25f)
 					    :
-					    ColorRGBA(0.0f, 1.0f, 0.0f, 0.25f); // зеленая при отключении
+					    ColorRGBA(0.0f, 1.0f, 0.0f, 0.25f);
 
 	if(DoButton_Menu(
 		   &SReconnectButton,
@@ -1008,8 +1005,6 @@ void CMenus::RenderCrossChat(CUIRect MainView)
 		SettingsRect.HSplitTop(20.0f, &Button, &SettingsRect);
 		if(DoButton_CheckBox(&g_Config.m_ClCrossChatAutoConnect, Localize("Connect on startup"), g_Config.m_ClCrossChatAutoConnect, &Button))
 			g_Config.m_ClCrossChatAutoConnect ^= 1;
-
-		
 	}
 
 	TextRender()->SetFontPreset(EFontPreset::DEFAULT_FONT);
@@ -1103,7 +1098,7 @@ void CMenus::RenderCrossChat(CUIRect MainView)
 	}
 
 	std::vector<CWebSocketChat::SChatMessage> Messages = GameClient()->m_WebSocket.m_WebSocketChat.GetMessages();
-	const float LineHeight = 12.0f;
+	const float LineHeight = 14.0f;
 	float y = ChatView.y + ChatView.h - LineHeight;
 
 	for(auto it = Messages.rbegin(); it != Messages.rend(); ++it)
