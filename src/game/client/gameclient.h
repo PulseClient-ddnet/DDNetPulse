@@ -75,7 +75,7 @@
 #include "components/comp_pulse/anti_quit.h"
 #include "components/comp_pulse/hover_notification.h"
 #include "components/comp_pulse/skinprofiles.h"
-#include "components/comp_pulse/socket_request.h"
+#include "components/comp_pulse/socket/socket.h"
 
 #include <vector>
 
@@ -980,12 +980,6 @@ private:
 	std::vector<SConsoleImageCache> m_vConsoleImageCache;
 	int m_ConsoleWidth;
 	int m_ConsoleHeight;
-
-public:
-	sio::client m_SocketIO;
-
-	void SendSocketMessage(const char *pEvent, sio::message::list pData);
-	void SendSocketEvent(const char *pEvent, const char *pData) { SendSocketMessage(pEvent, sio::message::list(pData)); }
 };
 
 ColorRGBA CalculateNameColor(ColorHSLA TextColorHSL);

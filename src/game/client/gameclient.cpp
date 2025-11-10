@@ -201,7 +201,7 @@ void CGameClient::OnConsoleInit()
 
 	//Pulse
 	Console()->Register("p_copy", "?r[player ID]", CFGFLAG_CLIENT, PulseCopy, this, "Copy player profile by ID");
-	Console()->Register("send_proximity_message", "?r[MSG]", CFGFLAG_CLIENT, SendProxyMessage, this, "Send message in special chat");
+	//Console()->Register("send_proximity_message", "?r[MSG]", CFGFLAG_CLIENT, SendProxyMessage, this, "Send message in special chat");
 
 	for(auto &pComponent : m_vpAll)
 		pComponent->OnInterfacesInit(this);
@@ -1257,13 +1257,6 @@ void CGameClient::OnShutdown()
 		}
 	}
 	m_vConsoleImageCache.clear();
-
-	// kill socketio
-	if(m_WebSocket.IsConnected() == true)
-	{
-		m_SocketIO.close();
-		dbg_msg("Socket.IO", "Client shutdown, socket closed");
-	}
 
 	for(auto &pComponent : m_vpAll)
 		pComponent->OnShutdown();
@@ -4610,12 +4603,13 @@ void CGameClient::PulseCopy(IConsole::IResult *pResult, void *pUserData)
 	pSelf->m_SkinProfiles.SaveProfiles();
 }
 
-void CGameClient::SendProxyMessage(IConsole::IResult *pResult, void *pUserData)
+/*void CGameClient::SendProxyMessage(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameClient *pSelf = (CGameClient *)pUserData;
 
 	pSelf->m_SocketIO.socket()->emit("chat_message", sio::string_message::create(pResult->GetString(0)));
 }
+*/
 
 void CGameClient::ConMapbug(IConsole::IResult *pResult, void *pUserData)
 {
@@ -5059,14 +5053,6 @@ int CGameClient::FindFirstMultiViewId()
 bool CGameClient::CheckNewInput()
 {
 	return m_Controls.CheckNewInput();
-}
-
-void CGameClient::SendSocketMessage(const char *pEvent, const sio::message::list pData)
-{
-	if(!m_WebSocket.IsConnected() || !m_SocketIO.socket())
-		return;
-
-	m_SocketIO.socket()->emit(pEvent, pData);
 }
 
 void CGameClient::LoadCustomConsole(const char *pPath)
