@@ -284,3 +284,12 @@ bool CScrollRegion::Active() const
 {
 	return Ui()->ActiveItem() == &m_ScrollY;
 }
+
+bool CScrollRegion::AtEnd() const
+{
+	if(m_ContentH <= m_ClipRect.h)
+		return true;
+
+	const float MaxScroll = m_ContentH - m_ClipRect.h;
+	return (m_ScrollY >= MaxScroll - 1.0f);
+}

@@ -142,6 +142,7 @@ public:
 	bool ScrollbarShown() const;
 	bool Animating() const;
 	bool Active() const;
+	bool AtEnd() const;
 	const CScrollRegionParams &Params() const { return m_Params; }
 };
 
