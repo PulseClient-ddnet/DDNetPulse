@@ -17,6 +17,7 @@ public:
 	struct SChatMessage
 	{
 		std::string m_Text;
+		std::string m_Username;
 		ColorRGBA m_Color;
 	};
 	std::vector<SChatMessage> GetMessages();
@@ -25,7 +26,7 @@ public:
 
 	void HandleChatMessage(sio::event &Ev);
 	void SendChatMessage(const std::string &Msg) const;
-	void AddMessage(const std::string &Msg, ColorRGBA MsgColor = ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f));
+	void AddMessage(const std::string &Msg, ColorRGBA MsgColor = ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f), std::string MsgUsername = "");
 	void HandleOnlineUpdate(sio::event &Ev);
 
 

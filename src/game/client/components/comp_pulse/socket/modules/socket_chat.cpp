@@ -63,8 +63,8 @@ void CWebSocketChat::HandleChatMessage(sio::event &ev)
 
 
 	char aBuf[128];
-	str_format(aBuf, sizeof(aBuf), "%s: %s", Nickname.c_str(), Message.c_str());
-	AddMessage(aBuf, color);
+	str_format(aBuf, sizeof(aBuf), "%s", Message.c_str());
+	AddMessage(aBuf, color, Nickname +": ");
 
 	if(g_Config.m_ClCrossChatDebug)
 	{
@@ -96,17 +96,18 @@ void CWebSocketChat::SendChatMessage(const std::string &Msg) const
 	m_Socket->socket()->emit("chat_message", sio::string_message::create(Msg));
 }
 
-void CWebSocketChat::AddMessage(const std::string &Msg, ColorRGBA MsgColor)
+void CWebSocketChat::AddMessage(const std::string &Msg, ColorRGBA MsgColor, std::string MsgUsername)
 {
 	std::lock_guard<std::mutex> lock(m_MessageMutex);
 	SChatMessage MsgStruct;
 	MsgStruct.m_Text = Msg;
+	MsgStruct.m_Username = MsgUsername;
 	MsgStruct.m_Color = MsgColor;
 	m_ChatMessages.push_back(MsgStruct);
 	if(m_ChatMessages.size() > 100)
 		m_ChatMessages.erase(m_ChatMessages.begin());
 
-	dbg_msg("MSGGGGG", "%s" , Msg.c_str());
+	//dbg_msg("MSGGGGG", "%s" , Msg.c_str());
 }
 
 std::vector<CWebSocketChat::SChatMessage> CWebSocketChat::GetMessages()

@@ -52,7 +52,6 @@ void CWebSocket::UserInit()
 	if(!m_Socket.socket())
 		return;
 
-
 	std::string SkinName = g_Config.m_ClPlayerSkin;
 	std::string BodyColor = std::to_string(g_Config.m_ClPlayerColorBody);
 	std::string FeetColor = std::to_string(g_Config.m_ClPlayerColorFeet);
@@ -66,11 +65,8 @@ void CWebSocket::UserInit()
 	msg->get_map()["use_custom_color"] = sio::bool_message::create(IsCustomColor);
 
 
-	m_Socket.socket()->emit("set_skin", msg);
 	m_Socket.socket()->emit("nickname", sio::string_message::create(Client()->PlayerName()));
-
-
-
+	m_Socket.socket()->emit("set_skin", msg);
 	//SetupSocketListeners();
 }
 

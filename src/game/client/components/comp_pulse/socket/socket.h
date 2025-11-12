@@ -31,10 +31,8 @@ public:
 	void SocketConnect();
 	void SocketDisconnect();
 	bool IsConnected() const;
-	void SendProxyMessage(IConsole::IResult *pResult, void *pUserData);
 	void OnOpen();
 	void OnClose();
-	void ListenerInit();
 
 	void UserInit();
 
