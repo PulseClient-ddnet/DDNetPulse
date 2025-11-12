@@ -201,7 +201,6 @@ void CGameClient::OnConsoleInit()
 
 	//Pulse
 	Console()->Register("p_copy", "?r[player ID]", CFGFLAG_CLIENT, PulseCopy, this, "Copy player profile by ID");
-	//Console()->Register("send_proximity_message", "?r[MSG]", CFGFLAG_CLIENT, SendProxyMessage, this, "Send message in special chat");
 
 	for(auto &pComponent : m_vpAll)
 		pComponent->OnInterfacesInit(this);
