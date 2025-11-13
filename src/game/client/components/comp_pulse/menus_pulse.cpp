@@ -327,7 +327,7 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 			}
 
 			if(DoLine_RadioMenu(PlayerAuraRect, Localize("Idle Aura Pattern"),
-				   MVButtonContainersIdleAura,
+				   m_MvButtonContainersIdleAura,
 				   {Localize("Starfall"), Localize("Spiral"), Localize("Clock"), Localize("Peace"), Localize("Circles")},
 				   {1, 2, 3, 4, 5},
 				   g_Config.m_ClIdleAuraType)) {}
@@ -918,7 +918,7 @@ void CMenus::RenderCrossChat(CUIRect MainView)
 	static std::vector<std::string> s_ChatHistory;
 	static int s_HistoryIndex = -1;
 	static CLineInputBuffered<256> s_ChatInput;
-	static int s_LastMsgCount = 0; // для автоскролла
+	static int s_LastMsgCount = 0;
 
 	if(!s_Initialized)
 	{
@@ -946,13 +946,13 @@ void CMenus::RenderCrossChat(CUIRect MainView)
 	InputBar.Margin(8.0f, &InputBar);
 
 	LeftBar.Draw(ColorRGBA(0.f, 0.f, 0.f, 0.3f), IGraphics::CORNER_ALL, 5.f);
-	std::lock_guard<std::mutex> lockPlayers(GameClient()->m_WebSocket.m_WebSocketChat.m_OnlinePlayersMutex);
+	std::lock_guard<std::mutex> LockPlayers(GameClient()->m_WebSocket.m_WebSocketChat.m_OnlinePlayersMutex);
 
-	float yOnline = LeftBar.y + 8.0f;
+	float YOnline = LeftBar.y + 8.0f;
 	for(const auto &player : GameClient()->m_WebSocket.m_WebSocketChat.m_OnlinePlayers)
 	{
-		TextRender()->Text(LeftBar.x + 5.0f, yOnline, 12.0f, player.c_str(), -1);
-		yOnline += 14.0f;
+		TextRender()->Text(LeftBar.x + 5.0f, YOnline, 12.0f, player.c_str(), -1);
+		YOnline += 14.0f;
 	}
 
 	static CScrollRegion s_ScrollRegion;
@@ -967,8 +967,6 @@ void CMenus::RenderCrossChat(CUIRect MainView)
 
 	const float MsgHeight = 24.0f;
 	CUIRect Line;
-	CUIRect LastLine = {};
-
 
 	for(int i = 0; i < (int)Messages.size(); i++)
 	{
@@ -980,22 +978,32 @@ void CMenus::RenderCrossChat(CUIRect MainView)
 		if(!s_ScrollRegion.AddRect(Line))
 			continue;
 
-		ColorRGBA BgColor = (Msg.m_Username == g_Config.m_PlayerName)
-			? ColorRGBA(0.0f, 0.5f, 1.0f, 0.15f)
-			: ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f);
-
+		ColorRGBA BgColor = (Msg.m_Username == g_Config.m_PlayerName) ? ColorRGBA(0.0f, 0.5f, 1.0f, 0.15f) : ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f);
 		Line.Draw(BgColor, IGraphics::CORNER_ALL, 4.0f);
 
 		CUIRect TextRect = Line;
 		TextRect.HMargin(4.0f, &TextRect);
 
 		const float TextFontSize = 12.5f;
-		TextRender()->TextColor(Msg.m_Color);
-		Ui()->DoLabel(&TextRect, (Msg.m_Username + Msg.m_Text).c_str(), TextFontSize, TEXTALIGN_ML);
-		TextRender()->TextColor(TextRender()->DefaultTextColor());
 
-		LastLine = Line;
+		if(!Msg.m_Skin.m_Name.empty())
+		{
+			CUIRect SkinRect = TextRect;
+			SkinRect.w = MsgHeight;
+			SkinRect.Margin(4.0f, &SkinRect);
+
+			vec2 TeePos = vec2(SkinRect.x + SkinRect.w / 2, SkinRect.y + SkinRect.h / 2);
+			RenderPlayerSkin(TeePos, 24.0f, Msg.m_Skin.m_Name.c_str(), Msg.m_Skin.m_BackupName.c_str(), Msg.m_Skin.m_CustomColors, Msg.m_Skin.m_FeetColor, Msg.m_Skin.m_BodyColor, EMOTE_NORMAL, Msg.m_Skin.m_ColorFeet, Msg.m_Skin.m_ColorBody);
+
+			TextRect.x += SkinRect.w + 6.0f;
+			TextRect.w -= SkinRect.w + 6.0f;
+		}
+
+		TextRender()->TextColor(Msg.m_Color);
+		Ui()->DoLabel(&TextRect, (" " + Msg.m_Username + Msg.m_Text).c_str(), TextFontSize, TEXTALIGN_ML);
+		TextRender()->TextColor(TextRender()->DefaultTextColor());
 	}
+
 	s_ScrollRegion.End();
 	if(WasAtEnd && (int)Messages.size() > s_LastMsgCount)
 	{
@@ -1012,7 +1020,6 @@ void CMenus::RenderCrossChat(CUIRect MainView)
 	if(Ui()->DoEditBox(&s_ChatInput, &InputBar, 14.0f))
 	{
 		Ui()->SetActiveItem(&s_ChatInput);
-		const char *pText = s_ChatInput.GetString();
 		int64_t Now = time_get();
 
 		if(!GameClient()->m_WebSocket.m_WebSocketChat.m_IsTyping)
@@ -1023,11 +1030,10 @@ void CMenus::RenderCrossChat(CUIRect MainView)
 
 		GameClient()->m_WebSocket.m_WebSocketChat.m_LastTypeTime = Now;
 	}
-
+	// I HATE INPUT HANDLING SO MUCH
 	if(Input()->KeyPress(KEY_RETURN) || Input()->KeyPress(KEY_KP_ENTER))
 	{
-		const char *pText = s_ChatInput.GetString();
-		if(pText && pText[0])
+		if(const char *pText = s_ChatInput.GetString(); pText && pText[0])
 		{
 			GameClient()->m_WebSocket.m_WebSocketChat.SendChatMessage(pText);
 			s_ChatHistory.emplace_back(pText);
@@ -1069,7 +1075,7 @@ void CMenus::RenderCrossChat(CUIRect MainView)
 	}
 
 	{
-		std::lock_guard<std::mutex> lockTyping(GameClient()->m_WebSocket.m_WebSocketChat.m_TypingMutex);
+		std::lock_guard<std::mutex> LockTyping(GameClient()->m_WebSocket.m_WebSocketChat.m_TypingMutex);
 
 		if(!GameClient()->m_WebSocket.m_WebSocketChat.m_TypingUsers.empty())
 		{
@@ -1081,9 +1087,9 @@ void CMenus::RenderCrossChat(CUIRect MainView)
 			else if(Count == 2)
 			{
 				auto it = GameClient()->m_WebSocket.m_WebSocketChat.m_TypingUsers.begin();
-				std::string first = *it++;
-				std::string second = *it;
-				TypingText = first + " and " + second + " are typing...";
+				std::string First = *it++;
+				std::string Second = *it;
+				TypingText = First + " and " + Second + " are typing...";
 			}
 			else
 				TypingText = "Several people are typing...";
@@ -1093,7 +1099,7 @@ void CMenus::RenderCrossChat(CUIRect MainView)
 			TextRender()->TextColor(TextRender()->DefaultTextColor());
 		}
 	}
-
+	// States is cute;3
 	if(GameClient()->m_WebSocket.m_WebSocketChat.m_IsTyping &&
 		time_get() - GameClient()->m_WebSocket.m_WebSocketChat.m_LastTypeTime > time_freq() * 2)
 	{
@@ -1101,5 +1107,38 @@ void CMenus::RenderCrossChat(CUIRect MainView)
 		GameClient()->m_WebSocket.m_WebSocketChat.SendTypingState(false);
 	}
 }
+void CMenus::RenderPlayerSkin(vec2 RenderPos, float Size, const char *pSkinName, const char *pBackupSkin, bool CustomColors, int FeetColor, int BodyColor, int Emote, ColorRGBA ColorFeet, ColorRGBA ColorBody)
+{
+	CTeeRenderInfo SkinInfo;
 
-//TODO: Add everything to here
+	const CSkin *pSkin = GameClient()->m_Skins.Find(pSkinName);
+	if(str_comp(pSkin->GetName(), pSkinName) != 0)
+		pSkin = GameClient()->m_Skins.Find(pBackupSkin);
+	SkinInfo.m_OriginalRenderSkin = pSkin->m_OriginalSkin;
+	SkinInfo.m_ColorableRenderSkin = pSkin->m_ColorableSkin;
+	SkinInfo.m_SkinMetrics = pSkin->m_Metrics;
+	SkinInfo.m_CustomColoredSkin = CustomColors;
+	if(SkinInfo.m_CustomColoredSkin)
+	{
+		SkinInfo.m_ColorBody = color_cast<ColorRGBA>(ColorHSLA(BodyColor).UnclampLighting(ColorHSLA::DARKEST_LGT));
+		SkinInfo.m_ColorFeet = color_cast<ColorRGBA>(ColorHSLA(FeetColor).UnclampLighting(ColorHSLA::DARKEST_LGT));
+		if(ColorFeet.a != 0.0f)
+		{
+			SkinInfo.m_ColorBody = ColorBody;
+			SkinInfo.m_ColorFeet = ColorFeet;
+		}
+	}
+	else
+	{
+		SkinInfo.m_ColorBody = ColorRGBA(1.0f, 1.0f, 1.0f);
+		SkinInfo.m_ColorFeet = ColorRGBA(1.0f, 1.0f, 1.0f);
+	}
+	SkinInfo.m_Size = Size;
+	const CAnimState *pIdleState = CAnimState::GetIdle();
+	vec2 OffsetToMid;
+	CRenderTools::GetRenderTeeOffsetToRenderedTee(pIdleState, &SkinInfo, OffsetToMid);
+	vec2 TeeRenderPos(RenderPos.x, RenderPos.y + OffsetToMid.y);
+	RenderTools()->RenderTee(pIdleState, &SkinInfo, Emote, vec2(1.0f, 0.0f), TeeRenderPos);
+}
+
+// TODO: Add everything to here
