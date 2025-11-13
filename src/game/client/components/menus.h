@@ -606,6 +606,9 @@ protected:
 	void RenderSettingsGraphics(CUIRect MainView);
 	void RenderSettingsSound(CUIRect MainView);
 	void RenderSettings(CUIRect MainView);
+
+
+	//pulse
 	void RenderSettingsCustom(CUIRect MainView);
 	void RenderCrossChat(CUIRect MainView);
 
@@ -613,8 +616,7 @@ protected:
 	std::vector<CButtonContainer> m_vButtonContainersNamePlateShow = {{}, {}, {}, {}};
 	std::vector<CButtonContainer> m_vButtonContainersNamePlateKeyPresses = {{}, {}, {}, {}};
 	//PULSE
-	std::vector<CButtonContainer> MVButtonContainersIdleAura = {{}, {}, {}, {}, {}};
-
+	std::vector<CButtonContainer> m_MvButtonContainersIdleAura = {{}, {}, {}, {}, {}};
 	class CMapListItem
 	{
 	public:
@@ -870,6 +872,11 @@ private:
 	void RenderSettingsPulse(CUIRect MainView);
 	void RenderSettingsProfs(CUIRect MainView);
 
+	void RenderPlayerSkin(vec2 RenderPos, float Size, const char *pSkinName, const char *pBackupSkin, bool CustomColors, int FeetColor, int BodyColor, int Emote,
+			ColorRGBA ColorFeet = ColorRGBA(0, 0, 0, 0), ColorRGBA ColorBody = ColorRGBA(0, 0, 0, 0));
+
 	//IServerBrowser m_ServerProcess;
+
+
 };
 #endif
