@@ -42,6 +42,13 @@ public:
 	};
 	std::vector<SChatMessage> GetMessages();
 
+	struct SOnlinePlayer
+	{
+		std::string m_Name;
+		SPlayerSkin m_Skin;
+	};
+
+
 
 
 
@@ -60,7 +67,7 @@ public:
 	std::mutex m_MessageMutex;
 	std::vector<SChatMessage> m_ChatMessages;
 
-	std::vector<std::string> m_OnlinePlayers;
+	std::vector<SOnlinePlayer> m_OnlinePlayers;
 	std::mutex m_OnlinePlayersMutex;
 
 	std::unordered_set<std::string> m_TypingUsers;

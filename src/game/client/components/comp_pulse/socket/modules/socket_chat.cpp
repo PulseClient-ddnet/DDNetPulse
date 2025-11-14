@@ -97,19 +97,38 @@ void CWebSocketChat::HandleChatMessage(sio::event &ev)
 
 void CWebSocketChat::HandleOnlineUpdate(sio::event &ev)
 {
-    auto Data = ev.get_message();
-    if(!Data || Data->get_flag() != sio::message::flag_object)
-        return;
+	auto Data = ev.get_message();
+	if(!Data || Data->get_flag() != sio::message::flag_object)
+		return;
 
-    auto UsersArray = Data->get_map()["users"]->get_vector();
-    std::vector<std::string> OnlinePlayers;
-    for(auto &userMsg : UsersArray)
-        if(userMsg->get_flag() == sio::message::flag_string)
-            OnlinePlayers.push_back(userMsg->get_string());
+	auto UsersArray = Data->get_map()["users"]->get_vector();
 
-    std::lock_guard<std::mutex> lock(m_OnlinePlayersMutex);
-    m_OnlinePlayers = OnlinePlayers;
+	std::vector<SOnlinePlayer> Players;
+
+	for(auto &userMsg : UsersArray)
+	{
+		if(userMsg->get_flag() != sio::message::flag_string)
+			continue;
+
+		std::string Nick = userMsg->get_string();
+		SOnlinePlayer Player;
+		Player.m_Name = Nick;
+
+		// получить skin из m_PlayerSkins
+		{
+			std::lock_guard<std::mutex> lock(m_PlayerSkinsMutex);
+			auto it = m_PlayerSkins.find(Nick);
+			if(it != m_PlayerSkins.end())
+				Player.m_Skin = it->second;
+		}
+
+		Players.push_back(Player);
+	}
+
+	std::lock_guard<std::mutex> lock(m_OnlinePlayersMutex);
+	m_OnlinePlayers = Players;
 }
+
 
 void CWebSocketChat::SendChatMessage(const std::string &Msg) const
 {
