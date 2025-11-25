@@ -32,18 +32,15 @@ void CWebSocket::SocketConnect()
 		dbg_msg("socket.io", "Connection failed");
 	});
 
-
 	m_Socket.connect(g_Config.m_ClSocketNameserver);
-	//UserInit();
-	//SetupSocketListeners();
+
+	// UserInit();
+	// SetupSocketListeners();
 }
 
 void CWebSocket::SocketDisconnect()
 {
-	CGameClient *pClient = (CGameClient *)GameClient();
-	{
 		m_Socket.close();
-	}
 }
 
 void CWebSocket::UserInit()

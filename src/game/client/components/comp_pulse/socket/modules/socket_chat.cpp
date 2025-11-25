@@ -95,6 +95,7 @@ void CWebSocketChat::HandleChatMessage(sio::event &ev)
     }
 }
 
+
 void CWebSocketChat::HandleOnlineUpdate(sio::event &ev)
 {
 	auto Data = ev.get_message();
@@ -107,19 +108,30 @@ void CWebSocketChat::HandleOnlineUpdate(sio::event &ev)
 
 	for(auto &userMsg : UsersArray)
 	{
-		if(userMsg->get_flag() != sio::message::flag_string)
+		if(userMsg->get_flag() != sio::message::flag_object)
 			continue;
 
-		std::string Nick = userMsg->get_string();
-		SOnlinePlayer Player;
-		Player.m_Name = Nick;
+		auto userMap = userMsg->get_map();
 
-		// получить skin из m_PlayerSkins
+
+
+
+		if(!userMap.count("nickname"))
+			continue;
+
+		SOnlinePlayer Player;
+		Player.m_Name = userMap["nickname"]->get_string();
+
+		if(userMap.count("skin") && userMap["skin"]->get_flag() == sio::message::flag_object)
 		{
-			std::lock_guard<std::mutex> lock(m_PlayerSkinsMutex);
-			auto it = m_PlayerSkins.find(Nick);
-			if(it != m_PlayerSkins.end())
-				Player.m_Skin = it->second;
+			auto skin = userMap["skin"]->get_map();
+
+			Player.m_Skin.m_Name = skin["skin_name"]->get_string();
+			Player.m_Skin.m_BackupName = skin["skin_name"]->get_string();
+			Player.m_Skin.m_CustomColors = skin["use_custom_color"]->get_bool();
+
+			Player.m_Skin.m_FeetColor = std::stoi(skin["feet_color"]->get_string());
+			Player.m_Skin.m_BodyColor = std::stoi(skin["body_color"]->get_string());
 		}
 
 		Players.push_back(Player);
@@ -127,7 +139,10 @@ void CWebSocketChat::HandleOnlineUpdate(sio::event &ev)
 
 	std::lock_guard<std::mutex> lock(m_OnlinePlayersMutex);
 	m_OnlinePlayers = Players;
+
 }
+
+
 
 
 void CWebSocketChat::SendChatMessage(const std::string &Msg) const

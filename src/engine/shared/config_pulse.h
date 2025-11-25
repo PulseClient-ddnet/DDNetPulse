@@ -88,4 +88,4 @@ MACRO_CONFIG_INT(ClCrossChatInGameChat, cl_cross_chat_ingame_chat, 1, 0, 1, CFGF
 MACRO_CONFIG_INT(ClCrossChatDebug, cl_cross_chat_debug, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Enable CrossChat debug messages")
 
 //pulse server
-MACRO_CONFIG_STR(ClSocketNameserver, ntwr_nameserver, 256, "localhost:3000", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Nameserver for websockets") //TODO: actaual nameserver
+MACRO_CONFIG_STR(ClSocketNameserver, ntwr_nameserver, 256, "http://localhost:3000", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Nameserver for websockets") //TODO: actaual nameserver

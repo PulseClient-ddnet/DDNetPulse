@@ -914,199 +914,303 @@ void CMenus::RenderSettingsProfs(CUIRect MainView)
 
 void CMenus::RenderCrossChat(CUIRect MainView)
 {
-	static bool s_Initialized = false;
-	static std::vector<std::string> s_ChatHistory;
-	static int s_HistoryIndex = -1;
-	static CLineInputBuffered<256> s_ChatInput;
-	static int s_LastMsgCount = 0;
+    // === СТАТИЧЕСКИЕ ПЕРЕМЕННЫЕ ===
+    static bool s_Initialized = false;
+    static std::vector<std::string> s_ChatHistory;
+    static int s_HistoryIndex = -1;
+    static CLineInputBuffered<256> s_ChatInput;
+    static int s_LastMsgCount = 0;
 
-	if(!s_Initialized)
-	{
-		s_Initialized = true;
-		s_ChatInput.Clear();
-		s_ChatHistory.clear();
+    // Для popup команд
+    static bool s_ShowCommandPopup = false;
+    static std::vector<std::string> s_FilteredCommands;
+    static int s_CommandIndex = 0;
+    static std::vector<std::string> s_Commands = {"/help", "/kick", "/ban", "/me", "/whisper"};
 
-		char aBuf[128];
-		if(GameClient()->m_WebSocket.m_IsConnected)
-			str_format(aBuf, sizeof(aBuf), "Welcome to chat, %s", g_Config.m_PlayerName);
-		else
-			str_copy(aBuf, "Try again later");
+    // === ИНИЦИАЛИЗАЦИЯ ===
+    if(!s_Initialized)
+    {
+        s_Initialized = true;
+        s_ChatInput.Clear();
+        s_ChatHistory.clear();
 
-		GameClient()->m_WebSocket.m_WebSocketChat.AddMessage(aBuf, ColorRGBA(0.0f, 1.0f, 0.0f, 1.0f), "System: ");
-	}
+        char aBuf[128];
+        if(GameClient()->m_WebSocket.m_IsConnected)
+            str_format(aBuf, sizeof(aBuf), "Welcome to chat, %s", g_Config.m_PlayerName);
+        else
+            str_copy(aBuf, "Try again later");
 
-	MainView.Draw(ColorRGBA(0, 0, 0, 0.5f), IGraphics::CORNER_ALL, 5.f);
+        GameClient()->m_WebSocket.m_WebSocketChat.AddMessage(aBuf, ColorRGBA(0.0f, 1.0f, 0.0f, 1.0f), "System: ");
+    }
 
-	CUIRect ChatView, InputBar, LeftBar;
-	MainView.HSplitBottom(40.0f, &ChatView, &InputBar);
-	ChatView.VSplitLeft(ChatView.w / 5, &LeftBar, &ChatView);
+    MainView.Draw(ColorRGBA(0, 0, 0, 0.5f), IGraphics::CORNER_ALL, 5.f);
 
-	LeftBar.Margin(10.0f, &LeftBar);
-	ChatView.Margin(10.0f, &ChatView);
-	InputBar.Margin(8.0f, &InputBar);
+    CUIRect ChatView, InputBar, LeftBar;
+    MainView.HSplitBottom(40.0f, &ChatView, &InputBar);
+    ChatView.VSplitLeft(ChatView.w / 5, &LeftBar, &ChatView);
 
-	LeftBar.Draw(ColorRGBA(0.f, 0.f, 0.f, 0.3f), IGraphics::CORNER_ALL, 5.f);
-	std::lock_guard<std::mutex> LockPlayers(GameClient()->m_WebSocket.m_WebSocketChat.m_OnlinePlayersMutex);
+    LeftBar.Margin(10.0f, &LeftBar);
+    ChatView.Margin(10.0f, &ChatView);
+    InputBar.Margin(8.0f, &InputBar);
 
-	float YOnline = LeftBar.y + 8.0f;
-	for(const auto &player : GameClient()->m_WebSocket.m_WebSocketChat.m_OnlinePlayers)
-	{
-		TextRender()->Text(LeftBar.x + 5.0f, YOnline, 12.0f, player.c_str(), -1);
-		YOnline += 14.0f;
-	}
+//	LeftBar.HSplitBottom( 20.0f, nullptr, &LeftBar);
+    LeftBar.Draw(ColorRGBA(0.f, 0.f, 0.f, 0.3f), IGraphics::CORNER_ALL, 5.f);
 
-	static CScrollRegion s_ScrollRegion;
-	vec2 ScrollOffset(0.0f, 0.0f);
-	CScrollRegionParams ScrollParams;
-	ScrollParams.m_ScrollUnit = 100.0f;
+    // Online players ===
+    std::lock_guard<std::mutex> LockPlayers(GameClient()->m_WebSocket.m_WebSocketChat.m_OnlinePlayersMutex);
+    {
+        static CScrollRegion s_ScrollRegionPlayers;
+        vec2 ScrollOffset(0.0f, 0.0f);
 
-	std::vector<CWebSocketChat::SChatMessage> Messages = GameClient()->m_WebSocket.m_WebSocketChat.GetMessages();
-	const bool WasAtEnd = s_ScrollRegion.AtEnd();
-	s_ScrollRegion.Begin(&ChatView, &ScrollOffset, &ScrollParams);
-	ChatView.y += ScrollOffset.y;
+        CScrollRegionParams ScrollParams;
+        ScrollParams.m_ScrollUnit = 80.0f;
 
-	const float MsgHeight = 24.0f;
-	CUIRect Line;
+        auto &Players = GameClient()->m_WebSocket.m_WebSocketChat.m_OnlinePlayers;
+        s_ScrollRegionPlayers.Begin(&LeftBar, &ScrollOffset, &ScrollParams);
 
-	for(int i = 0; i < (int)Messages.size(); i++)
-	{
-		const CWebSocketChat::SChatMessage &Msg = Messages[i];
+        LeftBar.y += ScrollOffset.y;
+        const float EntryHeight = 30.0f;
 
-		ChatView.HSplitTop(MsgHeight, &Line, &ChatView);
-		ChatView.HSplitTop(4.0f, nullptr, &ChatView);
+        for(const auto &P : Players)
+        {
+            CUIRect Line;
+            LeftBar.HSplitTop(EntryHeight, &Line, &LeftBar);
+            LeftBar.HSplitTop(4.0f, nullptr, &LeftBar);
 
-		if(!s_ScrollRegion.AddRect(Line))
-			continue;
+            if(!s_ScrollRegionPlayers.AddRect(Line))
+                continue;
 
-		ColorRGBA BgColor = (Msg.m_Username == g_Config.m_PlayerName) ? ColorRGBA(0.0f, 0.5f, 1.0f, 0.15f) : ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f);
-		Line.Draw(BgColor, IGraphics::CORNER_ALL, 4.0f);
+            Line.Margin(3.0f, &Line);
+            Line.Draw(ColorRGBA(1, 1, 1, 0.2f), IGraphics::CORNER_ALL, 4.0f);
 
-		CUIRect TextRect = Line;
-		TextRect.HMargin(4.0f, &TextRect);
+            CUIRect SkinRect, TextRect;
+            Line.VSplitLeft(EntryHeight, &SkinRect, &TextRect);
+            SkinRect.Margin(4.0f, &SkinRect);
 
-		const float TextFontSize = 12.5f;
+            vec2 TeePos(SkinRect.x + SkinRect.w / 2, SkinRect.y + SkinRect.h / 2);
+            RenderPlayerSkin(
+                TeePos,
+                EntryHeight * 0.8f,
+                P.m_Skin.m_Name.c_str(),
+                P.m_Skin.m_BackupName.c_str(),
+                P.m_Skin.m_CustomColors,
+                P.m_Skin.m_FeetColor,
+                P.m_Skin.m_BodyColor,
+                EMOTE_NORMAL,
+                P.m_Skin.m_ColorFeet,
+                P.m_Skin.m_ColorBody
+            );
 
-		if(!Msg.m_Skin.m_Name.empty())
-		{
-			CUIRect SkinRect = TextRect;
-			SkinRect.w = MsgHeight;
-			SkinRect.Margin(4.0f, &SkinRect);
+            TextRect.Margin(8.0f, &TextRect);
+            Ui()->DoLabel(&TextRect, P.m_Name.c_str(), 12.0f, TEXTALIGN_ML);
+        }
 
-			vec2 TeePos = vec2(SkinRect.x + SkinRect.w / 2, SkinRect.y + SkinRect.h / 2);
-			RenderPlayerSkin(TeePos, 24.0f, Msg.m_Skin.m_Name.c_str(), Msg.m_Skin.m_BackupName.c_str(), Msg.m_Skin.m_CustomColors, Msg.m_Skin.m_FeetColor, Msg.m_Skin.m_BodyColor, EMOTE_NORMAL, Msg.m_Skin.m_ColorFeet, Msg.m_Skin.m_ColorBody);
+        s_ScrollRegionPlayers.End();
+    }
 
-			TextRect.x += SkinRect.w + 6.0f;
-			TextRect.w -= SkinRect.w + 6.0f;
-		}
+    // MSG
+    static CScrollRegion s_ScrollRegion;
+    vec2 ScrollOffset(0.0f, 0.0f);
+    CScrollRegionParams ScrollParams;
+    ScrollParams.m_ScrollUnit = 100.0f;
 
-		TextRender()->TextColor(Msg.m_Color);
-		Ui()->DoLabel(&TextRect, (" " + Msg.m_Username + Msg.m_Text).c_str(), TextFontSize, TEXTALIGN_ML);
-		TextRender()->TextColor(TextRender()->DefaultTextColor());
-	}
+    auto Messages = GameClient()->m_WebSocket.m_WebSocketChat.GetMessages();
+    const bool WasAtEnd = s_ScrollRegion.AtEnd(ChatView);
+    s_ScrollRegion.Begin(&ChatView, &ScrollOffset, &ScrollParams);
+    ChatView.y += ScrollOffset.y;
 
-	s_ScrollRegion.End();
-	if(WasAtEnd && (int)Messages.size() > s_LastMsgCount)
-	{
-		s_ScrollRegion.ScrollHere(CScrollRegion::SCROLLHERE_BOTTOM);
-	}
+    const float MsgHeight = 24.0f;
+    for(const auto &Msg : Messages)
+    {
+        CUIRect Line;
+        ChatView.HSplitTop(MsgHeight, &Line, &ChatView);
+        ChatView.HSplitTop(4.0f, nullptr, &ChatView);
 
-	s_LastMsgCount = (int)Messages.size();
+        if(!s_ScrollRegion.AddRect(Line))
+            continue;
 
-	s_ChatInput.SetEmptyText("Send a message...");
+        ColorRGBA BgColor = (Msg.m_Username == g_Config.m_PlayerName) ? ColorRGBA(0.0f, 0.5f, 1.0f, 0.15f) : ColorRGBA(0.0f, 0.0f, 0.0f, 0.25f);
+        Line.Draw(BgColor, IGraphics::CORNER_ALL, 4.0f);
 
-	if(Ui()->ActiveItem() == nullptr)
-		Ui()->SetActiveItem(&s_ChatInput);
+        CUIRect TextRect = Line;
+        TextRect.HMargin(4.0f, &TextRect);
 
-	if(Ui()->DoEditBox(&s_ChatInput, &InputBar, 14.0f))
-	{
-		Ui()->SetActiveItem(&s_ChatInput);
-		int64_t Now = time_get();
+        if(!Msg.m_Skin.m_Name.empty())
+        {
+            CUIRect SkinRect = TextRect;
+            SkinRect.w = MsgHeight;
+            SkinRect.Margin(4.0f, &SkinRect);
+            vec2 TeePos(SkinRect.x + SkinRect.w / 2, SkinRect.y + SkinRect.h / 2);
+            RenderPlayerSkin(TeePos, 24.0f, Msg.m_Skin.m_Name.c_str(), Msg.m_Skin.m_BackupName.c_str(), Msg.m_Skin.m_CustomColors, Msg.m_Skin.m_FeetColor, Msg.m_Skin.m_BodyColor, EMOTE_NORMAL, Msg.m_Skin.m_ColorFeet, Msg.m_Skin.m_ColorBody);
 
-		if(!GameClient()->m_WebSocket.m_WebSocketChat.m_IsTyping)
-		{
-			GameClient()->m_WebSocket.m_WebSocketChat.m_IsTyping = true;
-			GameClient()->m_WebSocket.m_WebSocketChat.SendTypingState(true);
-		}
+            TextRect.x += SkinRect.w + 6.0f;
+            TextRect.w -= SkinRect.w + 6.0f;
+        }
 
-		GameClient()->m_WebSocket.m_WebSocketChat.m_LastTypeTime = Now;
-	}
-	// I HATE INPUT HANDLING SO MUCH
-	if(Input()->KeyPress(KEY_RETURN) || Input()->KeyPress(KEY_KP_ENTER))
-	{
-		if(const char *pText = s_ChatInput.GetString(); pText && pText[0])
-		{
-			GameClient()->m_WebSocket.m_WebSocketChat.SendChatMessage(pText);
-			s_ChatHistory.emplace_back(pText);
-			s_HistoryIndex = -1;
-			s_ChatInput.Clear();
+        TextRender()->TextColor(Msg.m_Color);
+        Ui()->DoLabel(&TextRect, (" " + Msg.m_Username + Msg.m_Text).c_str(), 12.5f, TEXTALIGN_ML);
+        TextRender()->TextColor(TextRender()->DefaultTextColor());
+    }
 
-			if(GameClient()->m_WebSocket.m_WebSocketChat.m_IsTyping)
-			{
-				GameClient()->m_WebSocket.m_WebSocketChat.m_IsTyping = false;
-				GameClient()->m_WebSocket.m_WebSocketChat.SendTypingState(false);
-			}
-		}
-	}
+    s_ScrollRegion.End();
+    if(WasAtEnd && (int)Messages.size() > s_LastMsgCount)
+        s_ScrollRegion.ScrollHere(CScrollRegion::SCROLLHERE_BOTTOM);
+    s_LastMsgCount = (int)Messages.size();
 
-	if(Input()->KeyPress(KEY_UP))
-	{
-		if(!s_ChatHistory.empty())
-		{
-			if(s_HistoryIndex == -1)
-				s_HistoryIndex = (int)s_ChatHistory.size() - 1;
-			else if(s_HistoryIndex > 0)
-				s_HistoryIndex--;
-			s_ChatInput.Set(s_ChatHistory[s_HistoryIndex].c_str());
-		}
-	}
-	else if(Input()->KeyPress(KEY_DOWN))
-	{
-		if(!s_ChatHistory.empty() && s_HistoryIndex != -1)
-		{
-			s_HistoryIndex++;
-			if(s_HistoryIndex >= (int)s_ChatHistory.size())
-			{
-				s_HistoryIndex = -1;
-				s_ChatInput.Clear();
-			}
-			else
-				s_ChatInput.Set(s_ChatHistory[s_HistoryIndex].c_str());
-		}
-	}
 
-	{
-		std::lock_guard<std::mutex> LockTyping(GameClient()->m_WebSocket.m_WebSocketChat.m_TypingMutex);
+    s_ChatInput.SetEmptyText("Send a message...");
+    if(Ui()->ActiveItem() == nullptr)
+        Ui()->SetActiveItem(&s_ChatInput);
 
-		if(!GameClient()->m_WebSocket.m_WebSocketChat.m_TypingUsers.empty())
-		{
-			std::string TypingText;
-			size_t Count = GameClient()->m_WebSocket.m_WebSocketChat.m_TypingUsers.size();
+    Ui()->DoEditBox(&s_ChatInput, &InputBar, 14.0f);
 
-			if(Count == 1)
-				TypingText = *GameClient()->m_WebSocket.m_WebSocketChat.m_TypingUsers.begin() + " is typing...";
-			else if(Count == 2)
-			{
-				auto it = GameClient()->m_WebSocket.m_WebSocketChat.m_TypingUsers.begin();
-				std::string First = *it++;
-				std::string Second = *it;
-				TypingText = First + " and " + Second + " are typing...";
-			}
-			else
-				TypingText = "Several people are typing...";
+    //  POPUP ===
+    const char* pText = s_ChatInput.GetString();
+    if(pText && pText[0] == '/')
+    {
+        s_ShowCommandPopup = true;
+        std::string InputStr(pText);
+        s_FilteredCommands.clear();
 
-			TextRender()->TextColor(ColorRGBA(0.8f, 0.8f, 0.8f, 1.0f));
-			TextRender()->Text(ChatView.x + 10, InputBar.y - 15.0f, 11.0f, TypingText.c_str(), -1);
-			TextRender()->TextColor(TextRender()->DefaultTextColor());
-		}
-	}
-	// States is cute;3
-	if(GameClient()->m_WebSocket.m_WebSocketChat.m_IsTyping &&
-		time_get() - GameClient()->m_WebSocket.m_WebSocketChat.m_LastTypeTime > time_freq() * 2)
-	{
-		GameClient()->m_WebSocket.m_WebSocketChat.m_IsTyping = false;
-		GameClient()->m_WebSocket.m_WebSocketChat.SendTypingState(false);
-	}
+        for(const auto &Cmd : s_Commands)
+            if(Cmd.find(InputStr) == 0)
+                s_FilteredCommands.push_back(Cmd);
+
+        if(s_FilteredCommands.empty())
+        {
+            s_ShowCommandPopup = false;
+            s_CommandIndex = 0;
+        }
+        else
+        {
+            if(s_CommandIndex < 0 || s_CommandIndex >= (int)s_FilteredCommands.size())
+                s_CommandIndex = 0;
+        }
+    }
+    else
+    {
+        s_ShowCommandPopup = false;
+        s_CommandIndex = 0;
+    }
+
+    if(s_ShowCommandPopup && !s_FilteredCommands.empty())
+    {
+        if(Input()->KeyPress(KEY_DOWN))
+        {
+            s_CommandIndex++;
+            if(s_CommandIndex >= (int)s_FilteredCommands.size())
+                s_CommandIndex = 0;
+        }
+        else if(Input()->KeyPress(KEY_UP))
+        {
+            s_CommandIndex--;
+            if(s_CommandIndex < 0)
+                s_CommandIndex = (int)s_FilteredCommands.size() - 1;
+        }
+
+        if(Input()->KeyPress(KEY_RETURN) || Input()->KeyPress(KEY_KP_ENTER))
+        {
+            if(s_CommandIndex >= 0 && s_CommandIndex < (int)s_FilteredCommands.size())
+            {
+                s_ChatInput.Set(s_FilteredCommands[s_CommandIndex].c_str());
+                s_ShowCommandPopup = false;
+            }
+        }
+    }
+    else
+    {
+        // === ОТПРАВКА СООБЩЕНИЯ ===
+        if(Input()->KeyPress(KEY_RETURN) || Input()->KeyPress(KEY_KP_ENTER))
+        {
+            if(pText && pText[0])
+            {
+                GameClient()->m_WebSocket.m_WebSocketChat.SendChatMessage(pText);
+                s_ChatHistory.emplace_back(pText);
+                s_HistoryIndex = -1;
+                s_ChatInput.Clear();
+            }
+        }
+
+        if(Input()->KeyPress(KEY_UP))
+        {
+            if(!s_ChatHistory.empty())
+            {
+                if(s_HistoryIndex == -1)
+                    s_HistoryIndex = (int)s_ChatHistory.size() - 1;
+                else if(s_HistoryIndex > 0)
+                    s_HistoryIndex--;
+                s_ChatInput.Set(s_ChatHistory[s_HistoryIndex].c_str());
+            }
+        }
+        else if(Input()->KeyPress(KEY_DOWN))
+        {
+            if(!s_ChatHistory.empty() && s_HistoryIndex != -1)
+            {
+                s_HistoryIndex++;
+                if(s_HistoryIndex >= (int)s_ChatHistory.size())
+                {
+                    s_HistoryIndex = -1;
+                    s_ChatInput.Clear();
+                }
+                else
+                    s_ChatInput.Set(s_ChatHistory[s_HistoryIndex].c_str());
+            }
+        }
+    }
+
+    // === РЕНДЕР POPUP КОМАНД ===
+    if(s_ShowCommandPopup && !s_FilteredCommands.empty())
+    {
+        CUIRect PopupRect = InputBar;
+        const float LineHeight = 20.0f;
+        PopupRect.HSplitTop(s_FilteredCommands.size() * LineHeight, &PopupRect, nullptr);
+        PopupRect.y -= PopupRect.h + 2.0f;
+
+        PopupRect.Draw(ColorRGBA(0.f, 0.f, 0.f, 0.8f), IGraphics::CORNER_ALL, 5.0f);
+
+        for(size_t i = 0; i < s_FilteredCommands.size(); ++i)
+        {
+            CUIRect Line = PopupRect;
+            Line.y += i * (LineHeight);
+            Line.h = LineHeight;
+
+            ColorRGBA TextColor = (i == s_CommandIndex) ? ColorRGBA(1.0f, 1.0f, 0.5f, 1.0f) : ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f);
+            Line.Margin(4.0f, &Line);
+
+            TextRender()->TextColor(TextColor);
+            Ui()->DoLabel(&Line, s_FilteredCommands[i].c_str(), 14.0f, TEXTALIGN_ML);
+            TextRender()->TextColor(TextRender()->DefaultTextColor());
+        }
+    }
+
+
+    {
+        std::lock_guard<std::mutex> LockTyping(GameClient()->m_WebSocket.m_WebSocketChat.m_TypingMutex);
+        if(!GameClient()->m_WebSocket.m_WebSocketChat.m_TypingUsers.empty())
+        {
+            std::string TypingText;
+            size_t Count = GameClient()->m_WebSocket.m_WebSocketChat.m_TypingUsers.size();
+
+            if(Count == 1)
+                TypingText = *GameClient()->m_WebSocket.m_WebSocketChat.m_TypingUsers.begin() + " is typing...";
+            else if(Count == 2)
+            {
+                auto it = GameClient()->m_WebSocket.m_WebSocketChat.m_TypingUsers.begin();
+                std::string First = *it++;
+                std::string Second = *it;
+                TypingText = First + " and " + Second + " are typing...";
+            }
+            else
+                TypingText = "Several people are typing...";
+
+            TextRender()->TextColor(ColorRGBA(0.8f, 0.8f, 0.8f, 1.0f));
+            TextRender()->Text(ChatView.x + 10, InputBar.y - 15.0f, 11.0f, TypingText.c_str(), -1);
+            TextRender()->TextColor(TextRender()->DefaultTextColor());
+        }
+    }
 }
+
+
 void CMenus::RenderPlayerSkin(vec2 RenderPos, float Size, const char *pSkinName, const char *pBackupSkin, bool CustomColors, int FeetColor, int BodyColor, int Emote, ColorRGBA ColorFeet, ColorRGBA ColorBody)
 {
 	CTeeRenderInfo SkinInfo;
