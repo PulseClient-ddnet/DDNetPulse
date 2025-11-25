@@ -18,6 +18,7 @@
 #include <game/client/ui.h>
 #include <game/localization.h>
 
+#include <cmath>
 #include <sstream>
 
 struct SPopupProperties
@@ -743,9 +744,8 @@ bool CScoreboard::RenderScoreboard(CUIRect Scoreboard, int Team, int CountStart,
 					{
 						float Time = LocalTime();
 						float PulseSpeed = 0.2f;
-						float PulseIntensity = 0.5f;
 
-						float Hue = fmod(Time * PulseSpeed, 1.0f);
+						float Hue = std::fmod(Time * PulseSpeed, 1.0f);
 						float Saturation = 0.8f + 0.2f * sinf(Time * PulseSpeed * 2.0f);
 						float Value = 0.8f + 0.2f * sinf(Time * PulseSpeed * 1.5f);
 

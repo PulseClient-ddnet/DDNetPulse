@@ -91,7 +91,6 @@ void CMenus::RenderConsoleImages(CUIRect MainView)
 	static std::vector<CConsoleImage> s_vConsoleImages;
 	static bool s_ImagesLoaded = false;
 	static int s_SelectedImage = -1;
-	static int s_SelectedConsoleType = 0; // 0 = default, 1 = RCON
 
 	if(!s_ImagesLoaded)
 	{
@@ -107,21 +106,21 @@ void CMenus::RenderConsoleImages(CUIRect MainView)
 
 			std::vector<CConsoleImage> vFiles;
 			Storage()->ListDirectory(IStorage::TYPE_ALL, aPath, ListConsoleImagesCallback, &vFiles);
-			dbg_msg("console_images", "Found %d PNG files in %s", vFiles.size(), aPath);
+			dbg_msg("console_images", "Found %lu PNG files in %s", vFiles.size(), aPath);
 
 			for(CConsoleImage &Image : vFiles)
 			{
-				bool bExists = false;
+				bool BExists = false;
 				for(const CConsoleImage &ExistingImage : s_vConsoleImages)
 				{
 					if(str_comp(ExistingImage.m_aName, Image.m_aName) == 0)
 					{
-						bExists = true;
+						BExists = true;
 						break;
 					}
 				}
 
-				if(!bExists)
+				if(!BExists)
 				{
 					CImageInfo ImgInfo;
 					char aFullPath[IO_MAX_PATH_LENGTH];
@@ -148,9 +147,6 @@ void CMenus::RenderConsoleImages(CUIRect MainView)
 	// Display console type selector
 	CUIRect ConsoleTypeSelector;
 	MainView.HSplitTop(20.0f, &ConsoleTypeSelector, &MainView);
-
-	static CButtonContainer s_DefaultConsoleBtn;
-	static CButtonContainer s_RconConsoleBtn;
 
 	CUIRect DefaultBtn, RconBtn;
 	ConsoleTypeSelector.VSplitMid(&DefaultBtn, &RconBtn);
@@ -260,14 +256,14 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 		CUIRect LeftSection, RightSection;
 		MainView.VSplitMid(&LeftSection, &RightSection, 10.0f);
 
-		ColorRGBA defaultCol = ColorRGBA(0, 0, 0, 0.45f);
+		ColorRGBA DefaultCol = ColorRGBA(0, 0, 0, 0.45f);
 
 		// Left Section - Gameplay Settings
 		{
 			CUIRect Section, Label;
 
 			CUIRect GameplayRect;
-			DRAW_BOX(LeftSection, GameplayRect, 100.0f, defaultCol, 10.0f);
+			DRAW_BOX(LeftSection, GameplayRect, 100.0f, DefaultCol, 10.0f);
 			s_ScrollRegion.AddRect(GameplayRect);
 			BOX_LABEL(GameplayRect, Section, "Input & Predict", 40.0f, 10.0f);
 			BUTTON(GameplayRect, Button, 20.0f, &g_Config.m_ClFastInp, "Fast Input", g_Config.m_ClFastInp);
@@ -276,7 +272,7 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 
 			// Laser Settings
 			CUIRect LaserRect;
-			DRAW_BOX(LeftSection, LaserRect, 260.0f, defaultCol, 10.0f);
+			DRAW_BOX(LeftSection, LaserRect, 260.0f, DefaultCol, 10.0f);
 			s_ScrollRegion.AddRect(LaserRect);
 			BOX_LABEL(LaserRect, Section, "Laser Settings", 40.0f, 10.0f);
 
@@ -303,7 +299,7 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 
 			CUIRect EffectsRect;
 			// Effects Settings Box
-			DRAW_BOX(LeftSection, EffectsRect, 160.0f, defaultCol, 10.0f);
+			DRAW_BOX(LeftSection, EffectsRect, 160.0f, DefaultCol, 10.0f);
 			s_ScrollRegion.AddRect(EffectsRect);
 			BOX_LABEL(EffectsRect, Section, "Effects Settings", 40.0f, 10.0f);
 			BUTTON(EffectsRect, Button, 20.0f, &g_Config.m_ClFreezeSnowFlakes, "Show Freeze Snowflakes", g_Config.m_ClFreezeSnowFlakes);
@@ -315,7 +311,7 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 
 			// Player Aura Settings
 			CUIRect PlayerAuraRect;
-			DRAW_BOX(LeftSection, PlayerAuraRect, 160.0f, defaultCol, 10.0f);
+			DRAW_BOX(LeftSection, PlayerAuraRect, 160.0f, DefaultCol, 10.0f);
 			s_ScrollRegion.AddRect(PlayerAuraRect);
 			BOX_LABEL(PlayerAuraRect, Section, "Player Aura Settings", 40.0f, 10.0f);
 			BUTTON(PlayerAuraRect, Button, 20.0f, &g_Config.m_ClPlayerIdleAura, "Idle Player Aura", g_Config.m_ClPlayerIdleAura);
@@ -334,7 +330,7 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 
 			END_LABEL(LeftSection);
 			CUIRect FunRect;
-			DRAW_BOX(LeftSection, FunRect, 80.0f, defaultCol, 10.0f);
+			DRAW_BOX(LeftSection, FunRect, 80.0f, DefaultCol, 10.0f);
 			s_ScrollRegion.AddRect(FunRect);
 			BOX_LABEL(FunRect, Section, "Fun Settings", 40.0f, 10.0f);
 			BUTTON(FunRect, Button, 20.0f, &g_Config.m_ClDeathPhrases, "Funny death phrases on death", g_Config.m_ClDeathPhrases);
@@ -343,11 +339,11 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 
 		// Right Section - Visual Effects
 		{
-			CUIRect Section, Label;
+			CUIRect Section;
 			CUIRect PreferencesRect;
 
 			// Preferences
-			DRAW_BOX(RightSection, PreferencesRect, 80.0f, defaultCol, 10.0f);
+			DRAW_BOX(RightSection, PreferencesRect, 80.0f, DefaultCol, 10.0f);
 			s_ScrollRegion.AddRect(PreferencesRect);
 			BOX_LABEL(PreferencesRect, Section, "Preferences", 40.0f, 10.0f);
 			BUTTON(PreferencesRect, Button, 20.0f, &g_Config.m_ClAntiRQ, "Prevent alt+f4 quit", g_Config.m_ClAntiRQ);
@@ -355,7 +351,7 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 
 			// Player Effects Box
 			CUIRect VisualRect;
-			DRAW_BOX(RightSection, VisualRect, 80.0f, defaultCol, 10.0f);
+			DRAW_BOX(RightSection, VisualRect, 80.0f, DefaultCol, 10.0f);
 			s_ScrollRegion.AddRect(VisualRect);
 			BOX_LABEL(VisualRect, Section, "Player Effects", 40.0f, 10.0f);
 			BUTTON(VisualRect, Button, 20.0f, &g_Config.m_ClPlayerSquashStretch, "Squash & Stretch Animation (beta)", g_Config.m_ClPlayerSquashStretch);
@@ -363,7 +359,7 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 
 			// Hover Messages Box
 			CUIRect HoverRect;
-			DRAW_BOX(RightSection, HoverRect, 140.0f, defaultCol, 10.0f);
+			DRAW_BOX(RightSection, HoverRect, 140.0f, DefaultCol, 10.0f);
 			s_ScrollRegion.AddRect(HoverRect);
 			BOX_LABEL(HoverRect, Section, "Hover Messages", 40.0f, 10.0f);
 			BUTTON(HoverRect, Button, 20.0f, &g_Config.m_ClHoverMessages, "Hover Messages", g_Config.m_ClHoverMessages);
@@ -378,7 +374,7 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 
 			CUIRect DuckRect;
 			// Duck Settings Box
-			DRAW_BOX(RightSection, DuckRect, 140.0f, defaultCol, 10.0f);
+			DRAW_BOX(RightSection, DuckRect, 140.0f, DefaultCol, 10.0f);
 			s_ScrollRegion.AddRect(DuckRect);
 			BOX_LABEL(DuckRect, Section, "Duck Settings", 40.0f, 10.0f);
 			BUTTON(DuckRect, Button, 20.0f, &g_Config.m_ClShowFlags, "Show Nameplates Flags (Deep/Jetpack/etc)", g_Config.m_ClShowFlags);
@@ -395,14 +391,15 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 
 			CUIRect ScoreboardRect;
 			// Scoreboard Settings Box
-			DRAW_BOX(RightSection, ScoreboardRect, 140.0f, defaultCol, 10.0f);
+			DRAW_BOX(RightSection, ScoreboardRect, 140.0f, DefaultCol, 10.0f);
 			s_ScrollRegion.AddRect(ScoreboardRect);
 			BOX_LABEL(ScoreboardRect, Section, "Scoreboard Settings", 40.0f, 10.0f);
 			static CButtonContainer s_FoeColor, s_FriendColor;
-			ColorRGBA DefaultCol = ColorRGBA(1.0f, 1.0f, 1.0f, 1.f);
-			COLORPICKER(s_FoeColor, ScoreboardRect, "Foe Color In Scoreboard", &g_Config.m_ClFoeColor, DefaultCol);
-			COLORPICKER(s_FriendColor, ScoreboardRect, "Friend Color In Scoreboard", &g_Config.m_ClFriendColor, DefaultCol);
-
+			{
+				ColorRGBA DefaulCol = ColorRGBA(1.0f, 1.0f, 1.0f, 1.f);
+				COLORPICKER(s_FoeColor, ScoreboardRect, "Foe Color In Scoreboard", &g_Config.m_ClFoeColor, DefaulCol);
+				COLORPICKER(s_FriendColor, ScoreboardRect, "Friend Color In Scoreboard", &g_Config.m_ClFriendColor, DefaulCol);
+			}
 			CKeyInfo Key;
 			FIND_KEY_BINDING(Key, "toggle_scoreboard_menu");
 
@@ -431,11 +428,11 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 
 			if(g_Config.m_ClFocusMode)
 			{
-				DRAW_BOX(RightSection, FocusModeRect, 180.0f, defaultCol, 10.0f);
+				DRAW_BOX(RightSection, FocusModeRect, 180.0f, DefaultCol, 10.0f);
 			}
 			else
 			{
-				DRAW_BOX(RightSection, FocusModeRect, 80.0f, defaultCol, 10.0f);
+				DRAW_BOX(RightSection, FocusModeRect, 80.0f, DefaultCol, 10.0f);
 			}
 
 			s_ScrollRegion.AddRect(FocusModeRect);
@@ -453,15 +450,15 @@ void CMenus::RenderSettingsPulse(CUIRect MainView)
 			END_LABEL(RightSection);
 
 			CUIRect CursorModeRect;
-			DRAW_BOX(RightSection, CursorModeRect, 140.0f, defaultCol, 10.0f);
+			DRAW_BOX(RightSection, CursorModeRect, 140.0f, DefaultCol, 10.0f);
 			s_ScrollRegion.AddRect(CursorModeRect);
 			BOX_LABEL(CursorModeRect, Section, "Cursor Settings", 40.0f, 10.0f);
 			SCROLLBAR(CursorModeRect, Button, 20.0f, &g_Config.m_ClPlayerIdleAuraTimer, 2, 30, "Aura Timer (seconds)"); //#define SCROLLBAR(section, button, height, value, min, max, text) \
 
 
-			float multiplier = g_Config.m_ClWeaponCursorSize / 64.0f;
+			float Multiplier = g_Config.m_ClWeaponCursorSize / 64.0f;
 			char aMultiplierText[16];
-			str_format(aMultiplierText, sizeof(aMultiplierText), "  (%.1fx)", multiplier);
+			str_format(aMultiplierText, sizeof(aMultiplierText), "  (%.1fx)", Multiplier);
 			CursorModeRect.HSplitTop(20.0f, &Button, &CursorModeRect);
 			Ui()->DoScrollbarOption(&g_Config.m_ClWeaponCursorSize, &g_Config.m_ClWeaponCursorSize, &Button, Localize("Cursor scaling"), 16, 128, &CUi::ms_LinearScrollbarScale, 0, aMultiplierText);
 
