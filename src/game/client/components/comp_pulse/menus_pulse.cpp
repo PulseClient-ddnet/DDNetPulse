@@ -924,7 +924,7 @@ void CMenus::RenderCrossChat(CUIRect MainView)
     static int s_CommandIndex = 0;
     static std::vector<std::string> s_Commands = {"/help", "/kick", "/ban", "/me", "/whisper"};
 
-    // === ИНИЦИАЛИЗАЦИЯ ===
+    // ===  ===
     if(!s_Initialized)
     {
         s_Initialized = true;
@@ -938,6 +938,8 @@ void CMenus::RenderCrossChat(CUIRect MainView)
             str_copy(aBuf, "Try again later");
 
         GameClient()->m_WebSocket.m_WebSocketChat.AddMessage(aBuf, ColorRGBA(0.0f, 1.0f, 0.0f, 1.0f), "System: ");
+    	//TODO:Beta-test message
+        GameClient()->m_WebSocket.m_WebSocketChat.AddMessage("This part is still under a beta test, please let client developer know when you facing a problems...", ColorRGBA(1.0f, 1.0f, 0.0f, 1.0f), "Caution: ");
     }
 
     MainView.Draw(ColorRGBA(0, 0, 0, 0.5f), IGraphics::CORNER_ALL, 5.f);
