@@ -918,13 +918,11 @@ void CMenus::RenderCrossChat(CUIRect MainView)
     static CLineInputBuffered<256> s_ChatInput;
     static int s_LastMsgCount = 0;
 
-    // Для popup команд
     static bool s_ShowCommandPopup = false;
     static std::vector<std::string> s_FilteredCommands;
     static int s_CommandIndex = 0;
     static std::vector<std::string> s_Commands = {"/help", "/kick", "/ban", "/me", "/whisper"};
 
-    // ===  ===
     if(!s_Initialized)
     {
         s_Initialized = true;
@@ -944,9 +942,10 @@ void CMenus::RenderCrossChat(CUIRect MainView)
 
     MainView.Draw(ColorRGBA(0, 0, 0, 0.5f), IGraphics::CORNER_ALL, 5.f);
 
-    CUIRect ChatView, InputBar, LeftBar;
+    CUIRect ChatView, InputBar, LeftBar, SettingsBar;
     MainView.HSplitBottom(40.0f, &ChatView, &InputBar);
     ChatView.VSplitLeft(ChatView.w / 5, &LeftBar, &ChatView);
+    LeftBar.HSplitTop(LeftBar.h / 1.2 , &LeftBar, &SettingsBar);
 
     LeftBar.Margin(10.0f, &LeftBar);
     ChatView.Margin(10.0f, &ChatView);
@@ -1007,7 +1006,6 @@ void CMenus::RenderCrossChat(CUIRect MainView)
         s_ScrollRegionPlayers.End();
     }
 
-    // MSG
     static CScrollRegion s_ScrollRegion;
     vec2 ScrollOffset(0.0f, 0.0f);
     CScrollRegionParams ScrollParams;
@@ -1118,7 +1116,6 @@ void CMenus::RenderCrossChat(CUIRect MainView)
     }
     else
     {
-        // === ОТПРАВКА СООБЩЕНИЯ ===
         if(Input()->KeyPress(KEY_RETURN) || Input()->KeyPress(KEY_KP_ENTER))
         {
             if(pText && pText[0])
@@ -1157,7 +1154,6 @@ void CMenus::RenderCrossChat(CUIRect MainView)
         }
     }
 
-    // === РЕНДЕР POPUP КОМАНД ===
     if(s_ShowCommandPopup && !s_FilteredCommands.empty())
     {
         CUIRect PopupRect = InputBar;

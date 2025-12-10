@@ -38,23 +38,29 @@ void CWebSocketChat::HandleTypingStop(sio::event &ev)
 
 void CWebSocketChat::HandleSkinUpdate(sio::event &ev)
 {
-    auto Data = ev.get_message();
-    if(!Data || Data->get_flag() != sio::message::flag_object)
-        return;
+	auto Data = ev.get_message();
+	if(!Data || Data->get_flag() != sio::message::flag_object)
+		return;
 
-    auto Map = Data->get_map();
-    std::string Nickname = Map["nickname"]->get_string();
+	auto Map = Data->get_map();
+	std::string Nickname = Map["nickname"]->get_string();
 
-    SPlayerSkin Skin;
-    Skin.m_Name = Map.contains("skin_name") ? Map["skin_name"]->get_string() : "";
-    Skin.m_BackupName = "default";
-    Skin.m_CustomColors = Map.contains("use_custom_color") ? Map["use_custom_color"]->get_bool() : false;
-    Skin.m_BodyColor = Map.contains("body_color") ? std::stoi(Map["body_color"]->get_string()) : 0;
-    Skin.m_FeetColor = Map.contains("feet_color") ? std::stoi(Map["feet_color"]->get_string()) : 0;
+	std::lock_guard<std::mutex> lock(m_OnlinePlayersMutex);
 
-    std::lock_guard<std::mutex> lock(m_PlayerSkinsMutex);
-    m_PlayerSkins[Nickname] = Skin;
+	for(auto &Player : m_OnlinePlayers)
+	{
+		if(Player.m_Name == Nickname)
+		{
+			Player.m_Skin.m_Name = Map["skin_name"]->get_string();
+			Player.m_Skin.m_BackupName = Map["skin_name"]->get_string();
+			Player.m_Skin.m_CustomColors = Map["use_custom_color"]->get_bool();
+			Player.m_Skin.m_BodyColor = std::stoi(Map["body_color"]->get_string());
+			Player.m_Skin.m_FeetColor = std::stoi(Map["feet_color"]->get_string());
+			break;
+		}
+	}
 }
+
 
 void CWebSocketChat::HandleChatMessage(sio::event &ev)
 {
@@ -66,13 +72,18 @@ void CWebSocketChat::HandleChatMessage(sio::event &ev)
     std::string Nickname = Map["nickname"]->get_string();
     std::string Message = Map["message"]->get_string();
 
-    SPlayerSkin Skin;
-    {
-        std::lock_guard<std::mutex> lock(m_PlayerSkinsMutex);
-        auto it = m_PlayerSkins.find(Nickname);
-        if(it != m_PlayerSkins.end())
-            Skin = it->second;
-    }
+	SPlayerSkin Skin;
+	{
+		std::lock_guard<std::mutex> lock(m_OnlinePlayersMutex);
+    	for(const auto &P : m_OnlinePlayers)
+    	{
+    		if(P.m_Name == Nickname)
+    		{
+    			Skin = P.m_Skin;
+    			break;
+    		}
+    	}
+	}
 
     ColorRGBA MsgColor(1.0f, 1.0f, 1.0f, 1.0f);
     if(Map.contains("color"))
