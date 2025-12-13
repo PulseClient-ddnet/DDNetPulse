@@ -114,6 +114,7 @@ public:
 	int LoadOpusFromMem(const void *pData, unsigned DataSize, bool ForceLoad, const char *pContextName) override REQUIRES(!m_SoundLock);
 	int LoadWVFromMem(const void *pData, unsigned DataSize, bool ForceLoad, const char *pContextName) override REQUIRES(!m_SoundLock);
 	void UnloadSample(int SampleId) override REQUIRES(!m_SoundLock);
+	void UnloadAllSamples() override REQUIRES(!m_SoundLock);
 
 	float GetSampleTotalTime(int SampleId) override REQUIRES(!m_SoundLock); // in s
 	float GetSampleCurrentTime(int SampleId) override REQUIRES(!m_SoundLock); // in s

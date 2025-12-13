@@ -77,6 +77,7 @@ public:
 				"assets/hud",
 				"assets/particles",
 				"audio",
+				"audio_packs",
 				"communityicons",
 				"downloadedmaps",
 				"downloadedskins",

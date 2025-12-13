@@ -26,6 +26,8 @@ MACRO_CONFIG_INT(ClCustomConsoleAlpha, p_custom_console_alpha, 100, 0, 100, CFGF
 MACRO_CONFIG_INT(ClCustomConsoleRconAlpha, p_custom_console_rcon_alpha, 100, 0, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "RCON console background alpha")
 MACRO_CONFIG_INT(ClCustomConsoleRconFading, p_custom_console_rcon_fading, 0, 0, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "RCON console background fading")
 
+MACRO_CONFIG_STR(ClAudioPack, cl_audio_pack, 256, "", CFGFLAG_SAVE | CFGFLAG_CLIENT, "Custom audio pack folder name (empty for default, place packs in $USERDIR/audio_packs/<name>/audio/)")
+
 MACRO_CONFIG_INT(ClFastInp, p_fast_input, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "")
 MACRO_CONFIG_INT(ClFastInpOthers, p_fast_input_others, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "")
 
@@ -48,7 +50,6 @@ MACRO_CONFIG_INT(ClLaserGlowIntensity, p_laser_ench, 0, 0, 100, CFGFLAG_CLIENT |
 MACRO_CONFIG_INT(ClBetterLasers, p_better_laser, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "")
 
 // All DClient variables are defined here
-
 MACRO_CONFIG_INT(ClShowFlags, cl_show_flags, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Tee stats (Deep/Jetpack/etc)")
 MACRO_CONFIG_INT(ClShowFlagsSize, cl_show_flags_size, 30, -50, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Size of tee stat indicators")
 MACRO_CONFIG_INT(ClShowDJ, cl_show_jumps, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show remaining double jumps of a tee")

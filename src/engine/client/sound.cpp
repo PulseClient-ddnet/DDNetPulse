@@ -667,6 +667,31 @@ void CSound::UnloadSample(int SampleId)
 	}
 }
 
+void CSound::UnloadAllSamples()
+{
+	const CLockScope LockScope(m_SoundLock);
+	
+	for(auto &Voice : m_aVoices)
+	{
+		Voice.m_pSample = nullptr;
+	}
+
+	for(size_t i = 0; i < std::size(m_aSamples); ++i)
+	{
+		CSample &Sample = m_aSamples[i];
+		if(Sample.IsLoaded())
+		{
+			free(Sample.m_pData);
+			Sample.m_pData = nullptr;
+		}
+
+		Sample.m_Index = i;
+		Sample.m_NextFreeSampleIndex = (i < std::size(m_aSamples) - 1) ? i + 1 : SAMPLE_INDEX_FULL;
+	}
+	
+	m_FirstFreeSampleIndex = 0;
+}
+
 float CSound::GetSampleTotalTime(int SampleId)
 {
 	dbg_assert(SampleId >= 0 && SampleId < NUM_SAMPLES, "SampleId invalid");

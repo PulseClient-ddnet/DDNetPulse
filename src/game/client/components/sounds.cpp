@@ -3,9 +3,13 @@
 
 #include "sounds.h"
 
+#include <base/system.h>
+
 #include <engine/engine.h>
 #include <engine/shared/config.h>
+#include <engine/shared/console.h>
 #include <engine/sound.h>
+#include <engine/storage.h>
 
 #include <generated/client_data.h>
 
@@ -21,8 +25,24 @@ CSoundLoading::CSoundLoading(CGameClient *pGameClient, bool Render) :
 	Abortable(true);
 }
 
+static void ConchainAudioPack(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData)
+{
+	pfnCallback(pResult, pCallbackUserData);
+	CSounds *pSounds = (CSounds *)pUserData;
+	pSounds->ReloadSounds();
+}
+
+void CSounds::OnConsoleInit()
+{
+	Console()->Chain("cl_audio_pack", ConchainAudioPack, this);
+}
+
 void CSoundLoading::Run()
 {
+	IStorage *pStorage = m_pGameClient->Storage();
+	char aCustomPath[IO_MAX_PATH_LENGTH];
+	bool UseCustomAudioPack = g_Config.m_ClAudioPack[0] != '\0';
+
 	for(int s = 0; s < g_pData->m_NumSounds; s++)
 	{
 		const char *pLoadingCaption = Localize("Loading DDNet Client");
@@ -30,12 +50,28 @@ void CSoundLoading::Run()
 
 		for(int i = 0; i < g_pData->m_aSounds[s].m_NumSounds; i++)
 		{
-			if(State() == IJob::STATE_ABORTED)
+			if(State() == STATE_ABORTED)
 				return;
 
-			int Id = m_pGameClient->Sound()->LoadWV(g_pData->m_aSounds[s].m_aSounds[i].m_pFilename);
+			int Id = -1;
+			const char *pFilename = g_pData->m_aSounds[s].m_aSounds[i].m_pFilename;
+
+			if(UseCustomAudioPack)
+			{
+				str_format(aCustomPath, sizeof(aCustomPath), "audio_packs/%s/%s", g_Config.m_ClAudioPack, pFilename);
+				if(pStorage->FileExists(aCustomPath, IStorage::TYPE_SAVE))
+				{
+					Id = m_pGameClient->Sound()->LoadWV(aCustomPath, IStorage::TYPE_SAVE);
+				}
+			}
+
+			// default
+			if(Id == -1)
+			{
+				Id = m_pGameClient->Sound()->LoadWV(pFilename);
+			}
+
 			g_pData->m_aSounds[s].m_aSounds[i].m_Id = Id;
-			// try to render a frame
 			if(m_Render)
 				m_pGameClient->m_Menus.RenderLoading(pLoadingCaption, pLoadingContent, 0);
 		}
@@ -225,6 +261,33 @@ bool CSounds::IsPlaying(int SetId)
 		if(pSet->m_aSounds[i].m_Id != -1 && Sound()->IsPlaying(pSet->m_aSounds[i].m_Id))
 			return true;
 	return false;
+}
+
+void CSounds::ReloadSounds()
+{
+	Sound()->StopAll();
+	ClearQueue();
+	Sound()->UnloadAllSamples();
+
+	for(int s = 0; s < g_pData->m_NumSounds; s++)
+	{
+		for(int i = 0; i < g_pData->m_aSounds[s].m_NumSounds; i++)
+		{
+			g_pData->m_aSounds[s].m_aSounds[i].m_Id = -1;
+		}
+	}
+
+	if(g_Config.m_ClThreadsoundloading)
+	{
+		m_pSoundJob = std::make_shared<CSoundLoading>(GameClient(), false);
+		GameClient()->Engine()->AddJob(m_pSoundJob);
+		m_WaitForSoundJob = true;
+	}
+	else
+	{
+		CSoundLoading(GameClient(), false).Run();
+		m_WaitForSoundJob = false;
+	}
 }
 
 ISound::CVoiceHandle CSounds::PlaySample(int Channel, int SampleId, int Flags, float Volume)

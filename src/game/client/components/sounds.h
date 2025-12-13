@@ -56,6 +56,7 @@ public:
 	};
 
 	int Sizeof() const override { return sizeof(*this); }
+	void OnConsoleInit() override;
 	void OnInit() override;
 	void OnReset() override;
 	void OnStateChange(int NewState, int OldState) override;
@@ -68,6 +69,8 @@ public:
 	void PlayAndRecord(int Channel, int SetId, float Volume, vec2 Position);
 	void Stop(int SetId);
 	bool IsPlaying(int SetId);
+
+	void ReloadSounds();
 
 	ISound::CVoiceHandle PlaySample(int Channel, int SampleId, int Flags, float Volume);
 	ISound::CVoiceHandle PlaySampleAt(int Channel, int SampleId, int Flags, float Volume, vec2 Position);

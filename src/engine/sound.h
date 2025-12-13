@@ -70,6 +70,7 @@ public:
 	virtual int LoadOpusFromMem(const void *pData, unsigned DataSize, bool ForceLoad, const char *pContextName) = 0;
 	virtual int LoadWVFromMem(const void *pData, unsigned DataSize, bool ForceLoad, const char *pContextName) = 0;
 	virtual void UnloadSample(int SampleId) = 0;
+	virtual void UnloadAllSamples() = 0;
 
 	virtual float GetSampleTotalTime(int SampleId) = 0; // in s
 	virtual float GetSampleCurrentTime(int SampleId) = 0; // in s
