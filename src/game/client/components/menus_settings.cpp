@@ -1815,6 +1815,82 @@ void CMenus::RenderSettingsSound(CUIRect MainView)
 	if(DoButton_CheckBox(&g_Config.m_SndHighlight, Localize("Enable highlighted chat sound"), g_Config.m_SndHighlight, &Button))
 		g_Config.m_SndHighlight ^= 1;
 
+	// Audio pack selection
+	{
+		MainView.HSplitTop(10.0f, nullptr, &MainView);
+		MainView.HSplitTop(20.0f, &Button, &MainView);
+		Ui()->DoLabel(&Button, Localize("Audio Pack"), 14.0f, TEXTALIGN_ML);
+
+		MainView.HSplitTop(5.0f, nullptr, &MainView);
+		CUIRect ListBox;
+		MainView.HSplitTop(150.0f, &ListBox, &MainView);
+
+		static std::vector<std::string> s_vAudioPacks;
+		static bool s_AudioPacksScanned = false;
+		static int s_LastScanTime = 0;
+		int CurrentTime = time_get();
+		// Rescan every 2 seconds
+		if(!s_AudioPacksScanned || CurrentTime - s_LastScanTime > time_freq() * 2)
+		{
+			s_AudioPacksScanned = true;
+			s_LastScanTime = CurrentTime;
+			s_vAudioPacks.clear();
+			s_vAudioPacks.emplace_back("");
+
+			struct SAudioPackScanData
+			{
+				std::vector<std::string> *m_pPacks;
+				IStorage *m_pStorage;
+			} ScanData;
+			ScanData.m_pPacks = &s_vAudioPacks;
+			ScanData.m_pStorage = Storage();
+
+			auto AudioPackScan = [](const char *pName, int IsDir, int Type, void *pUser) -> int {
+				if(!IsDir || pName[0] == '.')
+					return 0;
+				SAudioPackScanData *pData = static_cast<SAudioPackScanData *>(pUser);
+				char aBuf[IO_MAX_PATH_LENGTH];
+				str_format(aBuf, sizeof(aBuf), "audio_packs/%s/audio", pName);
+				if(pData->m_pStorage->FolderExists(aBuf, IStorage::TYPE_SAVE))
+				{
+					pData->m_pPacks->push_back(std::string(pName));
+				}
+				return 0;
+			};
+
+			Storage()->ListDirectory(IStorage::TYPE_SAVE, "audio_packs", AudioPackScan, &ScanData);
+		}
+
+		static CListBox s_AudioPackListBox;
+		int OldSelected = -1;
+		for(size_t i = 0; i < s_vAudioPacks.size(); i++)
+		{
+			if(str_comp(s_vAudioPacks[i].c_str(), g_Config.m_ClAudioPack) == 0)
+			{
+				OldSelected = i;
+				break;
+			}
+		}
+
+		s_AudioPackListBox.DoStart(20.0f, s_vAudioPacks.size(), 1, 3, OldSelected, &ListBox);
+		for(size_t i = 0; i < s_vAudioPacks.size(); i++)
+		{
+			const CListboxItem Item = s_AudioPackListBox.DoNextItem(&s_vAudioPacks[i], OldSelected >= 0 && (size_t)OldSelected == i);
+			if(!Item.m_Visible)
+				continue;
+
+			const char *pDisplayName = s_vAudioPacks[i].empty() ? Localize("Default") : s_vAudioPacks[i].c_str();
+			Ui()->DoLabel(&Item.m_Rect, pDisplayName, 12.0f, TEXTALIGN_ML);
+		}
+
+		const int NewSelected = s_AudioPackListBox.DoEnd();
+		if(OldSelected != NewSelected && NewSelected >= 0 && (size_t)NewSelected < s_vAudioPacks.size())
+		{
+			str_copy(g_Config.m_ClAudioPack, s_vAudioPacks[NewSelected].c_str(), sizeof(g_Config.m_ClAudioPack));
+				GameClient()->m_Sounds.ReloadSounds();
+		}
+	}
+
 	// volume slider
 	{
 		MainView.HSplitTop(5.0f, nullptr, &MainView);
